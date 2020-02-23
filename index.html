@@ -1,7 +1,98 @@
 <!DOCTYPE html>
 <html>
-	<head>
-	</head>
-	<body>
-	</body>
+
+<head>
+	<title>Bit Breaker</title>
+	<meta charset="UTF-8"/>
+	<script src="js/jquery.js"></script>
+	<script src="js/news.js"></script>
+	<script src="js/nav.js"></script>
+	<script src="js/game2.js"></script>
+	<link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+	<center>
+		<div class=news>
+			<h4 style="margin:0;padding:0;">Hello there.</h4>
+		</div>
+		<h1>You have <span id="bitcount">1 byte</span>.</h1>
+		<!-- deprecated 
+		<h4>Tickspeed: <span id="tickspeed">1.000</span> / second</h4>
+		<h4>Reduce the tick speed interval by 11%.</h4>
+		<button onclick="Game.buyTickspeedUpgrade()">Buy for 1 byte.</button>
+		<br><br> -->
+		
+		<nav>
+			<button onclick="Nav.navigate('generators')">Generators</button>
+			<button onclick="Nav.navigate('upgrades')">Upgrades</button>
+			<button onclick="Nav.navigate('achievements')">Achievements</button>
+			<button onclick="Nav.navigate('challenges')">Challenges</button>
+			<button onclick="Nav.navigate('stats')">Stats</button>
+			<button onclick="Nav.navigate('options')">Options</button>
+			<button onclick="Nav.navigate('about')">About</button>
+		</nav>
+
+		<div class="section" id="generators">
+		</div>
+		<div class="section" id="upgrades" hidden="1">
+			<h1>Upgrades</h1>
+			<div class="upgrade">
+				<h2>Incremental Reflux</h2>
+				<p>Add an additional +1 multiplier to the left side of the generator.</p>
+				<p>Cost: 40 KB.</p>
+			</div>
+			<br>
+			<div class="upgrade">
+				<h2>Incremental Overdrive</h2>
+				<p>Change the multiplier from x+(x^0.5) => x+(x^0.75) to the right side of the generator.</p>
+				<p>Cost: 100 KB.</p>
+			</div>
+			<p>Doesn't work yet :(</p>
+		</div>
+		<div class="section" id="achievements" hidden="1">
+			<h1>Achievements</h1>
+			<p>Nothing here yet :(</p>
+		</div>
+		<div class="section" id="challenges" hidden="1">
+			<h1>Challenges</h1>
+			<div class="challenge">
+				<h2>Challenge 1</h2>
+				<p>All generator mutipliers become additions.</p>
+				<p>(g1 * g2 * g3 => g1 + g2 + g3)</p>
+				<h3>Goal: 1 YB</h3>
+				<p><strong>Reward:</strong> x^1.5 to all generators</p>
+			</div>
+			<p>Nothing here yet :(</p>
+		</div>
+		<div class="section" id="stats" hidden="1">
+			<h1>Statistics</h1>
+			<p>Nothing here yet :(</p>
+		</div>
+		<div class="section" id="options" hidden="1">
+			<h1>Options</h1>
+			<p>Nothing here yet :(</p>
+		</div>
+		<div class="section" id="about" hidden="1">
+			<h1>About</h1>
+			<p><strong>Bit Breaker</strong> is an incremental idle game with tons of automation.<br>
+			This build however is currently in an early alpha! You can help by testing it out and giving me some feedback.<br>
+			This game is intended to be <strong>free.</strong> Free as in should there ever be a mobile game made, there won't be any room for
+			pay to progress stuff.
+			<br>
+			Although if you'd like, you can still donate! (obviously not right now since the game is at an early alpha stage)
+			</p>
+			<button id="donate" onclick="alert('It does not work, why did you click on it?')">Donate (doesn't work yet)</button>
+			<br>
+			<h5>Bit Breaker is a game by Jasper Fritse.</h5>
+			<a href="https://github.com/jasperfr/">GitHub</a>
+			<h5>jQuery is &copy; the jQuery Foundation. <a href="https://jquery.org/license/">License</a></h5>
+		</div>
+	<p style="position:fixed;bottom: 10px;left:0;text-align:center;width:100%;">
+		You're playing a very early alpha of the game! Nothing works as it should.
+	</p>
+	</center>
+
+</body>
+
 </html>
