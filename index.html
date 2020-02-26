@@ -5,74 +5,136 @@
 	<title>Bit Breaker</title>
 	<meta charset="UTF-8"/>
 	<script src="js/jquery.js"></script>
+	<script src="js/jquery-ui-1.12.1.custom/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
 	<script src="js/news.js"></script>
 	<script src="js/nav.js"></script>
 	<script src="js/game2.js"></script>
+	<link rel="stylesheet" href="js/jquery-ui-1.12.1.custom/jquery-ui-1.12.1.custom/jquery-ui.css" />
 	<link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 	<center>
-		<div class=news>
+		<div class="news">
 			<h4 style="margin:0;padding:0;">Hello there.</h4>
 		</div>
 		<h1>You have <span id="bitcount">1 byte</span>.</h1>
-		<!-- deprecated 
-		<h4>Tickspeed: <span id="tickspeed">1.000</span> / second</h4>
-		<h4>Reduce the tick speed interval by 11%.</h4>
-		<button onclick="Game.buyTickspeedUpgrade()">Buy for 1 byte.</button>
-		<br><br> -->
 		
 		<nav>
 			<button onclick="Nav.navigate('generators')">Generators</button>
-			<button onclick="Nav.navigate('upgrades')">Upgrades</button>
 			<button onclick="Nav.navigate('achievements')">Achievements</button>
-			<button onclick="Nav.navigate('challenges')">Challenges</button>
-			<button onclick="Nav.navigate('stats')">Stats</button>
+			<!--<button onclick="Nav.navigate('stats')">Stats</button>-->
 			<button onclick="Nav.navigate('options')">Options</button>
 			<button onclick="Nav.navigate('about')">About</button>
 		</nav>
 
-		<div class="section" id="generators">
+		<div class="section widget" id="generators" hidden="0">
+			<h1>Generators</h1>
 		</div>
-		<div class="section" id="upgrades" hidden="1">
-			<h1>Upgrades</h1>
-			<div class="upgrade">
-				<h2>Incremental Reflux</h2>
-				<p>Add an additional +1 multiplier to the left side of the generator.</p>
-				<p>Cost: 40 KB.</p>
-			</div>
-			<br>
-			<div class="upgrade">
-				<h2>Incremental Overdrive</h2>
-				<p>Change the multiplier from x+(x^0.5) => x+(x^0.75) to the right side of the generator.</p>
-				<p>Cost: 100 KB.</p>
-			</div>
-			<p>Doesn't work yet :(</p>
-		</div>
+
 		<div class="section" id="achievements" hidden="1">
 			<h1>Achievements</h1>
-			<p>Nothing here yet :(</p>
-		</div>
-		<div class="section" id="challenges" hidden="1">
-			<h1>Challenges</h1>
-			<div class="challenge">
-				<h2>Challenge 1</h2>
-				<p>All generator mutipliers become additions.</p>
-				<p>(g1 * g2 * g3 => g1 + g2 + g3)</p>
-				<h3>Goal: 1 YB</h3>
-				<p><strong>Reward:</strong> x^1.5 to all generators</p>
+			<p>Achievements give a multiplier to generators. Currently x1.0 .</p>
+			<div class="achievements-wrapper">
+
+				<div id="ac-first-of-many" class="achievement locked tooltip">
+					<span class="tooltiptext">Buy your first generator.</span>
+					<h2>The first of many</h2>
+				</div>
+
+				<div id="ac-electric-boogaloo" class="achievement locked tooltip">
+					<span class="tooltiptext">Buy your second generator.</span>
+					<h2>Electric Boogaloo</h2>
+				</div>
+
+				<div id="ac-half-life-three" class="achievement locked tooltip">
+					<span class="tooltiptext">Buy a third generator.</span>
+					<h2>HL3 Confirmed</h2>
+				</div>
+
+				<div id="ac-that-is-enough" class="achievement locked tooltip">
+					<span class="tooltiptext">Buy a fourth generator.</span>
+					<h2>That's Enough</h2>
+				</div>
+
+				<div id="ac-that-is-fast" class="achievement locked tooltip">
+					<span class="tooltiptext">Have a generator's speed at 1/tick.</span>
+					<h2>That's fast.</h2>
+				</div>
+
+				<div id="ac-that-is-faster" class="achievement locked tooltip">
+					<span class="tooltiptext">Have a generators's speed at 100/tick.</span>
+					<h2>That's faster!</h2>
+				</div>
+
+				<div id="ac-sweet-ascension" class="achievement locked tooltip">
+					<span class="tooltiptext">Ascend a generator.</span>
+					<h2>Sweet Ascension</h2>
+				</div>
+
+				<div id="ac-multiplication-era" class="achievement locked tooltip">
+					<span class="tooltiptext">Buy a multiplicator.</span>
+					<h2>Multiplication Era</h2>
+				</div>
+
+				<div id="ac-multi-multi" class="achievement locked tooltip">
+					<span class="tooltiptext">Buy another multiplicator.<br>Multiplicators give a multiplicative boost, e.g. g0 * m0 * m1.</span>
+					<h2>Multiplying Multipliers</h2>
+				</div>
+
+				<div id="ac-multhree" class="achievement locked tooltip">
+					<span class="tooltiptext">Buy a third multiplicator.</span>
+					<h2>Mul three plication</h2>
+				</div>
+
+				<div id="ac-multi-4" class="achievement locked tooltip">
+					<span class="tooltiptext">Buy a fourth multiplicator. Reward: Multiplicators are 1.2x more effective.</span>
+					<h2>Power of 4</h2>
+				</div>
 			</div>
-			<p>Nothing here yet :(</p>
+			
 		</div>
-		<div class="section" id="stats" hidden="1">
-			<h1>Statistics</h1>
-			<p>Nothing here yet :(</p>
-		</div>
-		<div class="section" id="options" hidden="1">
+
+		<!-- Options -->
+		<div class="section widget" id="options" hidden="1">
 			<h1>Options</h1>
-			<p>Nothing here yet :(</p>
+			<fieldset>
+				<legend>Title tab</legend>
+				<label for="title-tab-title">Title</label>
+				<input type="radio" name="title-tab" id="title-tab-title" checked>
+				<label for="title-tab-bytecount">Byte count</label>
+				<input type="radio" name="title-tab" id="title-tab-bytecount">
+			</fieldset>
+			<br>
+			<fieldset>
+				<legend>Saving</legend>
+				<label for="saving-title">Save</label>
+				<input type="radio" name="saving" id="saving-title">
+				<label for="saving-export">Export</label>
+				<input type="radio" name="saving" id="saving-export">
+				<label for="saving-import">Import</label>
+				<input type="radio" name="saving" id="saving-import">
+			</fieldset>
+			<br>
+			<fieldset>
+				<legend>Language</legend>
+				<label for="lang-en">English</label>
+				<input type="radio" name="lang" id="lang-en" checked>
+				<label for="lang-nl">Nederlands</label>
+				<input type="radio" name="lang" id="lang-nl">
+				<label for="lang-jp">日本語</label>
+				<input type="radio" name="lang" id="lang-jp">
+			</fieldset>
+			<br>
+			<fieldset>
+				<legend>Theme</legend>
+				<label for="theme-light">Light</label>
+				<input type="radio" name="theme" id="theme-light">
+				<label for="theme-dark">Dark</label>
+				<input type="radio" name="theme" id="theme-dark" checked>
+			</fieldset>
 		</div>
+		
 		<div class="section" id="about" hidden="1">
 			<h1>About</h1>
 			<p><strong>Bit Breaker</strong> is an incremental idle game with tons of automation.<br>
@@ -86,11 +148,8 @@
 			<br>
 			<h5>Bit Breaker is a game by Jasper Fritse.</h5>
 			<a href="https://github.com/jasperfr/">GitHub</a>
-			<h5>jQuery is &copy; the jQuery Foundation. <a href="https://jquery.org/license/">License</a></h5>
+			<h5>jQuery and jQueryUI are &copy; the jQuery Foundation. <a href="https://jquery.org/license/">License</a></h5>
 		</div>
-	<p style="position:fixed;bottom: 10px;left:0;text-align:center;width:100%;">
-		You're playing a very early alpha of the game! Nothing works as it should.
-	</p>
 	</center>
 
 </body>

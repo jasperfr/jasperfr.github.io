@@ -1,6 +1,61 @@
+/* 4 colors would be nice.
+Dark theme:
+    #ffffff
+    #fdf3e2
+    #a87e7c
+    #555
+*/
+
+#generators {
+    display: flex;
+    flex-direction: column !important;
+    align-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.output {
+    font-size: 20px;
+}
+
+fieldset {
+    border-color: #a87e7c;
+    border-style: dotted;
+    font-size: 16px;
+    display: flex;
+    max-width: 600px;
+    font-weight: 900;
+}
+fieldset label {
+    width:100%;
+    background-color: #222 !important;
+    border: 2px solid #fdf3e2 !important;
+    color: white;
+    border-radius: 0px !important;;
+    transition: background-color 500ms, color 500ms;
+}
+fieldset label:not(.ui-checkboxradio-checked) {
+    color: #ffffff;
+}
+fieldset label:not(.ui-checkboxradio-checked):hover {
+    background-color: #a87e7c !important;
+}
+fieldset .ui-checkboxradio-checked {
+    background-color: #fdf3e2 !important;
+    border: 2px solid #fdf3e2 !important;
+    color: #222 !important;
+}
+.ui-visual-focus {
+    box-shadow: none !important;
+}
+
 body {
     background-color: #222;
     color: white;
+}
+
+*  {
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Tooltip container */
@@ -8,6 +63,7 @@ body {
   position: relative;
   display: inline-block;
 }
+
 
 /* Tooltip text */
 .tooltip .tooltiptext {
@@ -69,24 +125,41 @@ button:active, button:enabled {
 }
 
 .generator {
-    border: 1px solid white;
-    display: block;
-    width:200px;
-    height:200px;
+    display: flex;
+    flex-direction: column;
+    width:600px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+.generator .upgrades {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
 .progress {
     position: relative;
     overflow: hidden;
+    border: 2px solid white;
+    margin: 4px;
+    margin-top:8px;
+    padding:4px;
 }
 
 .pbar {
     position: absolute;
-    left: 0;
-    top: 0;
+    left:0;
+    top:0;
     width: 0%;
-    height: 20px;
-    background-color: rgba(0, 233, 116, 0.897);
+    height: 40px;
+    background: repeating-linear-gradient(-45deg,#fff,#fff 20px,#222 20px,#222 40px);
+    background-size: 200% 200%;
+    animation: loader 8s linear infinite;
+}
+@keyframes loader {
+    0% {
+        background-position: 100% 100%;
+    }
 }
 
 /* bit classes */
@@ -99,7 +172,7 @@ button:active, button:enabled {
     border-collapse: collapse;
 }
 .bit table td {
-    border-bottom: 1px solid white;
+    border-bottom: 2px solid #fdf3e2;
     height:50%;
 }
 
@@ -107,10 +180,6 @@ th {
     margin:0;
     padding:0;
     width:100px;
-}
-
-.cost {
-    border-bottom: 1px solid white;
 }
 
 td {
@@ -124,17 +193,11 @@ td {
     flex-wrap: wrap;
 }
 
-.generator {
-    margin: 20px;
-}
-
 th button {
     border: none;
     margin:0;
     padding:0;
-    border-bottom: 1px solid white;
-    border-right: 1px solid white;
-    width:100px;
+    width:100%;
     height:30px;
     box-sizing: border-box;
     font-size: 10px;
@@ -167,14 +230,38 @@ button:hover {
 }
 
 .upgrade {
-    width: 50%;
-    border: 1px solid rgb(19, 156, 219);
+    margin: 4px;
+    display: flex;
+    border: 2px solid #a87e7c;
     transition: background-color 400ms, color 400ms;
 }
+.upgrade .cost {
+    display: block;
+    width:50%;
+    text-align: center;
+    font-size: 14px;
+    border-left: 2px solid #a87e7c;
+    margin:auto;
+}
+.upgrade button {
+    width: 50%;
+    background-color: #222;
+    color: #ffffff;
+    font-size: 16px;
+    border: 2px solid #222;
+}
+.upgrade button:hover {
+    background-color: #a87e7c;
+    border: 2px solid #222;
+    color: #222;
+}
+.upgrade button .tooltiptext {
+    font-size: 12px;
+    padding: 10px;
+}
 
-.upgrade:hover {
-    color: black;
-    background-color: rgba(19, 156, 219, 0.9);
+.progress .text {
+    mix-blend-mode: difference;
 }
 
 .challenge {
@@ -190,11 +277,104 @@ button:hover {
 }
 
 .buy-gen { 
-    background-color: lime;
-    color: black;
-    border: 1px solid black;
+    background-color: #222;
+    color: white;
+    border: 2px solid #a87e7c;
     padding: 20px;
     margin: 20px;
+}
+
+.achievements-wrapper {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-block-size: 3;
+}
+
+.achievement {
+    margin: 10px;
+    display: block;
+    width:100px;
+    height:100px;
+    border: 1px solid white;
+}
+
+.tier2 {
+    border: 1px solid yellow;
+    color: yellow !important;
+}
+
+.tier3 {
+    border: 1px solid magenta;
+    color: magenta !important;
+}
+
+.tier3 .tooltiptext {
+    border: 1px solid magenta;
+    color: magenta !important;
+}
+
+.tier4 {
+    animation: pulse 5s infinite;
+}
+
+@keyframes pulse {
+    0% {border-color: red; color: red;}
+    10% {border-color: orange; color: orange}
+    20% {border-color: yellow; color: yellow}
+    30% {border-color: lime; color: lime}
+    40% {border-color: green; color: green}
+    50% {border-color: cyan; color: cyan}
+    60% {border-color: blue; color: blue}
+    70% {border-color: magenta; color : magenta}
+    80% {border-color: purple; color: purple}
+    90% {border-color: pink; color: pink}
+    100% {border-color: red; color: red}
+}
+
+.tier3 .tooltiptext {
+    border: 1px solid magenta;
+    color: magenta !important;
+}
+
+.buy-multi {
+    border: 4px solid #a87e7c;
     width: 200px;
     height: 200px;
+    margin: 20px;
+}
+
+.multiplicator {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    height: 200px;
+    border: 4px solid #0a70a0;
+    margin: 20px;
+    box-sizing: border-box;
+}
+.multiplicator .multicount {
+    height:calc(50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-bottom: 4px solid #0a70a0;
+}
+.multiplicator button {
+    border: 2px solid #222222;
+    width:100%;
+    height:96px;
+    transition: background-color 250ms, border-color 250ms, color 250ms;
+}
+.multiplicator button span {
+    font-size: 16px;
+}
+.multiplicator button:hover {
+    background-color: #0a70a0;
+    border:2px solid #222222;
+}
+
+.slow {
+    background: #fff !important;
 }
