@@ -132,14 +132,10 @@ button:active, button:enabled {
     margin-bottom: 10px;
 }
 .generator .upgrades {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
+    width: 100%;
 }
 
-.progress {
-    position: relative;
-    overflow: hidden;
+.progress th {
     border: 2px solid white;
     margin: 4px;
     margin-top:8px;
@@ -147,15 +143,13 @@ button:active, button:enabled {
 }
 
 .pbar {
-    position: absolute;
-    left:0;
-    top:0;
-    width: 0%;
-    height: 40px;
+    height: 20px;
     background: repeating-linear-gradient(-45deg,#fff,#fff 20px,#222 20px,#222 40px);
     background-size: 200% 200%;
     animation: loader 8s linear infinite;
+    border:1px solid white;
 }
+
 @keyframes loader {
     0% {
         background-position: 100% 100%;
@@ -230,25 +224,23 @@ button:hover {
 }
 
 .upgrade {
-    margin: 4px;
-    display: flex;
-    border: 2px solid #a87e7c;
-    transition: background-color 400ms, color 400ms;
+    margin-left: 4px;
+    margin-right: 4px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 .upgrade .cost {
-    display: block;
-    width:50%;
     text-align: center;
     font-size: 14px;
-    border-left: 2px solid #a87e7c;
     margin:auto;
 }
 .upgrade button {
-    width: 50%;
+    margin-top:8px;
     background-color: #222;
     color: #ffffff;
     font-size: 16px;
-    border: 2px solid #222;
+    border: 2px solid #a87e7c;
+    transition: border 500ms, background-color 500ms;
 }
 .upgrade button:hover {
     background-color: #a87e7c;

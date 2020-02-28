@@ -147,9 +147,9 @@ class Generator {
         },
         this.progress = 0.0;
         this.upgrades = {
-            value : { base : 1.0, baseprice : 2.0, costscale : 1.0, amount : 1.0, price : 2.0, purchased : 0, increment : 1.75 },
-            speed : { base : 1.0, baseprice : 2.0, costscale : 1.0, amount : 1.0, price : 2.0, purchased : 0, increment: 1.5 },
-            ascend : { base : 1.0, baseprice : 1000.0, costscale : 1.0, amount : 1.0, price : 1000.0, purchased : 0, increment : 1.05 },
+            value : { base : 1.0, baseprice : 2.0, costscale : 1.0, amount : 1.0, price : 2.0, purchased : 0, increment : 1.5 },
+            speed : { base : 1.0, baseprice : 10.0, costscale : 1.0, amount : 1.0, price : 10.0, purchased : 0, increment: 1.2 },
+            ascend : { base : 1.0, baseprice : 1000.0, costscale : 1.0, amount : 1.0, price : 1000.0, purchased : 0, increment : 2.5 },
         };
 
         // Create a button to unlock this generator.
@@ -222,7 +222,7 @@ class Generator {
         setValue(-this.upgrades.value.price);
         // Increment values
         this.upgrades.value.amount *= this.upgrades.value.increment;
-        this.upgrades.value.price *= 3 * this.upgrades.value.costscale;
+        this.upgrades.value.price *= 2 * this.upgrades.value.costscale;
         // Set HTML
         $($(this.element).find('.output')).text(`Generate ${toByteCode(this.upgrades.value.amount)}.`);
         $($(this.element).find('.cost-value')).text(toByteCode(this.upgrades.value.price));
@@ -245,10 +245,12 @@ class Generator {
 
         // Set ascension.
         this.upgrades.ascend.purchased++;
-        this.upgrades.ascend.amount *= this.upgrades.ascend.increment;
+        this.upgrades.ascend.amount += this.upgrades.ascend.increment;
         this.upgrades.ascend.price *= 1000.0;
 
         // Reset value multiplier and speed multiplier.
+        // actually just give a x2 bonus
+        /*
         this.upgrades.value.amount = this.upgrades.value.base;
         this.upgrades.value.price = this.upgrades.value.baseprice;
         this.upgrades.value.increment *= this.upgrades.ascend.increment;
@@ -260,6 +262,7 @@ class Generator {
         this.upgrades.speed.purchased = 0;
         this.upgrades.speed.costscale *= 1.03; // todo fix
         setValue(values.bytes * -0.95);
+        */
 
         // Modify the HTML element.
         $($(this.element).find('.cost-value')).text(toByteCode(this.upgrades.value.price));
