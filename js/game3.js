@@ -90,9 +90,9 @@ class Generator {
         };
         this.id = generators.length + 1;
         this.price = price;
-        this.value = { amount: 1.00, increment: 0.75 + this.id, price: 5.00, pmult: 3.00 };
-        this.speed = { amount: 1.00, increment: 0.50, price: 10.00, pmult: 5.00 };
-        this.boost = { amount: 1.00, increment: 2.00, price: 100.00, pmult: 100.00 };
+        this.value = { amount: 1.00, increment: 1.5 + (0.066 * (this.id - 1)), price: 5.00, pmult: 2.50 };
+        this.speed = { amount: 1.00, increment: 0.50 * this.id, price: 10.00, pmult: 3.33 };
+        this.boost = { amount: 1.00, increment: 1.3 + 0.2 * this.id, price: 10 * Math.pow(10, this.id), pmult: 100.00 };
         this.progress = 0.0;
 
         this.button = $('<button>')
@@ -107,12 +107,12 @@ class Generator {
     buyGenerator() {
 
         if(this.active || bytes < this.price) return;
-        bytes -= this.price;
+        setByteCount(-this.price);
         this.active = true;
 
         $(this.button).remove();
         $('#generators').append(this.html); 
-        generators.push(new Generator(this.price * 100));
+        generators.push(new Generator(this.price * 1000));
 
         $(this.elements.buttonValue).click(() => this.buyValueUpgrade());
         $(this.elements.buttonSpeed).click(() => this.buySpeedUpgrade());
@@ -126,7 +126,7 @@ class Generator {
         $(this.elements.labelSpeedTotal).text(`${this.speed.amount.toFixed(2)}×`);
         $(this.elements.labelBoostTotal).text(`${this.boost.amount.toFixed(2)}×`);
 
-        $(this.elements.labelValueIncrement).text(`+ ${this.value.increment.toFixed(2)}×`);
+        $(this.elements.labelValueIncrement).text(`×${this.value.increment.toFixed(2)}`);
         $(this.elements.labelSpeedIncrement).text(`+ ${this.speed.increment.toFixed(2)}×`);
         $(this.elements.labelBoostIncrement).text(`×${this.boost.increment.toFixed(2)}`);
 
@@ -149,11 +149,11 @@ class Generator {
         setByteCount(-this.value.price);
 
         this.value.price *= this.value.pmult;
-        this.value.amount += this.value.increment;
+        this.value.amount *= this.value.increment;
 
         $(this.elements.costValue).text(toByteCode(this.value.price));
-        $(this.elements.labelValueTotal).text(`×${this.value.amount.toFixed(2)}`);
-        $(this.elements.labelValueIncrement).text(`+ ${this.value.increment.toFixed(2)}×`);
+        $(this.elements.labelValueTotal).text(`${this.value.amount.toFixed(2)}×`);
+        $(this.elements.labelValueIncrement).text(`×${this.value.increment.toFixed(2)}`);
         this.setBytesPerSecond();
     }
     buySpeedUpgrade() {
@@ -189,7 +189,7 @@ class Generator {
             this.progress += speed; // speed amount divided by tickspeed
             if(this.progress > 100) {
                 this.progress = 0;
-                setByteCount(this.value.amount * this.boost.amount);
+                setByteCount(this.value.amount * this.boost.amount * achievementMultiplier);
             }
             $(this.elements.progressBar).css('width', `${this.progress}%`);
             $(this.elements.progressLabel).text(`${this.progress}%`);
@@ -197,7 +197,9 @@ class Generator {
             // barbershop progress bar
             // progress increases per tick
             $(this.elements.progressBar).removeClass('slow');
-            let bpt = this.bps / 50.0;
+            $(this.elements.progressBar).css('width', `100%`);
+            $(this.elements.progressLabel).text(`${(speed / 100.0).toFixed(2)}x/t`);
+            let bpt = (achievementMultiplier * this.bps) / 50.0;
             setByteCount(bpt);
         }
 

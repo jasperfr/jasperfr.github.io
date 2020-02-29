@@ -9,11 +9,13 @@
 	<script src="js/news.js"></script>
 	<script src="js/nav.js"></script>
 	<script src="js/game3.js"></script>
+	<script src="js/achievement.js"></script>
 	<link rel="stylesheet" href="js/jquery-ui-1.12.1.custom/jquery-ui-1.12.1.custom/jquery-ui.css" />
 	<link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+	<div id="notifications"></div>
 	<center>
 		<div class="news">
 			<h4 style="margin:0;padding:0;">Hello there.</h4>
@@ -34,9 +36,10 @@
 
 		<div class="section" id="achievements" hidden="1">
 			<h1>Achievements</h1>
-			<p>Achievements give a multiplier to generators. Currently x1.0 .</p>
+			<p>Achievements give a multiplier to generators. Currently <span id='achievement-multi'>x1.0</span> .</p>
 			<div class="achievements-wrapper">
 
+				<!--
 				<div id="ac-first-of-many" class="achievement locked tooltip">
 					<span class="tooltiptext">Buy your first generator.</span>
 					<h2>The first of many</h2>
@@ -91,6 +94,7 @@
 					<span class="tooltiptext">Buy a fourth multiplicator. Reward: Multiplicators are 1.2x more effective.</span>
 					<h2>Power of 4</h2>
 				</div>
+			-->
 			</div>
 			
 		</div>

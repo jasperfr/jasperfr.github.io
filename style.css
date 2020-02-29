@@ -211,9 +211,10 @@ button:hover {
 
 .news {
     position: relative;
-    border: 1px solid white;
+    border: 2px solid white;
     overflow: hidden;
-    height: 18px;
+    height: 28px;
+    font-size:16px;
 }
 
 .news h4 {
@@ -369,4 +370,28 @@ button:hover {
 
 .slow {
     background: #fff !important;
+}
+
+.achievement.unlocked {
+    background-color: white;
+    color: black;
+}
+#notifications {
+    position: absolute;
+    left:0;
+    top:0;
+    width: 200px;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 999;
+}
+.achievement-dialog {
+    text-align: center;
+    padding: 10px 4px;
+    font-weight: 800;
+    font-size: 16px;
+    margin: 4px 10px;
+    color:black;
+    display: block;
+    background-color:yellow;
 }

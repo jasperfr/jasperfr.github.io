@@ -35,7 +35,6 @@ setValue = function(v) {
 // Start the game.
 $(document).ready(() => {
     generators.push(new Generator(1));
-
     $( "input" ).checkboxradio({
         icon: false
       });
