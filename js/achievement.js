@@ -10,7 +10,6 @@ const HTML_ACHIEVEMENT_DIALOG = `
 </div>
 `;
 
-achievements = [];
 achievementMultiplier = 1.0;
 class Achievement {
     constructor(name, description, func) {
