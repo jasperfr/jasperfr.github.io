@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="app.js"></script>
+    <title>Matter Dimensions</title>
+</head>
+<body>
+    <div class="centered">
+        <h2>There is <span class="matter">0.0</span> matter.</h2>
+        <h4>You are getting <span class="mps">0.0</span> matter per second.</h4>
+        <br>
+        <div class="navbar">
+            <button onclick="navigate('page-dimensions');">Dimensions</button>
+            <button onclick="navigate('page-achievements');">Achievements</button>
+        </div>
+
+        <div class="page page-dimensions" hidden>
+            <table class="dimensions">
+            </table>
+        </div>
+
+        <div class="page page-achievements">
+            <table class="achievements">
+                <tr>
+                    <td>
+                        <div class="achievement" style="background-position: 0px 0px;">
+                            <h2>Welcome back!</h2>
+                            <p class="tooltip">Buy a single first dimension.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -128px 0px;">
+                            <h2>Two types of matter</h2>
+                            <p class="tooltip">Buy a second dimension.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -256px 0px;">
+                            <h2>HL3 is still not confirmed</h2>
+                            <p class="tooltip">Buy a third dimension.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -384px 0px;">
+                            <h2>THERE'S MORE!</h2>
+                            <p class="tooltip">Buy a fourth dimension.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -512px 0px;">
+                            <h2>5 dimensions jumping on the bed</h2>
+                            <p class="tooltip">Buy a fifth dimension.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -640px 0px;">
+                            <h2>6 9 nice</h2>
+                            <p class="tooltip">Buy a sixth dimension.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -768px 0px;">
+                            <h2>Buy more at the dimension store</h2>
+                            <p class="tooltip">Buy a seventh dimension.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -896px 0px;">
+                            <h2>The limit?</h2>
+                            <p class="tooltip">Buy an eighth dimension.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -1024px 0px;">
+                            <h2>We COULD afford 9!</h2>
+                            <p class="tooltip">Buy a ninth dimension.</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="achievement" style="background-position: 0px -128px;">
+                            <h2>Infinity is a lot</h2>
+                            <p class="tooltip">Reach Infinity. Reward: Start with 100 matter.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -128px -128px;">
+                            <h2>Universal origami</h2>
+                            <p class="tooltip">Fold time for a speed boost.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -256px -128px;">
+                            <h2>I can show you the world</h2>
+                            <p class="tooltip">Get tickspeed to below 1ms. Reward: Initial tickspeed -5%.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -384px -128px;">
+                            <h2>FASTER!!!</h2>
+                            <p class="tooltip">Fold time 10 times.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -512px -128px;">
+                            <h2>It was a lie after all</h2>
+                            <p class="tooltip">Infinity without any 9th dimensions. Reward: 8th dimensions are stronger.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -640px -128px;">
+                            <h2>Gotta go fast</h2>
+                            <p class="tooltip">Go infinity in under an hour. Reward: x10 multiplier to 1st dimension.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -768px -128px;">
+                            <h2>No galaxies?</h2>
+                            <p class="tooltip">Buy a Black Hole.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -896px -128px;">
+                            <h2>Under Pressure</h2>
+                            <p class="tooltip">Buy a second Black Hole.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -1024px -128px;">
+                            <h2>Wrong game, kiddo</h2>
+                            <p class="tooltip">Get 1.78e308 antimatter.</p>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="percentage">
+            <div class="progress">
+                <p>10%</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
