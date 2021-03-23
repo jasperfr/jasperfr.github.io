@@ -1,30 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="icon" type="image/png" href="img/favicon.ico" />
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="settings.js"></script>
     <script src="app.js"></script>
     <title>Matter Dimensions</title>
 </head>
+
 <body>
     <div class="centered">
         <h2>There is <span class="matter">0.0</span> matter.</h2>
         <h4>You are getting <span class="mps">0.0</span> matter per second.</h4>
         <br>
-        <div class="navbar">
+        <nav class="navbar">
             <button onclick="navigate('page-dimensions');">Dimensions</button>
             <button onclick="navigate('page-achievements');">Achievements</button>
-        </div>
+            <button onclick="navigate('page-statistics');">Statistics</button>
+            <button onclick="navigate('page-challenges');">Challenges</button>
+            <button onclick="navigate('page-settings');">Settings</button>
+            <button onclick="navigate('page-overdrive');" hidden>Infinity</button>
+            <button onclick="navigate('page-overdrive');" hidden>Overdrive</button>
+        </nav>
 
-        <div class="page page-dimensions" hidden>
+        <div class="page page-dimensions">
+            <h2 class="title">Dimensions</h2>
             <table class="dimensions">
+                <noscript>You need to enable Javascript to play this game.</noscript>
             </table>
         </div>
 
-        <div class="page page-achievements">
+        <div class="page page-achievements" hidden>
+            <h2 class="title">Achievements</h2>
+            <h4>Current achievement multiplier: x1.0</h4>
             <table class="achievements">
                 <tr>
                     <td>
@@ -110,13 +123,15 @@
                     <td>
                         <div class="achievement" style="background-position: -512px -128px;">
                             <h2>It was a lie after all</h2>
-                            <p class="tooltip">Infinity without any 9th dimensions. Reward: 8th dimensions are stronger.</p>
+                            <p class="tooltip">Infinity without any 9th dimensions. Reward: 8th dimensions are stronger.
+                            </p>
                         </div>
                     </td>
                     <td>
                         <div class="achievement" style="background-position: -640px -128px;">
                             <h2>Gotta go fast</h2>
-                            <p class="tooltip">Go infinity in under an hour. Reward: x10 multiplier to 1st dimension.</p>
+                            <p class="tooltip">Go infinity in under an hour. Reward: x10 multiplier to 1st dimension.
+                            </p>
                         </div>
                     </td>
                     <td>
@@ -141,6 +156,59 @@
             </table>
         </div>
 
+        <div class="page page-statistics" hidden>
+            <h2 class="title">Statistics</h2>
+            <h4>Coming soon!</h4>
+        </div>
+
+        <div class="page page-challenges" hidden>
+            <h2 class="title">Challenges</h2>
+            <h4>Coming soon!</h4>
+        </div>
+
+        <div class="page page-settings" hidden>
+            <h2 class="title">Settings</h2>
+            <table class="settings">
+                <tr>
+                    <td>
+                        <button onclick="saveGame()">Save</button>
+                        <button onclick="exportGame()">Export</button>
+                        <button onclick="toggleNews()">Toggle the news</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="loadGame()">Load</button>
+                        <button onclick="importGame()">Import</button>
+                        <button onclick="toggleChallenges()">Auto retry challenges ON</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="page page-infinity" hidden>
+        </div>
+
+        <div class="page page-overdrive" hidden>
+            <h1>You have <b>0</b> Overdrive Points. Translated to <b>^1.0</b> boost on <b>all</b> dimensions.</h1>
+            <h2>Add a permanent x2 to Infinity</h2>
+            <p>Currently: ∞ = 2^1024 = 1.78e308</p>
+            <button class="big">Next: 2^1025<br>Cost: <b>10 IP</b></button>
+            <p>Overdriving will reset <b>EVERYTHING</b> (except achievements)<br>and you will get one Overdrive Point.
+            </p>
+
+            <h1>Overdrive Upgrades</h1>
+            <table class="upgrades">
+                <tr>
+                    <td>
+                        <button class="big">x2 to permanent boost<br>Currently: x1<br>Cost: 10 OP</button>
+                        <button class="big">x2 to OP gain<br>Currently: x1<br>Cost: 100 OP</button>
+                        <button class="big">You start with the 1st Infinity Dimension unlocked<br>Cost: 1000 OP</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
         <div class="percentage">
             <div class="progress">
                 <p>10%</p>
@@ -148,4 +216,5 @@
         </div>
     </div>
 </body>
+
 </html>
