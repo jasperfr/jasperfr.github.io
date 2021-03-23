@@ -17,8 +17,11 @@
     <div class="centered">
         <h2>There is <span class="matter">0.0</span> matter.</h2>
         <h4>You are getting <span class="mps">0.0</span> matter per second.</h4>
+        <div class="page page-dimensions">
+        </div>
+
         <br>
-        
+
         <nav class="navbar">
             <button onclick="navigate('page-dimensions');">Dimensions</button>
             <button onclick="navigate('page-achievements');">Achievements</button>
@@ -30,7 +33,14 @@
         </nav>
 
         <div class="page page-dimensions">
+            <div style="margin:10px;">
+            <h5>Tickspeed: <b class="tickspeed">1000</b></h5>
+            <h5>Reduce the tick interval by 7.5%.</h5>
+                <button class="tickspeed-button" onclick="buyTickspeed()">Cost: <span class="tickspeedCost">100</span></button>
+                <button class="tickspeed-button-max" onclick="buyMaxTickspeed()">Buy Max</button>
+            </div>
             <h2 class="title">Dimensions</h2>
+            <button class="buy-max" hidden>Buy Max</button>
             <table class="dimensions">
                 <noscript>You need to enable Javascript to play this game.</noscript>
             </table>
@@ -182,6 +192,12 @@
                         <button onclick="loadGame()">Load</button>
                         <button onclick="importGame()">Import</button>
                         <button onclick="toggleChallenges()">Auto retry challenges ON</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button onclick="commaToggle()">Commas on exponents</button>
+                        <button class="reset" onclick="resetGame()">RESET THE GAME</button>
                     </td>
                 </tr>
             </table>

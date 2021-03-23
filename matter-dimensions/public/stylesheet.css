@@ -89,6 +89,55 @@ table {
     padding: 20px;
 }
 
+button.single {
+    width: 150px;
+    font-size: 12px;
+}
+
+button.bulk {
+    width: 200px;
+    font-size: 12px;
+}
+
+button.notafford {
+    border-color: rgb(172, 44, 44);
+}
+
+button.afford {
+    border-color:rgb(46, 173, 46);
+}
+
+.tickspeed-button {
+    width: 200px;
+    font-size: 12px;
+    padding: 6px;
+}
+
+.tickspeed-button-max {
+    width: 100px;
+    font-size: 12px;
+    padding: 6px;
+}
+
+button.buy-max {
+    width: 100px;
+    font-size: 12px;
+    padding: 6px;
+    margin-bottom: 10px;
+}
+
+button.reset {
+    color: rgb(172, 44, 44);
+    border-color: rgb(172, 44, 44);
+    background-color: #222;
+    transition: color 500ms, background-color 500ms;
+}
+
+button.reset:hover {
+    background-color: rgb(172, 44, 44);
+    color: #222;
+}
+
 .achievement {
     border: 1px solid black;
     width: 128px;
