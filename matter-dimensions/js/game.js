@@ -18,6 +18,7 @@ Number.prototype.toMixedScientific = function(floored = false) {
 const _INFINITY = 1.797693134862315907729305190789e+308; // infinity const hacking
 const LOG_INFINITY =  308.2547155599167438988686281978809; // what the fuck???
 const tickInterval = 33;
+var totalMatterProduced = 10;
 var dimensions = [
     { amount: 10, multiplier: 1.0, bought: 0, price: null },
     { amount: 0, multiplier: 1.0, bought: 0, price: 1e1, increase: 2 },
@@ -31,7 +32,7 @@ var dimensions = [
     { amount: 0, multiplier: 1.0, bought: 0, price: 1e9, increase: 10 }
 ];
 var $dimensions = [];
-var tickspeed = { speed: 1000.0, amount: 0, cost: 100, decrease: 7.5 };
+var tickspeed = { speed: 1000.0, amount: 0, cost: 100, decrease: 6 };
 
 function getMatter() {
     return dimensions[0].amount;
@@ -96,6 +97,7 @@ function buy(dimension, until10 = false) {
         dim.bought++;
     } else {
         if(matter.amount < to10) return;
+        matter.amount -= dim.price * (10 - dim.bought);
         dim.amount += 10 - dim.bought;
         dim.bought = 10;
     }
@@ -119,13 +121,14 @@ function tick() {
     for(let i = 0; i < dimensions.length - 1; i++) {
         dimensions[i].amount += ((dimensions[i+1].amount * dimensions[i+1].multiplier) / tickInterval * tsp);
     }
+    totalMatterProduced += ((dimensions[1].amount * dimensions[1].multiplier) / tickInterval * tsp);
 
     // update text
     $('.matter').text(dimensions[0].amount.toMixedScientific());
     for(let i = 1; i < dimensions.length; i++) {
-        $(`.${i} > td > .count`).text(dimensions[i].amount.toMixedScientific());
-        $(`.${i} > td > .multiplier`).text(dimensions[i].multiplier.toMixedScientific());
-        $(`.${i} > td > .bought`).text(dimensions[i].bought);
+        $(`.${i} > td > .count`).text(dimensions[i].amount.toMixedScientific(true));
+        $(`.${i} > td > .multiplier`).text(dimensions[i].multiplier.toMixedScientific(false));
+        $(`.${i} > td > .bought`).text(dimensions[i].bought.toMixedScientific(true));
     }
 
     // update matter per second
@@ -175,6 +178,9 @@ $(() => {
 
         $dimensions.push($element);
         $('table.dimensions').append($element);
+        if(i > 4) {
+            $element.hide();
+        }
     }
 
     setInterval(saveGame, 30000);

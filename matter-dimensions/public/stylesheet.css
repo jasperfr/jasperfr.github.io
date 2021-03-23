@@ -78,6 +78,10 @@ table {
     margin: 0;
 }
 
+.page-statistics p {
+    margin: 0;
+}
+
 .achievements, .upgrades, .settings {
     display: inline;
     border-spacing: 0;
@@ -99,8 +103,12 @@ button.bulk {
     font-size: 12px;
 }
 
-button.notafford {
+button.notafford, .locked {
     border-color: rgb(172, 44, 44);
+}
+
+button.dimboost {
+    float: right;
 }
 
 button.afford {

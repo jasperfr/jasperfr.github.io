@@ -10,6 +10,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/game.js"></script>
+    <script src="js/stats.js"></script>
     <title>Matter Dimensions</title>
 </head>
 
@@ -35,7 +36,7 @@
         <div class="page page-dimensions">
             <div style="margin:10px;">
             <h5>Tickspeed: <b class="tickspeed">1000</b></h5>
-            <h5>Reduce the tick interval by 7.5%.</h5>
+            <h5>Reduce the tick interval by 6%.</h5>
                 <button class="tickspeed-button" onclick="buyTickspeed()">Cost: <span class="tickspeedCost">100</span></button>
                 <button class="tickspeed-button-max" onclick="buyMaxTickspeed()">Buy Max</button>
             </div>
@@ -43,6 +44,36 @@
             <button class="buy-max" hidden>Buy Max</button>
             <table class="dimensions">
                 <noscript>You need to enable Javascript to play this game.</noscript>
+            </table>
+            <table>
+                <tr class="shift-0">
+                    <td>Dimension Shift (0): Requires 20 Fourth dimensions</td>
+                    <td><button class="dimboost locked">Reset the game for a new dimension</button></td>
+                </tr>
+                <tr class="shift-1" hidden>
+                    <td>Dimension Shift (1): Requires 20 Fifth dimensions</td>
+                    <td><button class="dimboost locked">Reset the game for a new dimension</button></td>
+                </tr>
+                <tr class="shift-2" hidden>
+                    <td>Dimension Shift (2): Requires 20 Sixth dimensions</td>
+                    <td><button class="dimboost locked">Reset the game for a new dimension</button></td>
+                </tr>
+                <tr class="shift-3" hidden>
+                    <td>Dimension Shift (3): Requires 20 Seventh dimensions</td>
+                    <td><button class="dimboost locked">Reset the game for a new dimension</button></td>
+                </tr>
+                <tr class="shift-4" hidden>
+                    <td>Dimension Shift (4): Requires 20 Eighth dimensions</td>
+                    <td><button class="dimboost locked">Reset the game for a new dimension</button></td>
+                </tr>
+                <tr class="shift-5" hidden>
+                    <td>Dimension Boost (<span id="boost-count">5</span>): Requires <span id="boost-cost"></span> Ninth dimensions</td>
+                    <td><button class="dimboost locked">Reset the game for a dimension boost</button></td>
+                </tr>
+                <tr>
+                    <td>Black Hole (0): Requires 71 Ninth dimensions</td>
+                    <td><button  class="dimboost locked">Lose all your progress, but get a tickspeed generator</button></td>
+                </tr>
             </table>
         </div>
 
@@ -169,7 +200,17 @@
 
         <div class="page page-statistics" hidden>
             <h2 class="title">Statistics</h2>
-            <h4>Coming soon!</h4>
+            <p>You have made a total of <b id="stat-matter-produced">0.0</b> matter.</p>
+            <p>You have done <b id="stat-dimension-shifts">0</b> dimension boosts/shifts.</p>
+            <p>You folded time <b id="stat-time-folds">0</b> times.</p>
+            <p>You have <b id="stat-black-holes">0</b> black holes.</p>
+            <p>Your black holes gave a total of <b id="stat-black-hole-tickspeed-upgrades">0</b> tickspeed upgrades.</p>
+            <br>
+            <p>You have Infinitied <b id="stat-infinities">0</b> times.</p>
+            <p>Your fastest Infinity is in <b id="stat-fastest-infinity">999:99:99</b>.</p>
+            <p>You have spent <b id="stat-infinity-time">0:00:00</b> in this Infinity.</p>
+            <br>
+            <p>You have played for <b id="stat-total-time">0:00:00</b>.</p>
         </div>
 
         <div class="page page-challenges" hidden>

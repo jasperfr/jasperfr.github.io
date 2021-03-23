@@ -51,7 +51,7 @@ function resetGame() {
                 { amount: 0, multiplier: 1.0, bought: 0, price: 1e8, increase: 9 },
                 { amount: 0, multiplier: 1.0, bought: 0, price: 1e9, increase: 10 }
             ];
-            tickspeed = { speed: 1000.0, amount: 0, cost: 100, decrease: 7.5 };
+            tickspeed = { speed: 1000.0, amount: 0, cost: 100, decrease: 6 };
 
             $('.tickspeed').text(tickspeed.speed.toMixedScientific());
             $('.tickspeedCost').text(tickspeed.cost.toMixedScientific());
