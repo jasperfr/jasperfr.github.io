@@ -85,7 +85,7 @@ const Game = {
             increase: 11
         },
     },
-    dimBoosts: 2,
+    dimBoosts: 0,
     tickspeed: {
         speed: 1000.0,
         amount: 0,
@@ -429,4 +429,11 @@ $(function() {
     Game.toggleDimboostAndDimensions();
 
     setInterval(() => { Game.tick() }, interval);
+
+    $(document).keydown(function(e) {
+        // Max (M)
+        if(e.keyCode == 77) {
+            Game.buyMax();
+        }
+    });
 });
