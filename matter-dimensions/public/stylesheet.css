@@ -2,9 +2,14 @@
     font-family: 'Consolas', monospace;
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
     background-color: #eee;
     color: #333;
+    height: calc(100% + -16px);
 }
 
 button {
@@ -16,6 +21,10 @@ button {
     transition: background-color 500ms, border-color 250ms;
     border: 2px solid;
     cursor: pointer;
+}
+
+.progress p {
+    line-height: 21px;
 }
 
 button:hover {
@@ -56,14 +65,21 @@ table {
     width: 100%;
 }
 
-.percentage {
+.percentage, .news-ticker {
     display: block;
-    border: 1px solid black;
-    background-color: rgb(206, 206, 206);
-    width: calc(100% + -20px);
+    border: 2px solid rgb(90, 90, 90);
     height: 20px;
+}
+
+.news-ticker {
+    position: relative;
+    overflow: hidden;
+}
+.news-ticker > p {
+    margin: 0;
+    line-height: 21px;
     position: absolute;
-    bottom: 10px;
+    white-space: nowrap;
 }
 
 .percentage > .progress {
@@ -79,6 +95,15 @@ table {
 
 .page-statistics p {
     margin: 0;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+}
+
+.content .spacer {
+    flex: 1 0 auto;
 }
 
 .achievements, .upgrades, .settings {

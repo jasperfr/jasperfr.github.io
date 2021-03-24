@@ -209,6 +209,10 @@ const Game = {
         this.$elements.boosts.dimshift3.button.css('border-color', this.dimensions.sixth.count >= 20 ? c_green : c_red);
         this.$elements.boosts.dimshift4.button.css('border-color', this.dimensions.seventh.count >= 20 ? c_green : c_red);
         this.$elements.boosts.dimshift5.button.css('border-color', this.dimensions.eighth.count >= 20 ? c_green : c_red);
+        
+        let delta = Math.max(0, Math.log10(this.matter) / 308 * 100).toFixed(2);
+        $('.progress > p').text(`${delta}%`);
+        $('.progress').css('width', `${delta}%`)
     },
 
     tick: function() {
