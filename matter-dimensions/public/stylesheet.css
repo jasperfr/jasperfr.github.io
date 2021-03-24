@@ -145,6 +145,10 @@ button.afford {
     padding: 6px;
 }
 
+.progress {
+    transition: width cubic-bezier(0.075, 0.82, 0.165, 1) 500ms;
+}
+
 .tickspeed-button-max {
     width: 100px;
     font-size: 12px;

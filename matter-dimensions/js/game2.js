@@ -26,6 +26,7 @@ const Game = {
             multiplier: 1.0,
             bought: 0,
             price: 1e1,
+            basePrice: 1e1,
             increase: 3
         },
         second: {
@@ -33,6 +34,7 @@ const Game = {
             multiplier: 1.0,
             bought: 0,
             price: 1e2,
+            basePrice: 1e2,
             increase: 4
         },
         third: {
@@ -40,6 +42,7 @@ const Game = {
             multiplier: 1.0,
             bought: 0,
             price: 1e3,
+            basePrice: 1e3,
             increase: 5
         },
         fourth: {
@@ -47,6 +50,7 @@ const Game = {
             multiplier: 1.0,
             bought: 0,
             price: 1e4,
+            basePrice: 1e4,
             increase: 6
         },
         fifth: {
@@ -54,6 +58,7 @@ const Game = {
             multiplier: 1.0,
             bought: 0,
             price: 1e5,
+            basePrice: 1e5,
             increase: 7
         },
         sixth: {
@@ -61,6 +66,7 @@ const Game = {
             multiplier: 1.0,
             bought: 0,
             price: 1e6,
+            basePrice: 1e6,
             increase: 8
         },
         seventh: {
@@ -68,6 +74,7 @@ const Game = {
             multiplier: 1.0,
             bought: 0,
             price: 1e7,
+            basePrice: 1e7,
             increase: 9
         },
         eighth: {
@@ -75,6 +82,7 @@ const Game = {
             multiplier: 1.0,
             bought: 0,
             price: 1e8,
+            basePrice: 1e8,
             increase: 10
         },
         ninth: {
@@ -82,6 +90,7 @@ const Game = {
             multiplier: 1.0,
             bought: 0,
             price: 1e9,
+            basePrice: 1e9,
             increase: 11
         },
     },
@@ -116,6 +125,9 @@ const Game = {
 
     buyDimension: function(i, until10 = false) {
         let dimension = Game.dimensions[Object.keys(Game.dimensions)[i]];
+        // do not buy if locked
+        if(this.dimBoosts - i < -3) return;
+
 
         if(!until10) {
             if(dimension.price > this.matter) return;
@@ -160,12 +172,55 @@ const Game = {
     },
 
     buyDimensionShift: function(shift) {
+        switch(shift) {
+            case 0: if(this.dimensions.fourth.count < 20) return; break;
+            case 1: if(this.dimensions.fifth.count < 20) return; break;
+            case 2: if(this.dimensions.sixth.count < 20) return; break;
+            case 3: if(this.dimensions.seventh.count < 20) return; break;
+            case 4: if(this.dimensions.eighth.count < 20) return; break;
+        }
         this.dimBoosts++;
+        
+        // reset dimensions
+        for(let [k, v] of Object.entries(this.dimensions)) {
+            v.count = 0;
+            v.multiplier = 1.0;
+            v.bought = 0;
+            v.price = v.basePrice;
+        }
+
+        // reset tick speed
+        this.tickspeed.speed = 1000;
+        this.tickspeed.amount = 0;
+        this.tickspeed.price = 1000;
+
+        // reset matter
+        this.matter = 10;
+
         this.toggleDimboostAndDimensions();
     },
 
     buyDimensionBoost: function() {
+        let required = (this.dimBoosts - 4) * 20;
+        if(this.dimensions.ninth.count < required) return;
         this.dimBoosts++;
+        
+        // reset dimensions
+        for(let [k, v] of Object.entries(this.dimensions)) {
+            v.count = 0;
+            v.multiplier = 1.0;
+            v.bought = 0;
+            v.price = v.basePrice;
+        }
+
+        // reset tick speed
+        this.tickspeed.speed = 1000;
+        this.tickspeed.amount = 0;
+        this.tickspeed.price = 1000;
+
+        // reset matter
+        this.matter = 10;
+
         this.toggleDimboostAndDimensions();
     },
 
@@ -196,7 +251,7 @@ const Game = {
         for(let dimension of Object.keys(this.dimensions)) {
             let bulkPrice = (this.dimensions[dimension].price * (10 - this.dimensions[dimension].bought));
             this.$elements.dimensions[dimension].count.text(this.dimensions[dimension].count.toMixedScientific());
-            this.$elements.dimensions[dimension].multiplier.text((this.dimensions[dimension].multiplier * (dimension == 'first' ? Math.pow(2, this.dimBoosts) : 1)).toMixedScientific(false));
+            this.$elements.dimensions[dimension].multiplier.text((this.dimensions[dimension].multiplier * Math.pow(2, this.dimBoosts)).toMixedScientific(false));
             this.$elements.dimensions[dimension].bought.text(this.dimensions[dimension].bought.toMixedScientific());
             this.$elements.dimensions[dimension].singlePrice.text(this.dimensions[dimension].price.toMixedScientific());
             this.$elements.dimensions[dimension].bulkPrice.text(bulkPrice.toMixedScientific());
@@ -210,6 +265,10 @@ const Game = {
         this.$elements.boosts.dimshift4.button.css('border-color', this.dimensions.seventh.count >= 20 ? c_green : c_red);
         this.$elements.boosts.dimshift5.button.css('border-color', this.dimensions.eighth.count >= 20 ? c_green : c_red);
         
+        this.$elements.boosts.dimboost.boostCount.text(this.dimboosts);
+        this.$elements.boosts.dimboost.boostPrice.text((this.dimBoosts - 4) * 20);
+        this.$elements.boosts.dimboost.button.css('border-color', this.dimensions.ninth.count >= (this.dimBoosts - 4) * 20 ? c_green : c_red);
+        
         let delta = Math.max(0, Math.log10(this.matter) / 308 * 100).toFixed(2);
         $('.progress > p').text(`${delta}%`);
         $('.progress').css('width', `${delta}%`)
@@ -220,7 +279,7 @@ const Game = {
         
         const keys = Object.keys(this.dimensions);
         for(let i = 0; i < keys.length - 1; i++) {
-            this.dimensions[keys[i]].count += (this.dimensions[keys[i+1]].count * this.dimensions[keys[i+1]].multiplier / 1000 * interval / this.tickspeed.speed * 1000);
+            this.dimensions[keys[i]].count += 0.1 * (this.dimensions[keys[i+1]].count * Math.pow(2, this.dimBoosts) * this.dimensions[keys[i+1]].multiplier / 1000 * interval / this.tickspeed.speed * 1000);
         }
 
         // Update unlockables?
@@ -416,9 +475,9 @@ $(function() {
             },
             dimboost: {
                 container: $('.dimension-boost'),
-                boostCount: $('.dimension-boost .boost-count'),
-                cost: $('.dimension-boost .cost'),
-                button: $('.dimension-shift.1 button')
+                boostCount: $('#boost-count'),
+                boostPrice: $('#boost-price'),
+                button: $('.dimension-boost button')
             }
         }
     }
