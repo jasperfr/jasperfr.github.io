@@ -9,15 +9,14 @@
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="js/settings.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/stats.js"></script>
+    <script src="js/game2.js"></script>
     <title>Matter Dimensions</title>
 </head>
 
 <body>
     <div class="centered">
-        <h2>There is <span class="matter">0.0</span> matter.</h2>
-        <h4>You are getting <span class="mps">0.0</span> matter per second.</h4>
+        <h2>There is <span id="matter-count">0.0</span> matter.</h2>
+        <h4>You are getting <span id="matter-per-second">0.0</span> matter per second.</h4>
         <div class="page page-dimensions">
         </div>
 
@@ -29,50 +28,148 @@
             <button onclick="navigate('page-statistics');">Statistics</button>
             <button onclick="navigate('page-challenges');">Challenges</button>
             <button onclick="navigate('page-settings');">Settings</button>
-            <button onclick="navigate('page-overdrive');" hidden>Infinity</button>
-            <button onclick="navigate('page-overdrive');" hidden>Overdrive</button>
         </nav>
 
         <div class="page page-dimensions">
-            <div style="margin:10px;">
-            <h5>Tickspeed: <b class="tickspeed">1000</b></h5>
-            <h5>Reduce the tick interval by 6%.</h5>
-                <button class="tickspeed-button" onclick="buyTickspeed()">Cost: <span class="tickspeedCost">100</span></button>
-                <button class="tickspeed-button-max" onclick="buyMaxTickspeed()">Buy Max</button>
+
+            <div style="margin:10px;" id="tickspeed">
+                <h5>Tickspeed: <b id="tickspeed-amount">1000</b></h5>
+                <h5>Reduce the tick interval by <span id="tickspeed-interval">6</span>%.</h5>
+                <button id="tickspeed-button" onclick="Game.buyTickspeed()">Cost: <span
+                        id="tickspeed-cost">100</span></button>
+                <button id="tickspeed-button-max" onclick="Game.buyTickspeed(true)">Buy Max</button>
             </div>
+
             <h2 class="title">Dimensions</h2>
-            <button class="buy-max" hidden>Buy Max</button>
+            <button class="buy-max" onclick="Game.buyMax()">Buy Max</button>
             <table class="dimensions">
-                <noscript>You need to enable Javascript to play this game.</noscript>
+                <tr class="dimension 1">
+                    <td class="dname">1st Dimension x<span class="multiplier">1.0</span></td>
+                    <td class="damount"><span class="count">0</span> (<span class="bought">0</span>)</td>
+                    <td class="dbuttons">
+                        <button class="single notafford" onclick="Game.buyDimension(0)">Cost: <span
+                                class="price"></span></button>
+                        <button class="bulk notafford" onclick="Game.buyDimension(0, true)">Until 10, Cost: <span
+                                class="price10"></span></button>
+                    </td>
+                </tr>
+                <tr class="dimension 2">
+                    <td class="dname">2nd Dimension x<span class="multiplier">1.0</span></td>
+                    <td class="damount"><span class="count">0</span> (<span class="bought">0</span>)</td>
+                    <td class="dbuttons">
+                        <button class="single notafford" onclick="Game.buyDimension(1)">Cost: <span
+                                class="price"></span></button>
+                        <button class="bulk notafford" onclick="Game.buyDimension(1, true)">Until 10, Cost: <span
+                                class="price10"></span></button>
+                    </td>
+                </tr>
+                <tr class="dimension 3">
+                    <td class="dname">3rd Dimension x<span class="multiplier">1.0</span></td>
+                    <td class="damount"><span class="count">0</span> (<span class="bought">0</span>)</td>
+                    <td class="dbuttons">
+                        <button class="single notafford" onclick="Game.buyDimension(2)">Cost: <span
+                                class="price"></span></button>
+                        <button class="bulk notafford" onclick="Game.buyDimension(2, true)">Until 10, Cost: <span
+                                class="price10"></span></button>
+                    </td>
+                </tr>
+                <tr class="dimension 4">
+                    <td class="dname">4th Dimension x<span class="multiplier">1.0</span></td>
+                    <td class="damount"><span class="count">0</span> (<span class="bought">0</span>)</td>
+                    <td class="dbuttons">
+                        <button class="single notafford" onclick="Game.buyDimension(3)">Cost: <span
+                                class="price"></span></button>
+                        <button class="bulk notafford" onclick="Game.buyDimension(3, true)">Until 10, Cost: <span
+                                class="price10"></span></button>
+                    </td>
+                </tr>
+                <tr class="dimension 5">
+                    <td class="dname">5th Dimension x<span class="multiplier">1.0</span></td>
+                    <td class="damount"><span class="count">0</span> (<span class="bought">0</span>)</td>
+                    <td class="dbuttons">
+                        <button class="single notafford" onclick="Game.buyDimension(4)">Cost: <span
+                                class="price"></span></button>
+                        <button class="bulk notafford" onclick="Game.buyDimension(4, true)">Until 10, Cost: <span
+                                class="price10"></span></button>
+                    </td>
+                </tr>
+                <tr class="dimension 6">
+                    <td class="dname">6th Dimension x<span class="multiplier">1.0</span></td>
+                    <td class="damount"><span class="count">0</span> (<span class="bought">0</span>)</td>
+                    <td class="dbuttons">
+                        <button class="single notafford" onclick="Game.buyDimension(5)">Cost: <span
+                                class="price"></span></button>
+                        <button class="bulk notafford" onclick="Game.buyDimension(5, true)">Until 10, Cost: <span
+                                class="price10"></span></button>
+                    </td>
+                </tr>
+                <tr class="dimension 7">
+                    <td class="dname">7th Dimension x<span class="multiplier">1.0</span></td>
+                    <td class="damount"><span class="count">0</span> (<span class="bought">0</span>)</td>
+                    <td class="dbuttons">
+                        <button class="single notafford" onclick="Game.buyDimension(6)">Cost: <span
+                                class="price"></span></button>
+                        <button class="bulk notafford" onclick="Game.buyDimension(6, true)">Until 10, Cost: <span
+                                class="price10"></span></button>
+                    </td>
+                </tr>
+                <tr class="dimension 8">
+                    <td class="dname">8th Dimension x<span class="multiplier">1.0</span></td>
+                    <td class="damount"><span class="count">0</span> (<span class="bought">0</span>)</td>
+                    <td class="dbuttons">
+                        <button class="single notafford" onclick="Game.buyDimension(7)">Cost: <span
+                                class="price"></span></button>
+                        <button class="bulk notafford" onclick="Game.buyDimension(7, true)">Until 10, Cost: <span
+                                class="price10"></span></button>
+                    </td>
+                </tr>
+                <tr class="dimension 9">
+                    <td class="dname">9th Dimension x<span class="multiplier">1.0</span></td>
+                    <td class="damount"><span class="count">0</span> (<span class="bought">0</span>)</td>
+                    <td class="dbuttons">
+                        <button class="single notafford" onclick="Game.buyDimension(8)">Cost: <span
+                                class="price"></span></button>
+                        <button class="bulk notafford" onclick="Game.buyDimension(8, true)">Until 10, Cost: <span
+                                class="price10"></span></button>
+                    </td>
+                </tr>
             </table>
             <table>
-                <tr class="shift-0">
-                    <td>Dimension Shift (0): Requires 20 Fourth dimensions</td>
-                    <td><button class="dimboost locked">Reset the game for a new dimension</button></td>
+                <tr class="dimension-shift 1">
+                    <td>Dimension Shift (0): Requires <span class="cost">20</span> Fourth dimensions</td>
+                    <td><button class="dimboost locked" onclick="Game.buyDimensionShift(0);">Reset the game for a new
+                            dimension</button></td>
                 </tr>
-                <tr class="shift-1" hidden>
-                    <td>Dimension Shift (1): Requires 20 Fifth dimensions</td>
-                    <td><button class="dimboost locked">Reset the game for a new dimension</button></td>
+                <tr class="dimension-shift 2" hidden>
+                    <td>Dimension Shift (1): Requires <span class="cost">20</span> Fifth dimensions</td>
+                    <td><button class="dimboost locked" onclick="Game.buyDimensionShift(1);">Reset the game for a new
+                            dimension</button></td>
                 </tr>
-                <tr class="shift-2" hidden>
-                    <td>Dimension Shift (2): Requires 20 Sixth dimensions</td>
-                    <td><button class="dimboost locked">Reset the game for a new dimension</button></td>
+                <tr class="dimension-shift 3" hidden>
+                    <td>Dimension Shift (2): Requires <span class="cost">20</span> Sixth dimensions</td>
+                    <td><button class="dimboost locked" onclick="Game.buyDimensionShift(2);">Reset the game for a new
+                            dimension</button></td>
                 </tr>
-                <tr class="shift-3" hidden>
-                    <td>Dimension Shift (3): Requires 20 Seventh dimensions</td>
-                    <td><button class="dimboost locked">Reset the game for a new dimension</button></td>
+                <tr class="dimension-shift 4" hidden>
+                    <td>Dimension Shift (3): Requires <span class="cost">20</span> Seventh dimensions</td>
+                    <td><button class="dimboost locked" onclick="Game.buyDimensionShift(3);">Reset the game for a new
+                            dimension</button></td>
                 </tr>
-                <tr class="shift-4" hidden>
-                    <td>Dimension Shift (4): Requires 20 Eighth dimensions</td>
-                    <td><button class="dimboost locked">Reset the game for a new dimension</button></td>
+                <tr class="dimension-shift 5" hidden>
+                    <td>Dimension Shift (4): Requires <span class="cost">20</span> Eighth dimensions</td>
+                    <td><button class="dimboost locked" onclick="Game.buyDimensionShift(4);">Reset the game for a new
+                            dimension</button></td>
                 </tr>
-                <tr class="shift-5" hidden>
-                    <td>Dimension Boost (<span id="boost-count">5</span>): Requires <span id="boost-cost"></span> Ninth dimensions</td>
-                    <td><button class="dimboost locked">Reset the game for a dimension boost</button></td>
+                <tr class="dimension-boost" hidden>
+                    <td>Dimension Boost (<span id="boost-count">5</span>): Requires <span id="cost">20</span> Ninth
+                        dimensions</td>
+                    <td><button class="dimboost locked" onclick="Game.buyDimensionBoost();">Reset the game for a dimension
+                            boost</button></td>
                 </tr>
                 <tr>
                     <td>Black Hole (0): Requires 71 Ninth dimensions</td>
-                    <td><button  class="dimboost locked">Lose all your progress, but get a tickspeed generator</button></td>
+                    <td><button class="dimboost locked">Lose all your progress, but get a tickspeed generator</button>
+                    </td>
                 </tr>
             </table>
         </div>
@@ -195,6 +292,64 @@
                         </div>
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        <div class="achievement" style="background-position: 0px -256px;">
+                            <h2>Challenged</h2>
+                            <p class="tooltip">Complete a challenge.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -128px -256px;">
+                            <h2>We're halfway there (not)</h2>
+                            <p class="tooltip">Have over 1e154 matter.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -256px -256px;">
+                            <h2>Show off</h2>
+                            <p class="tooltip">Complete all the challenges. Reward: Dimensions are 10% stronger, but only in challenges.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -384px -256px;">
+                            <h2>But why?</h2>
+                            <p class="tooltip">Buy a single 1st dimension when you have over 1e100 of them. Reward: Yet another pointless achievement ripoff from the original game.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -512px -256px;">
+                            <h2>Hole in One</h2>
+                            <p class="tooltip">Infinity with 1 black hole. Reward: Black holes are 20% faster.
+                            </p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -640px -256px;">
+                            <h2>The 10th dimension is a lie</h2>
+                            <p class="tooltip">Reach Infinity with only 10 9th dimensions. Reward: 10x multiplier to 9th dimensions.
+                            </p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -768px -256px;">
+                            <h2>Yes, this is hell.</h2>
+                            <p class="tooltip">Complete challenge 6 in under 6.66 seconds. Reward: Dimension 6 is 6.66% stronger.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -896px -256px;">
+                            <h2>You're finally awake.</h2>
+                            <p class="tooltip">Be offline for 8 hours in a row.</p>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="achievement" style="background-position: -1024px -256px;">
+                            <h2>Professional Speedrunner</h2>
+                            <p class="tooltip">Get the sum of all challenge times below 10 minutes. Reward: Speed boost based on slowest challenge run.</p>
+                        </div>
+                    </td>
+                </tr>
             </table>
         </div>
 
@@ -267,7 +422,7 @@
             </table>
         </div>
 
-        <div class="percentage">
+        <div class="percentage" hidden>
             <div class="progress">
                 <p>10%</p>
             </div>

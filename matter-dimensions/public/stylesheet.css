@@ -3,14 +3,13 @@
 }
 
 body {
-    background-color: #222;
-    color: #aaa;
+    background-color: #eee;
+    color: #333;
 }
 
 button {
     outline: none;
-    background-color: #444;
-    color: #ccc;
+    background-color: #eee;
     font-weight: 400;
     font-size: 14px;
     padding: 10px;
@@ -20,7 +19,7 @@ button {
 }
 
 button:hover {
-    background-color: #666;
+    background-color: #ddd;
 }
 
 .dimension .dbuttons {

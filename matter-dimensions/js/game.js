@@ -1,3 +1,16 @@
+const _DIMENSIONS = [
+    { amount: 10, multiplier: 1.0, bought: 0, price: null },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e1, increase: 3 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e2, increase: 4 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e3, increase: 5 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e4, increase: 6 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e5, increase: 7 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e6, increase: 8 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e7, increase: 9 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e8, increase: 10 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e9, increase: 11 }
+];
+
 /* https://community.shopify.com/c/Shopify-Design/Ordinal-Number-in-javascript-1st-2nd-3rd-4th/m-p/72156 */
 Number.prototype.toOrdinal = function() {
     var s = ["th", "st", "nd", "rd"],
@@ -21,24 +34,43 @@ const tickInterval = 33;
 var totalMatterProduced = 10;
 var dimensions = [
     { amount: 10, multiplier: 1.0, bought: 0, price: null },
-    { amount: 0, multiplier: 1.0, bought: 0, price: 1e1, increase: 2 },
-    { amount: 0, multiplier: 1.0, bought: 0, price: 1e2, increase: 3 },
-    { amount: 0, multiplier: 1.0, bought: 0, price: 1e3, increase: 4 },
-    { amount: 0, multiplier: 1.0, bought: 0, price: 1e4, increase: 5 },
-    { amount: 0, multiplier: 1.0, bought: 0, price: 1e5, increase: 6 },
-    { amount: 0, multiplier: 1.0, bought: 0, price: 1e6, increase: 7 },
-    { amount: 0, multiplier: 1.0, bought: 0, price: 1e7, increase: 8 },
-    { amount: 0, multiplier: 1.0, bought: 0, price: 1e8, increase: 9 },
-    { amount: 0, multiplier: 1.0, bought: 0, price: 1e9, increase: 10 }
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e1, increase: 3 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e2, increase: 4 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e3, increase: 5 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e4, increase: 6 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e5, increase: 7 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e6, increase: 8 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e7, increase: 9 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e8, increase: 10 },
+    { amount: 0, multiplier: 1.0, bought: 0, price: 1e9, increase: 11 }
 ];
+var dimBoosts = 0;
 var $dimensions = [];
-var tickspeed = { speed: 1000.0, amount: 0, cost: 100, decrease: 6 };
+var tickspeed = { speed: 1000.0, amount: 0, cost: 1000, decrease: 6 };
 
 function getMatter() {
     return dimensions[0].amount;
 }
 function addMatter(matter) {
     dimensions[0].amount += matter;
+}
+
+function dimshift(dim) {
+    let lastDim = dimensions[dim + 4];
+    if(lastDim.amount < 20) return;
+
+    dimBoosts++;
+    dimensions = _DIMENSIONS;
+    for(let dimension of dimensions) {
+        dimension.multiplier = 2 * (dim + 1); 
+    }
+
+    tickspeed = { speed: 1000.0, amount: 0, cost: 1000, decrease: 6 };
+    $dimensions[dim + 4].show();
+}
+
+function dimboost(dimension) {
+
 }
 
 function buyTickspeed() {

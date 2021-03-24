@@ -41,17 +41,17 @@ function resetGame() {
             // Reset dimensions.
             dimensions = [
                 { amount: 10, multiplier: 1.0, bought: 0, price: null },
-                { amount: 0, multiplier: 1.0, bought: 0, price: 1e1, increase: 2 },
-                { amount: 0, multiplier: 1.0, bought: 0, price: 1e2, increase: 3 },
-                { amount: 0, multiplier: 1.0, bought: 0, price: 1e3, increase: 4 },
-                { amount: 0, multiplier: 1.0, bought: 0, price: 1e4, increase: 5 },
-                { amount: 0, multiplier: 1.0, bought: 0, price: 1e5, increase: 6 },
-                { amount: 0, multiplier: 1.0, bought: 0, price: 1e6, increase: 7 },
-                { amount: 0, multiplier: 1.0, bought: 0, price: 1e7, increase: 8 },
-                { amount: 0, multiplier: 1.0, bought: 0, price: 1e8, increase: 9 },
-                { amount: 0, multiplier: 1.0, bought: 0, price: 1e9, increase: 10 }
+                { amount: 0, multiplier: 1.0, bought: 0, price: 1e1, increase: 3 },
+                { amount: 0, multiplier: 1.0, bought: 0, price: 1e2, increase: 4 },
+                { amount: 0, multiplier: 1.0, bought: 0, price: 1e3, increase: 5 },
+                { amount: 0, multiplier: 1.0, bought: 0, price: 1e4, increase: 6 },
+                { amount: 0, multiplier: 1.0, bought: 0, price: 1e5, increase: 7 },
+                { amount: 0, multiplier: 1.0, bought: 0, price: 1e6, increase: 8 },
+                { amount: 0, multiplier: 1.0, bought: 0, price: 1e7, increase: 9 },
+                { amount: 0, multiplier: 1.0, bought: 0, price: 1e8, increase: 10 },
+                { amount: 0, multiplier: 1.0, bought: 0, price: 1e9, increase: 11 }
             ];
-            tickspeed = { speed: 1000.0, amount: 0, cost: 100, decrease: 6 };
+            tickspeed = { speed: 1000.0, amount: 0, cost: 1000, decrease: 6 };
 
             $('.tickspeed').text(tickspeed.speed.toMixedScientific());
             $('.tickspeedCost').text(tickspeed.cost.toMixedScientific());
