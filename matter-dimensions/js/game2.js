@@ -94,6 +94,7 @@ const Game = {
             increase: 11
         },
     },
+    dimShifts: 0,
     dimBoosts: 0,
     tickspeed: {
         speed: 1000.0,
@@ -126,17 +127,17 @@ const Game = {
     buyDimension: function(i, until10 = false) {
         let dimension = Game.dimensions[Object.keys(Game.dimensions)[i]];
         // do not buy if locked
-        if(this.dimBoosts - i < -3) return;
+        if(this.dimShifts - i < -3) return false;
 
 
         if(!until10) {
-            if(dimension.price > this.matter) return;
+            if(dimension.price > this.matter) return false;
             this.matter -= dimension.price;
             dimension.bought++;
             dimension.count++;
         } else {
             let bulkPrice = dimension.price * (10 - dimension.bought);
-            if(bulkPrice > this.matter) return;
+            if(bulkPrice > this.matter) return false;
             this.matter -= bulkPrice;
             dimension.count += (10 - dimension.bought);
             dimension.bought = 10;
@@ -147,6 +148,8 @@ const Game = {
             dimension.price *= Math.pow(10, dimension.increase);
             dimension.bought = 0;
         }
+
+        return true;
     },
 
     buyTickspeed: function(max = false) {
@@ -166,7 +169,7 @@ const Game = {
 
     buyMax: function() {
         for(let i = 0; i < 9; i++) {
-            this.buyDimension(i, true);
+            while(this.buyDimension(i, true)){}
         }
         this.buyTickspeed(true);
     },
@@ -179,7 +182,7 @@ const Game = {
             case 3: if(this.dimensions.seventh.count < 20) return; break;
             case 4: if(this.dimensions.eighth.count < 20) return; break;
         }
-        this.dimBoosts++;
+        this.dimShifts++;
         
         // reset dimensions
         for(let [k, v] of Object.entries(this.dimensions)) {
@@ -201,7 +204,7 @@ const Game = {
     },
 
     buyDimensionBoost: function() {
-        let required = (this.dimBoosts - 4) * 20;
+        let required = (this.dimBoosts + 1) * 20;
         if(this.dimensions.ninth.count < required) return;
         this.dimBoosts++;
         
@@ -224,21 +227,74 @@ const Game = {
         this.toggleDimboostAndDimensions();
     },
 
-    save: function() {
+    reset: function() {
+        if(confirm("WARNING! You will lose EVERYTHING! Are you ABSOLUTELY SURE you want to restart the entire game?")) {
+            if(prompt("THIS IS YOUR LAST CHANCE. If you REALLY WANT TO RESET ALL PROGRESS, type \"stroopwafel\" into the field below.") == "stroopwafel") {
+                this.matter = 10;
+                this.dimShifts = 0;
+                this.dimBoosts = 0;
+        
+                // reset dimensions
+                for(let [k, v] of Object.entries(this.dimensions)) {
+                    v.count = 0;
+                    v.multiplier = 1.0;
+                    v.bought = 0;
+                    v.price = v.basePrice;
+                }
+        
+                // reset tick speed
+                this.tickspeed.speed = 1000;
+                this.tickspeed.amount = 0;
+                this.tickspeed.price = 1000;
+                
+                console.log(`[DEBUG] Game reset at ${new Date().toLocaleString()}.`);
+            }
+        }
+    },
 
+    save: function() {
+        var parsed = `{
+            "matter": ${this.matter},
+            "dimShifts": ${this.dimShifts},
+            "dimBoosts": ${this.dimBoosts},
+            "dimensions": ${JSON.stringify(this.dimensions)},
+            "tickspeed": ${JSON.stringify(this.tickspeed)}
+        }`;
+        var toBase64 = btoa(parsed);
+        localStorage.matterDimensionsSaveGame = toBase64;
+        console.log(`[DEBUG] Game saved at ${new Date().toLocaleString()}.`);
     },
 
     load: function() {
+        var saveGame = localStorage.matterDimensionsSaveGame;
+        saveGame = JSON.parse(atob(saveGame));
+        
+        this.matter = saveGame.matter;
+        this.dimBoosts = saveGame.dimBoosts;
+        this.dimShifts = saveGame.dimShifts;
+        this.dimensions = saveGame.dimensions;
+        this.tickspeed = saveGame.tickspeed;
 
+        console.log(`[DEBUG] Game loaded at ${new Date().toLocaleString()}.`);
     },
 
     export: function() {
-
+        var parsed = `{
+            "matter": ${this.matter},
+            "dimShifts": ${this.dimShifts},
+            "dimBoosts": ${this.dimBoosts},
+            "dimensions": ${JSON.stringify(this.dimensions)},
+            "tickspeed": ${JSON.stringify(this.tickspeed)}
+        }`;
+        var toBase64 = btoa(parsed);
+        navigator.clipboard.writeText(toBase64).then(() => 
+            console.log(`[DEBUG] Game exported at ${new Date().toLocaleString()}.`),
+            (err) => console.log(err));
     },
 
     updateText: function() {
         this.$elements.matter.count.text(this.matter.toMixedScientific());
-        this.$elements.matter.perSecond.text((this.dimensions.first.count * (Math.pow(2, this.dimBoosts) * this.dimensions.first.multiplier)).toMixedScientific());
+        this.$elements.matter.perSecond.text((this.dimensions.first.count * (Math.pow(2, this.dimShifts) * this.dimensions.first.multiplier)).toMixedScientific());
 
         // Update tickspeed text
         this.$elements.tickspeed.amount.text(this.tickspeed.speed);
@@ -251,7 +307,7 @@ const Game = {
         for(let dimension of Object.keys(this.dimensions)) {
             let bulkPrice = (this.dimensions[dimension].price * (10 - this.dimensions[dimension].bought));
             this.$elements.dimensions[dimension].count.text(this.dimensions[dimension].count.toMixedScientific());
-            this.$elements.dimensions[dimension].multiplier.text((this.dimensions[dimension].multiplier * Math.pow(2, this.dimBoosts)).toMixedScientific(false));
+            this.$elements.dimensions[dimension].multiplier.text((this.dimensions[dimension].multiplier * (dimension == 'first' ? Math.pow(2, this.dimShifts) : 1) * (dimension == 'ninth' ? Math.pow(2, this.dimBoosts) : 1)).toMixedScientific(false));
             this.$elements.dimensions[dimension].bought.text(this.dimensions[dimension].bought.toMixedScientific());
             this.$elements.dimensions[dimension].singlePrice.text(this.dimensions[dimension].price.toMixedScientific());
             this.$elements.dimensions[dimension].bulkPrice.text(bulkPrice.toMixedScientific());
@@ -265,9 +321,9 @@ const Game = {
         this.$elements.boosts.dimshift4.button.css('border-color', this.dimensions.seventh.count >= 20 ? c_green : c_red);
         this.$elements.boosts.dimshift5.button.css('border-color', this.dimensions.eighth.count >= 20 ? c_green : c_red);
         
-        this.$elements.boosts.dimboost.boostCount.text(this.dimboosts);
-        this.$elements.boosts.dimboost.boostPrice.text((this.dimBoosts - 4) * 20);
-        this.$elements.boosts.dimboost.button.css('border-color', this.dimensions.ninth.count >= (this.dimBoosts - 4) * 20 ? c_green : c_red);
+        this.$elements.boosts.dimboost.boostCount.text(this.dimBoosts + this.dimShifts);
+        this.$elements.boosts.dimboost.boostPrice.text((this.dimBoosts + 1) * 20);
+        this.$elements.boosts.dimboost.button.css('border-color', this.dimensions.ninth.count >= (this.dimBoosts + 1) * 20 ? c_green : c_red);
         
         let delta = Math.max(0, Math.log10(this.matter) / 308 * 100).toFixed(2);
         $('.progress > p').text(`${delta}%`);
@@ -275,11 +331,11 @@ const Game = {
     },
 
     tick: function() {
-        this.matter += (this.dimensions.first.count * (Math.pow(2, this.dimBoosts) * this.dimensions.first.multiplier)) / 1000 * interval / this.tickspeed.speed * 1000;
+        this.matter += (this.dimensions.first.count * (Math.pow(2, this.dimShifts) * this.dimensions.first.multiplier)) / 1000 * interval / this.tickspeed.speed * 1000;
         
         const keys = Object.keys(this.dimensions);
         for(let i = 0; i < keys.length - 1; i++) {
-            this.dimensions[keys[i]].count += 0.1 * (this.dimensions[keys[i+1]].count * Math.pow(2, this.dimBoosts) * this.dimensions[keys[i+1]].multiplier / 1000 * interval / this.tickspeed.speed * 1000);
+            this.dimensions[keys[i]].count += 0.1 * (this.dimensions[keys[i+1]].count * (keys[i] == 'ninth' ? Math.pow(2, this.dimBoosts) : 1) * this.dimensions[keys[i+1]].multiplier / 1000 * interval / this.tickspeed.speed * 1000);
         }
 
         // Update unlockables?
@@ -293,19 +349,19 @@ const Game = {
     // function calling in tick.
     // TODO tidy up code, I know this can be written better...
     toggleDimboostAndDimensions: function() {
-        if(this.dimBoosts == 1) {
+        if(this.dimShifts == 1) {
             this.$elements.boosts.dimshift1.container.hide();
             this.$elements.boosts.dimshift2.container.show();
             this.$elements.dimensions.fifth.container.show();
         }
-        if(this.dimBoosts == 2) {
+        if(this.dimShifts == 2) {
             this.$elements.boosts.dimshift1.container.hide();
             this.$elements.boosts.dimshift2.container.hide();
             this.$elements.boosts.dimshift3.container.show();
             this.$elements.dimensions.fifth.container.show();
             this.$elements.dimensions.sixth.container.show();
         }
-        if(this.dimBoosts == 3) {
+        if(this.dimShifts == 3) {
             this.$elements.boosts.dimshift1.container.hide();
             this.$elements.boosts.dimshift2.container.hide();
             this.$elements.boosts.dimshift3.container.hide();
@@ -314,7 +370,7 @@ const Game = {
             this.$elements.dimensions.sixth.container.show();
             this.$elements.dimensions.seventh.container.show();
         }
-        if(this.dimBoosts == 4) {
+        if(this.dimShifts == 4) {
             this.$elements.boosts.dimshift1.container.hide();
             this.$elements.boosts.dimshift2.container.hide();
             this.$elements.boosts.dimshift3.container.hide();
@@ -325,7 +381,7 @@ const Game = {
             this.$elements.dimensions.seventh.container.show();
             this.$elements.dimensions.eighth.container.show();
         }
-        if(this.dimBoosts > 4) {
+        if(this.dimShifts > 4) {
             this.$elements.boosts.dimshift1.container.hide();
             this.$elements.boosts.dimshift2.container.hide();
             this.$elements.boosts.dimshift3.container.hide();
@@ -499,4 +555,12 @@ $(function() {
             Game.buyMax();
         }
     });
+
+    // Try loading.
+    if(localStorage.matterDimensionsSaveGame !== undefined) {
+        Game.load();
+    }
+
+    // Save game every 30 seconds.
+    setInterval(() => Game.save(), 30000);
 });

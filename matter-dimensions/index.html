@@ -391,22 +391,22 @@
             <table class="settings">
                 <tr>
                     <td>
-                        <button onclick="saveGame()">Save</button>
-                        <button onclick="exportGame()">Export</button>
-                        <button onclick="toggleNews()">Toggle the news</button>
+                        <button onclick="Game.save()">Save</button>
+                        <button onclick="Game.export()">Export</button>
+                        <button onclick="Game.toggleNews()">Toggle the news</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <button onclick="loadGame()">Load</button>
-                        <button onclick="importGame()">Import</button>
-                        <button onclick="toggleChallenges()">Auto retry challenges ON</button>
+                        <button onclick="Game.load()">Load</button>
+                        <button onclick="Game.import()">Import</button>
+                        <button onclick="Game.toggleChallengeRetry()">Auto retry challenges ON</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <button onclick="commaToggle()">Commas on exponents</button>
-                        <button class="reset" onclick="resetGame()">RESET THE GAME</button>
+                        <button onclick="Game.toggleCommas()">Commas on exponents</button>
+                        <button class="reset" onclick="Game.reset()">RESET THE GAME</button>
                     </td>
                 </tr>
             </table>
