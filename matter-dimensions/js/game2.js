@@ -561,6 +561,8 @@ $(function() {
         Game.load();
     }
 
+    Game.toggleDimboostAndDimensions();
+
     // Save game every 30 seconds.
     setInterval(() => Game.save(), 30000);
 });
