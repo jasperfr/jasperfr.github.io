@@ -1,0 +1,13 @@
+#game {
+    display: flex;
+    justify-content: center;
+}
+
+#game > * {
+    margin: 4px;
+}
+
+#main, #hold, #next {
+    border: 1px solid black;
+    box-shadow: 2px 2px 0 black;
+}

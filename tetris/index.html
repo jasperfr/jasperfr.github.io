@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="jetris.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Jetris</title>
+</head>
+<body style="overflow:hidden;">
+    <center>
+        <h1>Jetris</h1>
+        <hr>
+        <div id="game">
+            <div id="div-hold">
+                <h2>HOLD</h2>
+                <canvas id="hold" width="64" height="64" style="border:1px solid black;"></canvas>
+            </div>
+            <canvas id="main" width="200" height="400"></canvas>
+            <div id="div-next">
+                <h2>NEXT</h2>
+                <canvas id="next" width="64" height="320" style="border:1px solid black;"></canvas>
+            </div>
+        </div>
+    </center>
+    <a style="position:absolute;bottom:20px;width:100%;" href="../index.html">Back</a>
+</body>
+</html>
