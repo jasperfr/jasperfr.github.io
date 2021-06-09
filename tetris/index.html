@@ -14,21 +14,35 @@
     <center>
         <h1>Jetris</h1>
         <hr>
-        <div id="game">
-            <div id="div-hold">
-                <h2>HOLD</h2>
-                <canvas id="hold" width="64" height="64" style="border:1px solid white;"></canvas>
-                <h3>TIME</h3>
-                <h5 id="time"></h5>
-                <h3>PPS</h3>
-                <h5 id="pieces-per-second"></h5>
-                <h3>LINES</h3>
-                <h5 id="lines"></h5>
+        <div class="container">
+            <div id="game">
+                <div id="div-hold">
+                    <h2>HOLD</h2>
+                    <canvas id="hold" width="64" height="64" style="border:1px solid white;"></canvas>
+                    <h3>TIME</h3>
+                    <i id="time"></i>
+                    <h3>PPS</h3>
+                    <h5 id="pieces-per-second"></h5>
+                    <h3>LINES</h3>
+                    <h5 id="lines"></h5>
+                    <h3>APM</h3>
+                    <h5 id="apm">?</h5>
+                    <h3>SCORE</h3>
+                    <h5 id="score"></h5>
+                </div>
+                <canvas id="main" width="200" height="400"></canvas>
+                <div id="div-next">
+                    <h2>NEXT</h2>
+                    <canvas id="next" width="64" height="320" style="border:1px solid white;"></canvas>
+                </div>
             </div>
-            <canvas id="main" width="200" height="400"></canvas>
-            <div id="div-next">
-                <h2>NEXT</h2>
-                <canvas id="next" width="64" height="320" style="border:1px solid white;"></canvas>
+
+            <div id="settings">
+                <h1>PAUSED</h1> <br>
+                <h2>Settings</h2> <br>
+                <span title="Soft Drop Factor, how fast pieces drop.">SDF 1</span><input type="range" min="1" max="20" value="10" id="sdf"><span>20</span> <span id="sdf-val">10</span><br>
+                <span title="Delayed Auto Shift, how long it takes before a piece to repeat movement.">DAS 0</span><input type="range" min="0" max="50" value="25" id="das"><span>50</span> <span id="das-val">25</span><br>
+                <span title="Automatic Repeat Rate, how fast pieces repeadetly move.">ARR 1</span><input type="range" min="1" max="10" value="1" id="arr"><span>10</span> <span id="arr-val">10</span><br>
             </div>
         </div>
     </center>

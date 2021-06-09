@@ -32,6 +32,42 @@ const SRSX = {
     "I3-1": [[ 0, 0], [ 0,-1], [ 0,-2], [ 0, 1], [ 0, 2], [ 1, 0]]
 }
 
+var paused = false;
+var DAS = 10, SDF = 4;
+$(() => {
+    $('#sdf').on('input', function() {
+        SDF = $('#sdf').val();
+        $('#sdf-val').text($('#sdf').val());
+    });
+    $('#das').on('input', function() {
+        DAS = $('#das').val();
+        $('#das-val').text($('#das').val());
+    });
+    window.addEventListener('keydown', function(e) {
+        if(e.keyCode == 27) {
+            $('#settings').toggle();
+            paused ^= true;
+        }
+    });
+    $('#settings').hide();
+});
+
+var sounds = {
+    hard_drop: 'audio/hard_drop.mp3',
+    rotate: 'audio/rotate.mp3',
+    move: 'audio/move_piece.mp3',
+    hold: 'audio/hold.mp3',
+    line_1: 'audio/line_1.mp3',
+    line_2: 'audio/line_2.mp3',
+    line_3: 'audio/line_3.mp3',
+    line_4: 'audio/line_4.mp3',
+};
+function playSound(sound) {
+    new Audio(sounds[sound]).play();
+};
+
+var score = 0;
+
 // Returns [x, y, new rotation], or [0, 0, same rotation] if no kick has been found.
 function getKickTable(piece, board, xpos, ypos, rotationFrom, rotationTo) {
     let key = `${piece=='I'?'I':'N'}${rotationFrom}-${rotationTo}`;
@@ -47,7 +83,11 @@ function getKickTable(piece, board, xpos, ypos, rotationFrom, rotationTo) {
             if(board[y] == undefined) continue; // prevent overflowing
             if(board[y][x + 1] != 0 && pieces[currentPiece].grid[rotationTo][i] == 1) ok = false;
         }
-        if(ok) return [xpos + tx, ypos - ty, rotationTo];
+        if(ok) {
+            playSound('rotate');
+            score += 1;
+            return [xpos + tx, ypos - ty, rotationTo];
+        }
     }
     return [xpos, ypos, rotationFrom];
 }
@@ -516,16 +556,60 @@ function canMoveTo(xpos, ypos, r) {
     return true;
 }
 
+class Particle {
+    constructor(x, y, c) {
+        this.x = x;
+        this.y = y;
+        this.c = c;
+        this.vx = Math.random() * 10 - Math.random() * 10;
+        this.vy = Math.random() * 10 - Math.random() * 10;
+    }
+    render(context) {
+        // update
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx /= 1.1;
+        this.vy /= 1.1;
+        // render
+        context.fillStyle = fillStyles[this.c - 1];
+        let size = Math.min(this.vx * 4, 8);
+        context.fillRect(this.x - size / 2, this.y - size / 2, size, size);
+
+        if(this.vx < 0.1 && this.vy < 0.1) {
+            this.remove();
+        }
+    }
+    remove() {
+        particles.splice(particles.indexOf(this), 1);
+    }
+}
+const particles = [];
+
+function addParticle(x, y, color) {
+    console.log('a');
+    particles.push(new Particle(x, y, color));
+}
+
 function checkTetraLines() {
+    let clear = 0;
     for(let y = 0; y < 20; y++) {
         let line = board[y];
         if(!line.some(i => i == 0)) {
             // remove this line and add an empty on top of the board
-            board.splice(y, 1);
+            let l = board.splice(y, 1)[0];
+            for(let p = 1; p < l.length - 1; p++) {
+                for(let _ = 0; _ < 10 + Math.floor(Math.random() * 10); _++) {
+                    addParticle(p * 20, y * 20, l[p]);
+                }
+            }
+
             board.unshift([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
             lineClears++;
+            clear++;
         }
     }
+    if(clear > 0) playSound(`line_${clear}`);
+    score += Math.pow(clear * 10, 2);
 }
 
 var dasTimer = 10; dasTime = 0; dasTrigger = false; dasEnabled = false;
@@ -533,6 +617,9 @@ var holdBool = false;
 
 var $canvas, ctx;
 function tick() {
+    if(paused) return;
+
+
     dropTimer++;
     if(dropTimer > dropRate) {
         if(canMoveTo(posX, posY + 1, rotation)) {
@@ -565,6 +652,7 @@ function tick() {
             if(pressedKeys.some(i => [37].includes(i))) {
                 if(canMoveTo(posX - 1, posY, rotation)) {
                     posX--;
+                    if(!dasEnabled) playSound('move');
                 } else {
                     bx -= 6;
                 }
@@ -572,6 +660,7 @@ function tick() {
             if(pressedKeys.some(i => [39].includes(i))) {
                 if(canMoveTo(posX + 1, posY, rotation)) {
                     posX++;
+                    if(!dasEnabled) playSound('move');
                 } else {
                     bx += 6;
                 }
@@ -586,7 +675,8 @@ function tick() {
 
     if(dasTrigger) {
         dasTime++;
-        if(dasTime > dasTimer) {
+        if(dasTime > DAS) {
+            if(!dasEnabled) playSound('move');
             dasEnabled = true;
         }
     }
@@ -596,7 +686,9 @@ function tick() {
         for(let i = 0; i < 20; i++)
         if(canMoveTo(posX, posY + 1, rotation)) {
             posY++;
+            score += 1;
         }
+        playSound('hard_drop');
         by = 40;
         newPiece();
     }
@@ -604,6 +696,8 @@ function tick() {
     // Hold
     if(!holdBool && pressedKeys.some(i => [16].includes(i))) {
         holdBool = true;
+        playSound('hold');
+
         // No hold piece
         if(!holdPiece) {
             holdPiece = currentPiece;
@@ -621,7 +715,14 @@ function tick() {
 
     if(pressedKeys.some(i => [83, 40].includes(i))) {
         if(canMoveTo(posX, posY + 1, rotation)) {
-            posY++;
+            for(let i = 0; i < SDF; i++) {
+                if(canMoveTo(posX, posY + 1, rotation)) {
+                    posY++;
+                    score += 1;
+                }
+            }
+            if(!canMoveTo(posX, posY + 1, rotation)) playSound('hard_drop');
+            score += 1;
         } else {
             by += 6;
         }
@@ -629,6 +730,7 @@ function tick() {
 
     if(pressedKeys.some(i => [82].includes(i))) {
         restart();
+        score = 0;
     }
 
     // Flip
@@ -685,6 +787,8 @@ function tick() {
     getPPS();
     getTime();
     getLines();
+    particles.forEach(p => p.render(ctx));
+    $('#score').text(score);
 }
 
 var bx = 0, by = 0;

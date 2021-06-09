@@ -29,3 +29,18 @@ body {
 #div-hold h3 {
     margin: 8px;
 }
+
+#settings {
+    width: 400px;
+    height: 400px;
+    position: absolute;
+    left: calc(-200px + 50%);
+    top: calc(-200px + 50%);
+    border: 1px solid white;
+    background-color: black;
+    box-shadow: 2px 2px 0 white;
+}
+
+.container {
+    position: relative;
+}
