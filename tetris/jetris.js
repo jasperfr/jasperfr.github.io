@@ -1,3 +1,57 @@
+const SRSX = {
+    "_comment1": "Kicks",
+    "N0-1": [[ 0, 0], [-1, 0], [-1, 1], [ 0,-2], [-1,-2]],
+    "N1-0": [[ 0, 0], [ 1, 0], [ 1,-1], [ 0, 2], [ 1, 2]],
+    "N1-2": [[ 0, 0], [ 1, 0], [ 1,-1], [ 0, 2], [ 1, 2]],
+    "N2-1": [[ 0, 0], [-1, 0], [-1, 1], [ 0,-2], [-1,-2]],
+    "N2-3": [[ 0, 0], [ 1, 0], [ 1, 1], [ 0,-2], [ 1,-2]],
+    "N3-2": [[ 0, 0], [-1, 0], [-1,-1], [ 0, 2], [-1, 2]],
+    "N3-0": [[ 0, 0], [-1, 0], [-1,-1], [ 0, 2], [-1, 2]],
+    "N0-3": [[ 0, 0], [ 1, 0], [ 1, 1], [ 0,-2], [ 1,-2]], 
+
+    "_comment2": "180 Kicks",
+    "N0-2": [[ 0, 0], [ 1, 0], [ 2, 0], [ 1,-1], [ 2,-1], [-1, 0], [-2, 0], [-1,-1], [-2,-1], [ 0, 1], [ 3, 0], [-3, 0]],
+    "N1-3": [[ 0, 0], [ 0,-1], [ 0,-2], [-1,-1], [-1,-2], [ 0, 1], [ 0, 2], [-1, 1], [-1, 2], [ 1, 0], [ 0,-3], [ 0, 3]],
+    "N2-0": [[ 0, 0], [-1, 0], [-2, 0], [-1, 1], [-2, 1], [ 1, 0], [ 2, 0], [ 1, 1], [ 2, 1], [ 0,-1], [-3, 0], [ 3, 0]],
+    "N3-1": [[ 0, 0], [ 0,-1], [ 0,-2], [ 1,-1], [ 1,-2], [ 0, 1], [ 0, 2], [ 1, 1], [ 1, 2], [-1, 0], [ 0,-3], [ 0, 3]],
+
+    "_comment3": "I Piece Kicks",
+    "I0-1": [[ 0, 0], [-2, 0], [ 1, 0], [-2,-1], [ 1, 2]],
+    "I1-0": [[ 0, 0], [ 2, 0], [-1, 0], [ 2, 1], [-1,-2]],
+    "I1-2": [[ 0, 0], [-1, 0], [ 2, 0], [-1, 2], [ 2,-1]],
+    "I2-1": [[ 0, 0], [ 1, 0], [-2, 0], [ 1,-2], [-2, 1]],
+    "I2-3": [[ 0, 0], [ 2, 0], [-1, 0], [ 2, 1], [-1,-2]],
+    "I3-2": [[ 0, 0], [-2, 0], [ 1, 0], [-2,-1], [ 1, 2]],
+    "I3-0": [[ 0, 0], [ 1, 0], [-2, 0], [ 1,-2], [-2, 1]],
+    "I0-3": [[ 0, 0], [-1, 0], [ 2, 0], [-1, 2], [ 2,-1]],
+
+    "_comment4": "I Piece 180 Kicks",
+    "I0-2": [[ 0, 0], [-1, 0], [-2, 0], [ 1, 0], [ 2, 0], [ 0,-1]],
+    "I1-3": [[ 0, 0], [ 0,-1], [ 0,-2], [ 0, 1], [ 0, 2], [-1, 0]],
+    "I2-0": [[ 0, 0], [ 1, 0], [ 2, 0], [-1, 0], [-2, 0], [ 0, 1]],
+    "I3-1": [[ 0, 0], [ 0,-1], [ 0,-2], [ 0, 1], [ 0, 2], [ 1, 0]]
+}
+
+// Returns [x, y, new rotation], or [0, 0, same rotation] if no kick has been found.
+function getKickTable(piece, board, xpos, ypos, rotationFrom, rotationTo) {
+    let key = `${piece=='I'?'I':'N'}${rotationFrom}-${rotationTo}`;
+    let table = SRSX[key];
+    let pieceMatrix = pieces[piece].grid[rotationTo];
+    for(let xy of table) {
+        let tx = xy[0];
+        let ty = xy[1];
+        let ok = true;
+        for(let i = 0; i <= 15; i++) {
+            let x = xpos + i % 4 + tx;
+            let y = ypos + Math.floor(i / 4) - ty;
+            if(board[y] == undefined) continue; // prevent overflowing
+            if(board[y][x + 1] != 0 && pieces[currentPiece].grid[rotationTo][i] == 1) ok = false;
+        }
+        if(ok) return [xpos + tx, ypos - ty, rotationTo];
+    }
+    return [xpos, ypos, rotationFrom];
+}
+
 const _BOARD_ = [
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -22,6 +76,24 @@ const _BOARD_ = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ];
 
+var lineClears = 0;
+const TICKSPEED = 17;
+var piecesPlaced = 0, millisecondsElapsed = 0.0001;
+function getPPS() {
+    millisecondsElapsed += TICKSPEED;
+    let $pps = $('#pieces-per-second');
+    let pps = piecesPlaced / millisecondsElapsed * 1000;
+    $pps.text(pps.toFixed(2));
+};
+function getTime() {
+    let $time = $('#time');
+    let time = millisecondsElapsed;
+    $time.text(`${Math.floor(time / 60000)}:${Math.floor(time / 1000) % 60}.${Math.floor(time % 1000)}`);
+}
+function getLines() {
+    let $lines = $('#lines');
+    $lines.text(lineClears);
+}
 
 var board = JSON.parse(JSON.stringify(_BOARD_));
 
@@ -122,26 +194,26 @@ const pieces = {
         grid: [
             [
                 0, 0, 0, 0,
-                1, 1, 0, 0,
-                1, 1, 0, 0,
+                0, 1, 1, 0,
+                0, 1, 1, 0,
                 0, 0, 0, 0
             ],
             [
                 0, 0, 0, 0,
-                1, 1, 0, 0,
-                1, 1, 0, 0,
+                0, 1, 1, 0,
+                0, 1, 1, 0,
                 0, 0, 0, 0
             ],
             [
                 0, 0, 0, 0,
-                1, 1, 0, 0,
-                1, 1, 0, 0,
+                0, 1, 1, 0,
+                0, 1, 1, 0,
                 0, 0, 0, 0
             ],
             [
                 0, 0, 0, 0,
-                1, 1, 0, 0,
-                1, 1, 0, 0,
+                0, 1, 1, 0,
+                0, 1, 1, 0,
                 0, 0, 0, 0
             ],
         ]
@@ -187,22 +259,22 @@ const pieces = {
                 0, 0, 0, 0
             ],
             [
+                0, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 1, 1, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 0
+                0, 0, 1, 0
             ],
             [
-                0, 1, 1, 0,
-                1, 1, 0, 0,
                 0, 0, 0, 0,
-                0, 0, 0, 0
+                0, 0, 0, 0,
+                0, 1, 1, 0,
+                1, 1, 0, 0
             ],
             [
+                0, 0, 0, 0,
                 1, 0, 0, 0,
                 1, 1, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 0, 0
+                0, 1, 0, 0
             ],
         ]
     },
@@ -217,22 +289,22 @@ const pieces = {
                 0, 0, 0, 0
             ],
             [
+                0, 0, 0, 0,
                 0, 0, 1, 0,
                 0, 1, 1, 0,
-                0, 1, 0, 0,
-                0, 0, 0, 0
+                0, 1, 0, 0
             ],
             [
-                1, 1, 0, 0,
-                0, 1, 1, 0,
                 0, 0, 0, 0,
-                0, 0, 0, 0
+                0, 0, 0, 0,
+                1, 1, 0, 0,
+                0, 1, 1, 0
             ],
             [
+                0, 0, 0, 0,
                 0, 1, 0, 0,
                 1, 1, 0, 0,
-                1, 0, 0, 0,
-                0, 0, 0, 0
+                1, 0, 0, 0
             ],
         ]
     },
@@ -275,11 +347,15 @@ function restart() {
     board = JSON.parse(JSON.stringify(_BOARD_));
     dropTimer = 0;
     rotation = 0;
+    piecesPlaced = 0;
+    millisecondsElapsed = 0.0001;
+    lineClears = 0;
 }
 
 const s = 20; // piece size
 function drawGrid(ctx) {
     ctx.clearRect(0, 0, 200, 400);
+    ctx.strokeStyle = '#444';
 
     for(let x = 0; x < 10; x++) {
         drawLine(ctx, x * s, 0, x * s, 400);
@@ -381,6 +457,7 @@ function drawShadowPiece(ctx, x, y, piece, r) {
 
 function newPiece(isHold = false) {
     if(!isHold) {
+        piecesPlaced++;
         holdBool = false;
         let p = pieces[currentPiece];
         let fill = p.fill;
@@ -426,7 +503,7 @@ function removeKey(key) {
     }
 }
 
-var dropRate = 25, dropTimer = 0, lockDelay = 30, lockTimer = 0, triggerLockDelay = false;
+var dropRate = 25, dropTimer = 0, lockDelay = 30000, lockTimer = 0, triggerLockDelay = false;
 
 function canMoveTo(xpos, ypos, r) {
     let pieceMatrix = pieces[currentPiece].grid[r];
@@ -446,11 +523,12 @@ function checkTetraLines() {
             // remove this line and add an empty on top of the board
             board.splice(y, 1);
             board.unshift([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+            lineClears++;
         }
     }
 }
 
-var dasTimer = 6; dasTime = 0; dasTrigger = false; dasEnabled = false;
+var dasTimer = 10; dasTime = 0; dasTrigger = false; dasEnabled = false;
 var holdBool = false;
 
 var $canvas, ctx;
@@ -535,13 +613,9 @@ function tick() {
         // With hold piece
         else {
             [currentPiece, holdPiece] = [holdPiece, currentPiece];
-            if(!canMoveTo(posX, posY + 1, rotation)) {
-                [currentPiece, holdPiece] = [holdPiece, currentPiece];
-            } else {
-                rotation = 0;
-                posY = -1;
-                posX = 3;
-            }
+            rotation = 0;
+            posY = -1;
+            posX = 3;
         }
     }
 
@@ -557,30 +631,33 @@ function tick() {
         restart();
     }
 
+    // Flip
     if(pressedKeys.some(i => [65].includes(i))) {
         switch(rotation) {
-            case 0: if (canMoveTo(posX, posY, 2)) rotation = 2; break;
-            case 1: if (canMoveTo(posX, posY, 3)) rotation = 3; break;
-            case 2: if (canMoveTo(posX, posY, 0)) rotation = 0; break;
-            case 3: if (canMoveTo(posX, posY, 1)) rotation = 1; break;
+            case 0: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 0, 2); break;
+            case 1: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 1, 3); break;
+            case 2: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 2, 0); break;
+            case 3: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 3, 1); break;
         }
     }
 
+    // Rotate clockwise
     if(pressedKeys.some(i => [38, 88].includes(i))) {
         switch(rotation) {
-            case 0: if (canMoveTo(posX, posY, 1)) rotation = 1; break;
-            case 1: if (canMoveTo(posX, posY, 2)) rotation = 2; break;
-            case 2: if (canMoveTo(posX, posY, 3)) rotation = 3; break;
-            case 3: if (canMoveTo(posX, posY, 0)) rotation = 0; break;
+            case 0: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 0, 1); break;
+            case 1: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 1, 2); break;
+            case 2: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 2, 3); break;
+            case 3: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 3, 0); break;
         }
     }
 
+    // Rotate counterclockwise
     if(pressedKeys.some(i => [90].includes(i))) {
         switch(rotation) {
-            case 0: if (canMoveTo(posX, posY, 3)) rotation = 3; break;
-            case 1: if (canMoveTo(posX, posY, 0)) rotation = 0; break;
-            case 2: if (canMoveTo(posX, posY, 1)) rotation = 1; break;
-            case 3: if (canMoveTo(posX, posY, 2)) rotation = 2; break;
+            case 0: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 0, 3); break;
+            case 1: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 1, 0); break;
+            case 2: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 2, 1); break;
+            case 3: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 3, 2); break;
         }
     }
 
@@ -605,6 +682,9 @@ function tick() {
     drawPieces(ctx);
     drawHoldPiece();
     drawNext();
+    getPPS();
+    getTime();
+    getLines();
 }
 
 var bx = 0, by = 0;
@@ -621,7 +701,7 @@ $(() => {
 
     window.addEventListener('keydown', keyDownEvent);
     window.addEventListener('keyup', keyUpEvent);
-    window.setInterval(tick, 33);
+    window.setInterval(tick, 17);
     window.setInterval(boardBounce, 17);
 
     console.log('kagari isn\'t real');

@@ -1,3 +1,13 @@
+body {
+    background-color: #222;
+    color: white;
+    font-family: Roboto;
+    background-image:url('background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 #game {
     display: flex;
     justify-content: center;
@@ -8,6 +18,14 @@
 }
 
 #main, #hold, #next {
-    border: 1px solid black;
-    box-shadow: 2px 2px 0 black;
+    border: 1px solid white;
+    box-shadow: 2px 2px 0 white;
+}
+
+#div-hold h5 {
+    margin: 2px;
+}
+
+#div-hold h3 {
+    margin: 8px;
 }
