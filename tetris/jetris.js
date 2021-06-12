@@ -76,7 +76,19 @@ $(() => {
         }
     });
     $('#settings').hide();
+
+    sprites.J = new Image(20, 20); sprites.J.src = 'sprites/J.png';
+    sprites.Z = new Image(20, 20); sprites.Z.src = 'sprites/Z.png';
+    sprites.O = new Image(20, 20); sprites.O.src = 'sprites/O.png';
+    sprites.S = new Image(20, 20); sprites.S.src = 'sprites/S.png';
+    sprites.L = new Image(20, 20); sprites.L.src = 'sprites/L.png';
+    sprites.I = new Image(20, 20); sprites.I.src = 'sprites/I.png';
+    sprites.T = new Image(20, 20); sprites.T.src = 'sprites/T.png';
+    sprites.H = new Image(20, 20); sprites.H.src = 'sprites/H.png';
+    sprites.G = new Image(20, 20); sprites.G.src = 'sprites/G.png';
 });
+
+var sprites = {};
 
 var sounds = {
     hard_drop: 'audio/hard_drop.mp3',
@@ -515,14 +527,16 @@ function drawGrid(ctx) {
 }
 
 // J L T O I S Z
+const pcs = ['J', 'L', 'T', 'O', 'I', 'S', 'Z'];
 fillStyles = ['#0000FF', '#FF8000', '#FF00FF', '#FFFF00', '#00FFFF', '#00FF00', '#FF0000', '#808080']
 function drawPieces(ctx) {
     for(let y = 0; y < 20; y++) {
         for(let x = 0; x < 20; x++) {
             let piece = board[y][x + 1];
             if(piece == 0) continue;
-            ctx.fillStyle = fillStyles[piece - 1];
-            ctx.fillRect(x * 20, y * 20, 20, 20);
+            let px = pcs[piece - 1];
+            if(px == undefined) continue;
+            ctx.drawImage(sprites[px], x * s, y * s);
         }
     }
 }
@@ -530,22 +544,23 @@ function drawPieces(ctx) {
 function drawHoldPiece() {
     let ch = document.getElementById('hold');
     let ctxh = ch.getContext('2d');
-    ctxh.clearRect(0, 0, 128, 128);
+    ctxh.clearRect(0, 0, 200, 150);
 
     if(!holdPiece) return;
     let p = pieces[holdPiece];
+    let sprite = holdBool ? sprites['H'] : sprites[holdPiece];
     ctxh.fillStyle = p.color;
-    for(let _x = 0; _x < 4; _x++) {
-        for(let _y = 0; _y < 4; _y++) {
-            let current = p.grid[0][_y * 4 + _x];
+    for(let x = 0; x < 4; x++) {
+        for(let y = 0; y < 4; y++) {
+            let current = p.grid[0][y * 4 + x];
             if (current == 1) {
                 if(holdPiece == 'I') {
-                    ctxh.fillRect(_x * 16 + 18, _y * 24 + 16, 16, 16);
+                    ctxh.drawImage(sprite, x * 20 + 10, y * 20 + 10);
                 }
                 else if(holdPiece == 'O')
-                    ctxh.fillRect(_x * 16 + 18, _y * 16 + 16, 16, 16);
+                    ctxh.drawImage(sprite, x * 20 + 10, y * 20);
                 else 
-                    ctxh.fillRect(_x * 16 + 26, _y * 16 + 16, 16, 16);
+                    ctxh.drawImage(sprite, x * 20 + 20, y * 20);
             }
         }
     }
@@ -560,18 +575,18 @@ function drawNext() {
         let offset = i * 64;
         let p = pieces[bags[i]];
         let pc = bags[i];
-        ctxn.fillStyle = p.color;
-        for(let _x = 0; _x < 4; _x++) {
-            for(let _y = 0; _y < 4; _y++) {
-                let current = p.grid[0][_y * 4 + _x];
+        let sprite = sprites[pc];
+        for(let x = 0; x < 4; x++) {
+            for(let y = 0; y < 4; y++) {
+                let current = p.grid[0][y * 4 + x];
                 if (current == 1) {
                     if(pc == 'I') {
-                        ctxn.fillRect(_x * 16 + 18, _y * 24 + offset, 16, 16);
+                        ctxn.drawImage(sprite, x * 20 + 10, i * 60 + y * 20 + 10);
                     }
                     else if(pc == 'O')
-                        ctxn.fillRect(_x * 16 + 18, _y * 16 + offset, 16, 16);
+                        ctxn.drawImage(sprite, x * 20 + 10, i * 60 + y * 20);
                     else 
-                        ctxn.fillRect(_x * 16 + 26, _y * 16 + offset, 16, 16);
+                        ctxn.drawImage(sprite, x * 20 + 20, i * 60 + y * 20);
                 }
             }
         }
@@ -592,7 +607,7 @@ function drawPiece(ctx, x, y, piece, r) {
         for(let _y = 0; _y < 4; _y++) {
             let current = p.grid[r][_y * 4 + _x];
             if (current == 1) {
-                ctx.fillRect((_x + x) * s, (_y + y) * s, s, s);
+                ctx.drawImage(sprites[piece], (_x + x) * s, (_y + y) * s);
             }
         }
     }
@@ -611,7 +626,7 @@ function drawShadowPiece(ctx, x, y, piece, r) {
         for(let _y = 0; _y < 4; _y++) {
             let current = p.grid[r][_y * 4 + _x];
             if (current == 1) {
-                ctx.fillRect((_x + x) * s, (_y + y + dy) * s, s, s);
+                ctx.drawImage(sprites.G, (_x + x) * s, (_y + y + dy) * s);
             }
         }
     }

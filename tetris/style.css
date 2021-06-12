@@ -8,6 +8,10 @@ body {
     background-repeat: no-repeat;
 }
 
+.container {
+    margin-top: 10%;
+}
+
 #game {
     display: flex;
     justify-content: center;
@@ -60,6 +64,7 @@ body {
     width: 200px;
     position: relative;
     overflow: hidden;
+    margin-right: 20px;
 }
 
 #div-action-text *, #div-action-text * span {
