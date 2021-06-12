@@ -45,7 +45,7 @@ function createAllClear() {
 };
 
 function show($el) {
-    $el.show('drop', { direction: 'right' });
+    $el.show();
 }
 function hide($el) {
     $el.hide();
@@ -193,7 +193,7 @@ function getPPS() {
 function getTime() {
     let $time = $('#time');
     let time = millisecondsElapsed;
-    $time.text(`${Math.floor(time / 60000)}:${Math.floor(time / 1000) % 60}.${Math.floor(time % 1000)}`);
+    $time.text(`${Math.floor(time / 60000)}:${('00' + Math.floor(time / 1000) % 60).slice(-2)}.${('000' + Math.floor(time % 1000)).slice(-3)}`);
 }
 function getLines() {
     let $lines = $('#lines');
@@ -803,6 +803,8 @@ function checkTetraLines(spin) {
         if(combo > 1) playSound('combobreak');
         combo = 0;
     }
+    
+    Level.add(clear);
 
     if(combo <= 1) {
         hide($combo);
@@ -850,7 +852,7 @@ function tick() {
 
     if(paused) return;
 
-    dropTimer++;
+    dropTimer += Level.getLevel();
     if(dropTimer > dropRate) {
         if(canMoveTo(posX, posY + 1, rotation)) {
             posY++;
@@ -971,6 +973,7 @@ function tick() {
     if(pressedKeys.some(i => [82].includes(i))) {
         restart();
         Score.set(0);
+        Level.restart();
         kick = -1;
         tspin = 0;
     }

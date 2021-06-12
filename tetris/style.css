@@ -10,8 +10,7 @@ body {
 }
 
 .container {
-    margin-top: 10%;
-    transform: scale(150%);
+    transform: translateY(25vh) scale(160%);
 }
 
 #main-area {
@@ -24,10 +23,31 @@ body {
     background-color: black;
     margin: 0;
     font-weight: 200;
-    border-bottom-right-radius: 5px;
+    height: 25px;
     border-bottom-left-radius: 5px;
     border-top:none;
     font-family: monospace;
+}
+
+#line-progress {
+    position: relative;
+    display: block;
+    width: 16px;
+    height: 427px;
+    border: 2px solid white;
+    background-color: black;
+    border-left:none;
+    border-bottom-right-radius: 5px;
+}
+
+#line-progress .progressbar {
+    background-color: #0D5EB4;
+    position: absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    height: 0%;
+    transition: height 1000ms;
 }
 
 #score-box h2 {
@@ -39,13 +59,46 @@ body {
     transition: color 500ms;
 }
 
+#stats {
+    background: black;
+    margin: 0;
+    padding: 4px;
+    padding-bottom: 12px;
+    border-left: 2px solid white;
+    border-bottom: 2px solid white;
+}
+
+.level {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    margin: 0 auto;
+    text-align: center;
+    width: 200px;
+    color: yellow;
+    text-shadow: 0px 0px 2px white;
+    opacity: 1;
+    animation: bonk linear 500ms;
+    font-size: 300%;
+}
+@keyframes bonk {
+    from {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(-60px);
+        opacity:0;
+    }
+}
+
 #all-clear {
     position: absolute;
     left: 50%;
     top: 40%;
     margin: 0 auto;
     text-align: center;
-    width: 220px;
+    width: 200px;
     color: yellow;
     text-shadow: 0px 0px 2px white;
     animation: rotate linear 2s;
@@ -101,6 +154,11 @@ body {
 #next {
     border-left: none;
     border-top: none;
+}
+
+#div-hold {
+    display: flex;
+    flex-direction: column;
 }
 
 #div-hold h5 {

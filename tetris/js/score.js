@@ -8,7 +8,7 @@ const Score = (() => {
     }
 
     const addScore = function(score) {
-        scoreToAdd += score;
+        scoreToAdd += score * Level.getLevel();
     }
 
     const tick = function() {
@@ -16,7 +16,7 @@ const Score = (() => {
         score += delta;
         scoreToAdd -= delta;
         let log10 = Math.floor(Math.log10(score));
-        trailingLength = 9 - log10;
+        trailingLength = Math.min(9 - log10, 9);
         $score.text(Math.round(score));
         $trailing.text(Array(trailingLength).fill(0).join(''));
     }

@@ -2,19 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" 
+          type="image/png" 
+          href="favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="jetris.js"></script>
     <script src="js/score.js"></script>
+    <script src="js/level.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>Jetris</title>
 </head>
 <body style="overflow:hidden;">
     <center>
-        <h1>Jetris</h1>
-        <hr>
         <div class="container">
             <div id="game">
                 <div id="div-action-text">
@@ -26,20 +28,25 @@
                 <div id="div-hold">
                     <h2>HOLD</h2>
                     <canvas id="hold" width="100" height="80"></canvas>
-                    <h3>TIME</h3>
-                    <i id="time"></i>
-                    <h3>PPS</h3>
-                    <h5 id="pieces-per-second"></h5>
-                    <h3>LINES</h3>
-                    <h5 id="lines"></h5>
-                    <h3>APM</h3>
-                    <h5 id="apm">?</h5>
+                    <div id="stats">
+                        <h3>TIME</h3>
+                        <h5 id="time"></h5>
+                        <h3>PPS</h3>
+                        <h5 id="pieces-per-second"></h5>
+                        <h3>LINES</h3>
+                        <h5 id="lines"></h5>
+                        <h3>LEVEL</h3>
+                        <h5 id="level">1</h5>
+                    </div>
                 </div>
                 <div id="main-area">
                     <canvas id="main" width="200" height="400"></canvas>
                     <div id="score-box">
                         <h2><span class="zeroes">0000000</span><span class="score">74500</span></h2>
                     </div>
+                </div>
+                <div id="line-progress">
+                    <div class="progressbar"></div>
                 </div>
                 <div id="div-next">
                     <h2>NEXT</h2>
