@@ -36,6 +36,14 @@ const SRSX = {
     "I3-1": [[ 0, 0], [ 0,-1], [ 0,-2], [ 0, 1], [ 0, 2], [ 1, 0]]
 }
 
+function createAllClear() {
+    let $element = $(`<h1 id="all-clear">PERFECT CLEAR!</h1>`);
+    $('#game').prepend($element);
+    setTimeout(() => {
+        $element.remove();
+    }, 3000);
+};
+
 function show($el) {
     $el.show('drop', { direction: 'right' });
 }
@@ -91,28 +99,34 @@ $(() => {
 var sprites = {};
 
 var sounds = {
-    hard_drop: 'audio/hard_drop.mp3',
-    rotate: 'audio/rotate.mp3',
-    move: 'audio/move_piece.mp3',
-    hold: 'audio/hold.mp3',
-    line_1: 'audio/line_1.mp3',
-    line_2: 'audio/line_2.mp3',
-    line_3: 'audio/line_3.mp3',
-    line_4: 'audio/line_4.mp3',
-    line_5: 'audio/line_5.mp3',
-    line_6: 'audio/line_6.mp3',
-    line_7: 'audio/line_7.mp3',
-    line_8: 'audio/line_8.mp3',
-    line_9: 'audio/line_9.mp3',
-    line_10: 'audio/line_10.mp3',
-    line_11: 'audio/line_11.mp3',
-    line_12: 'audio/line_12.mp3',
-    line_13: 'audio/line_13.mp3',
-    line_14: 'audio/line_14.mp3',
-    line_15: 'audio/line_15.mp3'
+    harddrop: 'audio/harddrop.ogg',
+    softdrop: 'audio/softdrop.ogg',
+    rotate: 'audio/rotate.ogg',
+    move: 'audio/move.ogg',
+    hold: 'audio/hold.ogg',
+    spin: 'audio/spin.ogg',
+    spinend: 'audio/spinend.ogg',
+    clearline: 'audio/clearline.ogg',
+    clearquad: 'audio/clearquad.ogg',
+    line_1: 'audio/line_1.ogg',
+    line_2: 'audio/line_2.ogg',
+    line_3: 'audio/line_3.ogg',
+    line_4: 'audio/line_4.ogg',
+    line_5: 'audio/line_5.ogg',
+    line_6: 'audio/line_6.ogg',
+    line_7: 'audio/line_7.ogg',
+    line_8: 'audio/line_8.ogg',
+    line_9: 'audio/line_9.ogg',
+    line_10: 'audio/line_10.ogg',
+    line_11: 'audio/line_11.ogg',
+    line_12: 'audio/line_12.ogg',
+    line_13: 'audio/line_13.ogg',
+    line_14: 'audio/line_14.ogg',
+    line_15: 'audio/line_15.ogg',
+    warning: 'audio/warning.ogg'
 };
 function playSound(sound) {
-    new Audio(sounds[sound]).play();
+    new Audio(`audio/${sound}.ogg`).play();
 };
 
 var score = 0;
@@ -188,22 +202,6 @@ function getLines() {
 
 var board = JSON.parse(JSON.stringify(_BOARD_));
 
-// Checks if something is a T - piece.
-/*
-  .
-  TTT  - T spin full
-  .T.
-
-  . .
-  TTT  - T Spin mini
-   T.
-
-  ...
-  .
-  .T. 
-  .TT  - exception (TST kick)
-  .T
-*/
 function checkTSpin(piece, board, x, y, r, kick) {
     if(piece !== 'T') return false;
     let pieceGrid = pieces['T']['grid'][r];
@@ -511,6 +509,8 @@ function restart() {
     millisecondsElapsed = 0.0001;
     lineClears = 0;
     holdBool = false;
+    warning = false;
+    $('#game').removeClass('warning');
 }
 
 const s = 20; // piece size
@@ -633,6 +633,7 @@ function drawShadowPiece(ctx, x, y, piece, r) {
 }
 
 function newPiece(isHold = false) {
+
     if(!isHold) {
         piecesPlaced++;
         holdBool = false;
@@ -646,6 +647,15 @@ function newPiece(isHold = false) {
             if(matrix[i]) board[y][x + 1] = fill;
         }
     }
+
+    warning = false;
+    for(let y = 0; y < 6; y++) {
+        for(let x = 1; x < 10; x++) {
+            if(board[y][x] != 0) warning = true;
+        }
+    }
+    if(warning) $('#game').addClass('warning');
+    else $('#game').removeClass('warning');
 
     posX = 3;
     posY = -1;
@@ -741,12 +751,11 @@ function addParticle(x, y, color) {
 
 const spins = ['SINGLE', 'DOUBLE', 'TRIPLE', 'WHAT'];
 var combo = 0;
+var b2b = 0;
 function checkTetraLines(spin) {
     hide($tSpinHeader);
     hide($tSpinCount);
     if(spin) show($tSpinHeader);
-
-
     let clear = 0;
     for(let y = 0; y < 20; y++) {
         let line = board[y];
@@ -764,17 +773,36 @@ function checkTetraLines(spin) {
             clear++;
         }
     }
-    if(clear > 0) {
-        if(spin) {
-            $tSpinCount.text(spins[clear - 1]);
-            show($tSpinCount);
+    if(clear == 4) {
+        playSound(b2b ? 'clearbtb' : 'clearquad');
+        Score.add(b2b ? 1200 : 800);
+        b2b++;
+    } else if(spin) {
+        playSound('spinend');
+        $tSpinCount.text(spins[clear - 1]);
+        show($tSpinCount);
+        switch(clear) {
+            case 3: Score.add(b2b ? 2400 : 1600); break;
+            case 2: Score.add(b2b ? 1800 : 1200); break;
+            case 1: Score.add(b2b ? 1200 :  800); break;
+            case 0: Score.add(100); break;
         }
-        // console.log(combo);
-        playSound(`line_${Math.min(combo + 1, 15)}`);
-        combo++;
-    } else combo = 0;
-    score += Math.pow(clear * 10, 2);
+        b2b++;
+    } else if(clear > 0) {
+        switch(clear) {
+            case 3: Score.add(500); break;
+            case 2: Score.add(300); break;
+            case 1: Score.add(100); break;
+        }
 
+        if(b2b > 1) playSound('btb_break');
+        playSound(combo ? `combo_${Math.min(combo, 16)}` : 'clearline');
+        b2b = 0;
+        combo++;
+    } else {
+        if(combo > 1) playSound('combobreak');
+        combo = 0;
+    }
 
     if(combo <= 1) {
         hide($combo);
@@ -782,14 +810,44 @@ function checkTetraLines(spin) {
         $comboCount.text(`x${combo - 1}`);
         show($combo);
     }
+
+    // Check if all clear
+    // createAllClear();
+    let pc = true;
+    for(let y = 0; y < 20; y++) {
+        for(let x = 0; x < 10; x++) {
+            if(board[y][x + 1]) pc = false;
+        }
+    }
+    if(pc) {
+        playSound('allclear');
+        createAllClear();
+        score += 4000;
+    }
+
+    // Generate warning
+    warning = false;
+    for(let y = 0; y < 6; y++) {
+        for(let x = 1; x < 10; x++) {
+            if(board[y][x] != 0) warning = true;
+        }
+    }
+    if(warning) $('#game').addClass('warning');
+    else $('#game').removeClass('warning');
 }
 
 var dasTimer = 10; dasTime = 0; dasTrigger = false; dasEnabled = false;
 var holdBool = false;
-var kick = -1, tspin = 0;
+var kick = -1, tspin = 0, warning = 0; sWarning = 0;
 
 var $canvas, ctx;
 function tick() {
+    sWarning++;
+    if(sWarning >= 60 && warning) {
+        sWarning = 0;
+        playSound('warning');
+    }
+
     if(paused) return;
 
     dropTimer++;
@@ -861,12 +919,12 @@ function tick() {
         for(let i = 0; i < 20; i++)
         if(canMoveTo(posX, posY + 1, rotation)) {
             posY++;
-            score += 1;
+            Score.add(2);
         }
         // checkTSpin(currentPiece, board, posX, posY, rotation, kick);
         newPiece();
         checkTetraLines(tspin);
-        playSound('hard_drop');
+        playSound('harddrop');
         by = 40;
         kick = -1;
     }
@@ -899,11 +957,11 @@ function tick() {
             for(let i = 0; i < SDF; i++) {
                 if(canMoveTo(posX, posY + 1, rotation)) {
                     posY++;
-                    score += 1;
+                    Score.add(1);
                 }
             }
-            if(!canMoveTo(posX, posY + 1, rotation)) playSound('hard_drop');
-            score += 1;
+            if(!canMoveTo(posX, posY + 1, rotation)) playSound('softdrop');
+            Score.add(1);
         } else {
             by += 6;
         }
@@ -912,7 +970,7 @@ function tick() {
     // Restart.
     if(pressedKeys.some(i => [82].includes(i))) {
         restart();
-        score = 0;
+        Score.set(0);
         kick = -1;
         tspin = 0;
     }
@@ -921,20 +979,29 @@ function tick() {
     if(pressedKeys.some(i => [65].includes(i))) {
         [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, fmod((rotation + 2), 4));
         tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
+        if(tspin) {
+            playSound('spin');
+        }
     }
 
     // Rotate clockwise
     if(pressedKeys.some(i => [38, 88].includes(i))) {
         [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, (rotation + 1) % 4);
         tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
-        if(tspin) boardRotate += 5;
+        if(tspin) {
+            boardRotate += 5;
+            playSound('spin');
+        }
     }
 
     // Rotate counterclockwise
     if(pressedKeys.some(i => [90].includes(i))) {
         [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, fmod((rotation - 1), 4));
         tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
-        if(tspin) boardRotate -= 5;
+        if(tspin) {
+            boardRotate -= 5;
+            playSound('spin');
+        }
     }
 
     // Remove restart keypress.
@@ -960,7 +1027,7 @@ function tick() {
     getTime();
     getLines();
     particles.forEach(p => p.render(ctx));
-    $('#score').text(score);
+    Score.tick(); // TODO move
 
 }
 

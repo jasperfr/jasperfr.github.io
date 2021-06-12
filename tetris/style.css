@@ -2,24 +2,105 @@ body {
     background-color: #222;
     color: white;
     font-family: Roboto;
-    background-image:url('background.png');
+    background-image:url('https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    height: 100vh;
 }
 
 .container {
     margin-top: 10%;
+    transform: scale(150%);
+}
+
+#main-area {
+    display: flex;
+    flex-direction: column;
+}
+
+#score-box {
+    border: 2px solid white;
+    background-color: black;
+    margin: 0;
+    font-weight: 200;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-top:none;
+    font-family: monospace;
+}
+
+#score-box h2 {
+    margin: 0;
+}
+
+#score-box .zeroes {
+    color: #555;
+    transition: color 500ms;
+}
+
+#all-clear {
+    position: absolute;
+    left: 50%;
+    top: 40%;
+    margin: 0 auto;
+    text-align: center;
+    width: 220px;
+    color: yellow;
+    text-shadow: 0px 0px 2px white;
+    animation: rotate linear 2s;
+    opacity: 0;
+}
+
+@keyframes rotate {
+    0% {
+        transform: scale(200%) rotate(360deg);
+        opacity: 1;
+    }
+    15% {
+        transform: scale(100%) rotate(0deg);
+    }
+    100% {
+        transform: scale(110%) rotate(0deg);
+        opacity: 0;
+    }
 }
 
 #game {
+    position: relative;
     display: flex;
     justify-content: center;
     margin-left: -200px;
 }
 
+#game #main, #game canvas {
+    transition: border-color 500ms;
+}
+#game h2, #game #score-box {
+    transition: background-color 500ms;
+}
+
+#game.warning #main, #game.warning canvas, #game.warning #score-box {
+    border-color: red;
+}
+#game.warning #score-box .zeroes {
+    color: black;
+}
+#game.warning h2 {
+    background-color: red;
+}
+
 #main, #hold, #next {
     border: 2px solid white;
+    background-color: black;
+}
+#hold {
+    border-right: none;
+    border-top: none;
+}
+#next {
+    border-left: none;
+    border-top: none;
 }
 
 #div-hold h5 {
@@ -28,14 +109,18 @@ body {
 
 #div-hold h2 {
     background-color: white;
-    border-top-left-radius: 25px;
+    border-top-left-radius: 5px;
     margin: 0;
     padding: 5px 20px;
+    font-size: 18px;
+    line-height:18px;
     color: #222;
 }
 #div-next h2 {
     background-color: white;
-    border-top-right-radius: 25px;
+    border-top-right-radius: 5px;
+    font-size: 18px;
+    line-height:18px;
     margin: 0;
     padding: 5px 20px;
     color: #222;
