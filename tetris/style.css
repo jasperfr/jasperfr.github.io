@@ -11,6 +11,7 @@ body {
 #game {
     display: flex;
     justify-content: center;
+    margin-left: -200px;
 }
 
 #game > * {
@@ -43,4 +44,26 @@ body {
 
 .container {
     position: relative;
+}
+
+#div-action-text {
+    width: 200px;
+    position: relative;
+    overflow: hidden;
+}
+
+#div-action-text *, #div-action-text * span {
+    text-align: right;
+    font-weight: 200;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    font-size: 30px;
+}
+
+#div-action-text h4 {
+    margin: 0;
+}
+
+#div-action-text .t {
+    color: magenta;
 }

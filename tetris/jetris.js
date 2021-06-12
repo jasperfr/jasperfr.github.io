@@ -1,3 +1,7 @@
+function fmod(a, b) {
+    return (a < 0 && b + a) || a % b;
+}  
+
 const SRSX = {
     "_comment1": "Kicks",
     "N0-1": [[ 0, 0], [-1, 0], [-1, 1], [ 0,-2], [-1,-2]],
@@ -32,9 +36,31 @@ const SRSX = {
     "I3-1": [[ 0, 0], [ 0,-1], [ 0,-2], [ 0, 1], [ 0, 2], [ 1, 0]]
 }
 
+function show($el) {
+    $el.show('drop', { direction: 'right' });
+}
+function hide($el) {
+    $el.hide();
+}
+
 var paused = false;
 var DAS = 10, SDF = 4;
+var boardRotate = 0;
+
+var $lineClear, $combo, $comboCount, $tSpinHeader, $tSpinCount;
+
 $(() => {
+    $lineClear = $('#line-clear');
+    $combo = $('#combo');
+    $comboCount = $('#combo-count');
+    $tSpinHeader = $('#tspin');
+    $tSpinCount = $('#tspin-count');
+
+    hide($lineClear);
+    hide($combo);
+    hide($tSpinHeader);
+    hide($tSpinCount);
+
     $('#sdf').on('input', function() {
         SDF = $('#sdf').val();
         $('#sdf-val').text($('#sdf').val());
@@ -61,6 +87,17 @@ var sounds = {
     line_2: 'audio/line_2.mp3',
     line_3: 'audio/line_3.mp3',
     line_4: 'audio/line_4.mp3',
+    line_5: 'audio/line_5.mp3',
+    line_6: 'audio/line_6.mp3',
+    line_7: 'audio/line_7.mp3',
+    line_8: 'audio/line_8.mp3',
+    line_9: 'audio/line_9.mp3',
+    line_10: 'audio/line_10.mp3',
+    line_11: 'audio/line_11.mp3',
+    line_12: 'audio/line_12.mp3',
+    line_13: 'audio/line_13.mp3',
+    line_14: 'audio/line_14.mp3',
+    line_15: 'audio/line_15.mp3'
 };
 function playSound(sound) {
     new Audio(sounds[sound]).play();
@@ -73,6 +110,7 @@ function getKickTable(piece, board, xpos, ypos, rotationFrom, rotationTo) {
     let key = `${piece=='I'?'I':'N'}${rotationFrom}-${rotationTo}`;
     let table = SRSX[key];
     let pieceMatrix = pieces[piece].grid[rotationTo];
+    let q = 0;
     for(let xy of table) {
         let tx = xy[0];
         let ty = xy[1];
@@ -86,10 +124,11 @@ function getKickTable(piece, board, xpos, ypos, rotationFrom, rotationTo) {
         if(ok) {
             playSound('rotate');
             score += 1;
-            return [xpos + tx, ypos - ty, rotationTo];
+            return [xpos + tx, ypos - ty, rotationTo, q];
         }
+        q++;
     }
-    return [xpos, ypos, rotationFrom];
+    return [xpos, ypos, rotationFrom, -1];
 }
 
 const _BOARD_ = [
@@ -136,6 +175,75 @@ function getLines() {
 }
 
 var board = JSON.parse(JSON.stringify(_BOARD_));
+
+// Checks if something is a T - piece.
+/*
+  .
+  TTT  - T spin full
+  .T.
+
+  . .
+  TTT  - T Spin mini
+   T.
+
+  ...
+  .
+  .T. 
+  .TT  - exception (TST kick)
+  .T
+*/
+function checkTSpin(piece, board, x, y, r, kick) {
+    if(piece !== 'T') return false;
+    let pieceGrid = pieces['T']['grid'][r];
+
+    let corners = {
+        topLeft: board[y + 1][x + 1] != 0,
+        topRight: board[y + 1][x + 3] != 0,
+        bottomLeft: board[y + 3][x + 1] != 0,
+        bottomRight: board[y + 3][x + 3] != 0
+    }
+
+    //console.log(corners);
+
+    let facingCorners = 0;
+    let behindCorners = 0;
+
+    //console.log('Rotation: ' + r);
+    switch(r) {
+        case 0: // ┴
+        facingCorners = corners.topLeft + corners.topRight;
+        behindCorners = corners.bottomLeft + corners.bottomRight;
+        break;
+        case 1: // ├
+        facingCorners = corners.topRight + corners.bottomRight;
+        behindCorners = corners.topLeft + corners.bottomLeft;
+        break;
+        case 2: // ┬
+        facingCorners = corners.bottomLeft + corners.bottomRight;
+        behindCorners = corners.topLeft + corners.topRight;
+        break;
+        case 3: // ┤
+        facingCorners = corners.topLeft + corners.bottomLeft;
+        behindCorners = corners.topRight + corners.bottomRight;
+        break;
+    }
+
+    //console.log('facing corners: ' + facingCorners);
+    //console.log('corners behind T: ' + behindCorners);
+    if(kick == 4) console.log('Exception: kick table is 4.')
+
+    if(facingCorners + behindCorners >= 3) {
+        if(facingCorners == 1 && kick != 4) {
+            //console.log('This is a T-Spin mini.');
+            return 1;
+        } else {
+            //console.log('This is a T-Spin.');
+            return 2;
+        }
+    }
+
+    return false;
+}
 
 const pieces = {
     "J": {
@@ -390,6 +498,7 @@ function restart() {
     piecesPlaced = 0;
     millisecondsElapsed = 0.0001;
     lineClears = 0;
+    holdBool = false;
 }
 
 const s = 20; // piece size
@@ -406,7 +515,7 @@ function drawGrid(ctx) {
 }
 
 // J L T O I S Z
-fillStyles = ['#0000FF', '#FF8000', '#FF00FF', '#FFFF00', '#00FFFF', '#00FF00', '#FF0000']
+fillStyles = ['#0000FF', '#FF8000', '#FF00FF', '#FFFF00', '#00FFFF', '#00FF00', '#FF0000', '#808080']
 function drawPieces(ctx) {
     for(let y = 0; y < 20; y++) {
         for(let x = 0; x < 20; x++) {
@@ -514,6 +623,7 @@ function newPiece(isHold = false) {
     posY = -1;
     rotation = 0;
     currentPiece = getNextPiece();
+    // if(piecesPlaced % 4 == 0) addGarbage(1);
 }
 
 function drawLine(ctx, x0, y0, x1, y1) {
@@ -521,6 +631,18 @@ function drawLine(ctx, x0, y0, x1, y1) {
     ctx.moveTo(x0, y0);
     ctx.lineTo(x1, y1);
     ctx.stroke();
+}
+
+function addGarbage(lines) {
+    let bottom = board.pop();
+    let arr = [1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1];
+    arr[1 + Math.floor(Math.random() * 10)] = 0;
+    for(let i = 0; i < lines; i++) {
+        board.splice(0, 1);
+        board.push(arr.slice());
+    }
+
+    board.push(bottom);
 }
 
 /* Key handling */
@@ -586,11 +708,17 @@ class Particle {
 const particles = [];
 
 function addParticle(x, y, color) {
-    console.log('a');
     particles.push(new Particle(x, y, color));
 }
 
-function checkTetraLines() {
+const spins = ['SINGLE', 'DOUBLE', 'TRIPLE', 'WHAT'];
+var combo = 0;
+function checkTetraLines(spin) {
+    hide($tSpinHeader);
+    hide($tSpinCount);
+    if(spin) show($tSpinHeader);
+
+
     let clear = 0;
     for(let y = 0; y < 20; y++) {
         let line = board[y];
@@ -608,22 +736,39 @@ function checkTetraLines() {
             clear++;
         }
     }
-    if(clear > 0) playSound(`line_${clear}`);
+    if(clear > 0) {
+        if(spin) {
+            $tSpinCount.text(spins[clear - 1]);
+            show($tSpinCount);
+        }
+        // console.log(combo);
+        playSound(`line_${Math.min(combo + 1, 15)}`);
+        combo++;
+    } else combo = 0;
     score += Math.pow(clear * 10, 2);
+
+
+    if(combo <= 1) {
+        hide($combo);
+    } else {
+        $comboCount.text(`x${combo - 1}`);
+        show($combo);
+    }
 }
 
 var dasTimer = 10; dasTime = 0; dasTrigger = false; dasEnabled = false;
 var holdBool = false;
+var kick = -1, tspin = 0;
 
 var $canvas, ctx;
 function tick() {
     if(paused) return;
 
-
     dropTimer++;
     if(dropTimer > dropRate) {
         if(canMoveTo(posX, posY + 1, rotation)) {
             posY++;
+            tspin = 0;
         }
         dropTimer = 0;
     }
@@ -652,6 +797,7 @@ function tick() {
             if(pressedKeys.some(i => [37].includes(i))) {
                 if(canMoveTo(posX - 1, posY, rotation)) {
                     posX--;
+                    tspin = 0;
                     if(!dasEnabled) playSound('move');
                 } else {
                     bx -= 6;
@@ -660,6 +806,7 @@ function tick() {
             if(pressedKeys.some(i => [39].includes(i))) {
                 if(canMoveTo(posX + 1, posY, rotation)) {
                     posX++;
+                    tspin = 0;
                     if(!dasEnabled) playSound('move');
                 } else {
                     bx += 6;
@@ -688,13 +835,18 @@ function tick() {
             posY++;
             score += 1;
         }
+        // checkTSpin(currentPiece, board, posX, posY, rotation, kick);
+        newPiece();
+        checkTetraLines(tspin);
         playSound('hard_drop');
         by = 40;
-        newPiece();
+        kick = -1;
     }
 
     // Hold
     if(!holdBool && pressedKeys.some(i => [16].includes(i))) {
+        tspin = 0;
+
         holdBool = true;
         playSound('hold');
 
@@ -713,6 +865,7 @@ function tick() {
         }
     }
 
+    // Soft drop.
     if(pressedKeys.some(i => [83, 40].includes(i))) {
         if(canMoveTo(posX, posY + 1, rotation)) {
             for(let i = 0; i < SDF; i++) {
@@ -728,39 +881,32 @@ function tick() {
         }
     }
 
+    // Restart.
     if(pressedKeys.some(i => [82].includes(i))) {
         restart();
         score = 0;
+        kick = -1;
+        tspin = 0;
     }
 
     // Flip
     if(pressedKeys.some(i => [65].includes(i))) {
-        switch(rotation) {
-            case 0: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 0, 2); break;
-            case 1: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 1, 3); break;
-            case 2: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 2, 0); break;
-            case 3: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 3, 1); break;
-        }
+        [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, fmod((rotation + 2), 4));
+        tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
     }
 
     // Rotate clockwise
     if(pressedKeys.some(i => [38, 88].includes(i))) {
-        switch(rotation) {
-            case 0: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 0, 1); break;
-            case 1: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 1, 2); break;
-            case 2: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 2, 3); break;
-            case 3: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 3, 0); break;
-        }
+        [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, (rotation + 1) % 4);
+        tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
+        if(tspin) boardRotate += 5;
     }
 
     // Rotate counterclockwise
     if(pressedKeys.some(i => [90].includes(i))) {
-        switch(rotation) {
-            case 0: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 0, 3); break;
-            case 1: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 1, 0); break;
-            case 2: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 2, 1); break;
-            case 3: [posX, posY, rotation] = getKickTable(currentPiece, board, posX, posY, 3, 2); break;
-        }
+        [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, fmod((rotation - 1), 4));
+        tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
+        if(tspin) boardRotate -= 5;
     }
 
     // Remove restart keypress.
@@ -775,8 +921,6 @@ function tick() {
     // Remove hold keypress.
     removeKey(16);
 
-    checkTetraLines();
-
     /* Render */
     drawGrid(ctx);
     drawShadowPiece(ctx, posX, posY, currentPiece, rotation);
@@ -789,13 +933,15 @@ function tick() {
     getLines();
     particles.forEach(p => p.render(ctx));
     $('#score').text(score);
+
 }
 
 var bx = 0, by = 0;
 function boardBounce() {
     bx = bx / 1.2;
     by = by / 1.15;
-    $('#game').css('transform', `translateX(${bx}px) translateY(${by}px)`);
+    boardRotate /= 1.1;
+    $('#game').css('transform', `translateX(${bx}px) translateY(${by}px) rotate(${boardRotate}deg)`);
 }
 
 
