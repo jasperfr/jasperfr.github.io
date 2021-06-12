@@ -530,7 +530,7 @@ function drawPieces(ctx) {
 function drawHoldPiece() {
     let ch = document.getElementById('hold');
     let ctxh = ch.getContext('2d');
-    ctxh.clearRect(0, 0, 64, 64);
+    ctxh.clearRect(0, 0, 128, 128);
 
     if(!holdPiece) return;
     let p = pieces[holdPiece];
@@ -539,7 +539,13 @@ function drawHoldPiece() {
         for(let _y = 0; _y < 4; _y++) {
             let current = p.grid[0][_y * 4 + _x];
             if (current == 1) {
-                ctxh.fillRect(_x * 16, _y * 16, 16, 16);
+                if(holdPiece == 'I') {
+                    ctxh.fillRect(_x * 16 + 18, _y * 24 + 16, 16, 16);
+                }
+                else if(holdPiece == 'O')
+                    ctxh.fillRect(_x * 16 + 18, _y * 16 + 16, 16, 16);
+                else 
+                    ctxh.fillRect(_x * 16 + 26, _y * 16 + 16, 16, 16);
             }
         }
     }
@@ -548,17 +554,24 @@ function drawHoldPiece() {
 function drawNext() {
     let cn = document.getElementById('next');
     let ctxn = cn.getContext('2d');
-    ctxn.clearRect(0, 0, 64, 320);
+    ctxn.clearRect(0, 0, 100, 320);
 
     for(let i = 0; i < 5; i++) {
         let offset = i * 64;
         let p = pieces[bags[i]];
+        let pc = bags[i];
         ctxn.fillStyle = p.color;
         for(let _x = 0; _x < 4; _x++) {
             for(let _y = 0; _y < 4; _y++) {
                 let current = p.grid[0][_y * 4 + _x];
                 if (current == 1) {
-                    ctxn.fillRect(_x * 16, _y * 16 + offset, 16, 16);
+                    if(pc == 'I') {
+                        ctxn.fillRect(_x * 16 + 18, _y * 24 + offset, 16, 16);
+                    }
+                    else if(pc == 'O')
+                        ctxn.fillRect(_x * 16 + 18, _y * 16 + offset, 16, 16);
+                    else 
+                        ctxn.fillRect(_x * 16 + 26, _y * 16 + offset, 16, 16);
                 }
             }
         }
