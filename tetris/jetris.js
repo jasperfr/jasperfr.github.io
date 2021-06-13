@@ -852,7 +852,7 @@ function tick() {
 
     if(paused) return;
 
-    dropTimer += Level.getLevel();
+    dropTimer += Level.getLevel() * 2;
     if(dropTimer > dropRate) {
         if(canMoveTo(posX, posY + 1, rotation)) {
             posY++;
