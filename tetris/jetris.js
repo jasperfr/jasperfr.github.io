@@ -889,6 +889,7 @@ function checkTetraLines(spin) {
         Score.add(b2b ? 1200 : 800);
         b2b++;
     } else if(spin) {
+        clears.tspin++;
         playSound('spinend');
         $tSpinCount.text(spins[clear - 1]);
         show($tSpinCount);
@@ -908,12 +909,16 @@ function checkTetraLines(spin) {
 
         if(b2b > 1) playSound('btb_break');
         playSound(combo ? `combo_${Math.min(combo, 16)}` : 'clearline');
+        maxb2b = Math.max(b2b, maxb2b);
         b2b = 0;
         combo++;
     } else {
         if(combo > 1) playSound('combobreak');
+        maxCombo = Math.max(combo, maxCombo);
         combo = 0;
     }
+    maxCombo = Math.max(combo, maxCombo);
+    maxb2b = Math.max(b2b, maxb2b);
     
     Level.add(clear);
 
@@ -922,6 +927,13 @@ function checkTetraLines(spin) {
     } else {
         $comboCount.text(`x${combo - 1}`);
         show($combo);
+    }
+
+    switch(clear) {
+        case 4: clears.quad++; break;
+        case 3: clears.triple++; break;
+        case 2: clears.double++; break;
+        case 1: clears.single++; break;
     }
 
     // Check if all clear
@@ -933,6 +945,7 @@ function checkTetraLines(spin) {
         }
     }
     if(pc) {
+        clears.allclears++;
         playSound('allclear');
         createAllClear();
         score += 4000;
@@ -970,8 +983,28 @@ function gameRestart() {
         $('#background').css('opacity', '0');
         paused = false;
     });
+
+    clears = {
+        single: 0,
+        double: 0,
+        triple: 0,
+        quad: 0,
+        tspin: 0,
+        allclears: 0
+    };
 }
 
+var clears = {
+    single: 0,
+    double: 0,
+    triple: 0,
+    quad: 0,
+    tspin: 0,
+    allclears: 0
+};
+
+var maxCombo = 0;
+var maxb2b = 0;
 var interval;
 var gy = 1;
 function gameOver() {
@@ -986,13 +1019,35 @@ function gameOver() {
             $('#gameover').show('drop', {easing: 'easeOutCubic', duration: 1000});
         }
     }, 17);
+
+    // set statistics
+    let time = millisecondsElapsed;
+    let pps = piecesPlaced / millisecondsElapsed * 1000;
+    $('.score-box').text(Score.get());
+    
+    $('#s-level').text(Level.getLevel());
+    
+    $('#s-time-played').text(`${Math.floor(time / 60000)}:${('00' + Math.floor(time / 1000) % 60).slice(-2)}.${('000' + Math.floor(time % 1000)).slice(-3)}`);
+    $('#s-pieces-placed').text(piecesPlaced);
+    $('#s-pieces-per-second').text(pps.toFixed(2));
+    $('#s-lines-cleared').text(lineClears);
+
+    $('#s-singles').text(clears.single);
+    $('#s-doubles').text(clears.double);
+    $('#s-triples').text(clears.triple);
+    $('#s-quads').text(clears.quad);
+    $('#s-tspins').text(clears.tspin);
+    $('#s-all-clears').text(clears.allclears);
+
+    $('#s-max-combo').text(maxCombo + 1);
+    $('#s-max-b2b').text(maxb2b);
+
 }
 
 var dropButtonPresses = 0;
 
 function tick() {
     if(paused || game == 'over') return;
-    lockTimer = 0;
 
     sWarning++;
     if(sWarning >= 60 && warning && !critical) {
@@ -1230,7 +1285,6 @@ function boardBounce() {
     boardRotate /= 1.1;
     $('#game').css('transform', `translateX(${bx}px) translateY(${by}px) rotate(${boardRotate}deg)`);
 }
-
 
 $(() => {
     var $canvas = document.getElementById('main');

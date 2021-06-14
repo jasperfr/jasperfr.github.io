@@ -2,6 +2,10 @@ const Score = (() => {
 
     var $score, $trailing, trailingLength, score, scoreToAdd;
 
+    const getScore = function() {
+        return Math.round(score + scoreToAdd);
+    }
+
     const setScore = function(s) {
         score = s;
         scoreToAdd = 0;
@@ -33,6 +37,7 @@ const Score = (() => {
         init: init,
         add: addScore,
         set: setScore,
+        get: getScore,
         tick: tick
     }
 
