@@ -1044,7 +1044,7 @@ function gameOver() {
 
 }
 
-var dropButtonPresses = 0;
+var dropButtonPresses = 0, preventHD = 0;
 
 function tick() {
     if(paused || game == 'over') return;
@@ -1059,6 +1059,7 @@ function tick() {
         playSound('critical');
     }
 
+    preventHD = Math.min(preventHD + 1, 5);
 
     dropTimer += Level.getLevel() * 2;
     if(dropTimer > dropRate) {
@@ -1087,6 +1088,7 @@ function tick() {
             lockTimer = 0;
             dropButtonPresses = 0;
             lockDelay = 30 - Level.getLevel();
+            preventHD = 0;
         }
     }
 
@@ -1141,7 +1143,7 @@ function tick() {
     }
 
     // Hard drop
-    if(pressedKeys.some(i => [32].includes(i))) {
+    if(pressedKeys.some(i => [32].includes(i)) && preventHD >= 5) {
         for(let i = 0; i < 40; i++)
         if(canMoveTo(posX, posY + 1, rotation)) {
             posY++;
