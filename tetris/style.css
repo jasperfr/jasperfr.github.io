@@ -7,10 +7,127 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     height: 100vh;
+    overflow: hidden;
+}
+
+.fire {
+    display: block;
+    border-radius: 50%;
+    background-color: red;
+    animation: fire-spread 200ms;
+    width: 0;
+    height: 0;
+    filter: blur(2px);
+    opacity: 1;
+}
+
+@keyframes fire-spread {
+    0% {
+        background-color: white;
+        width: 16px;
+        height: 16px;
+    }
+    25% {
+        background-color: yellow;
+        width: 24px;
+        height: 24px;
+    }
+    85% {
+        background-color: red;
+        width: 32px;
+        height: 32px;
+        opacity: 1;
+    }
+    90% {
+        opacity: 0;
+    }
 }
 
 .container {
     transform: translateY(25vh) scale(160%);
+}
+
+#particle-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+#menu-game-modes {
+    display: flex;
+    justify-content: center;
+    margin-top: 100px;
+}
+
+.game-mode-select {
+    margin-top: 4px;
+    display: block;
+    position: relative;
+    width: 1224px;
+    height: 800px;
+    border-top: 8px solid rgba(255, 255, 255, 0.3);
+    border-left: 8px solid rgba(255, 255, 255, 0.3);
+    border-right: 8px solid rgba(0, 0, 0, 0.3);
+    border-bottom: 8px solid rgba(0, 0, 0, 0.3);
+    display: none;
+}
+
+.game-mode-select .back {
+    display: block;
+    float: left;
+    font-size: 40px;
+    cursor: pointer;
+}
+
+.game-mode {
+    margin: 4px;
+    display: block;
+    position: relative;
+    width: 300px;
+    height: 300px;
+    border-top: 8px solid rgba(255, 255, 255, 0.3);
+    border-left: 8px solid rgba(255, 255, 255, 0.3);
+    border-right: 8px solid rgba(0, 0, 0, 0.3);
+    border-bottom: 8px solid rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+.game-mode.a, .game-mode-select.a {
+    background-color: rgb(122, 54, 131);
+}
+.game-mode.b, .game-mode-select.b {
+    background-color: rgb(49, 89, 148);
+}
+.game-mode.c, .game-mode-select.c {
+    background-color: rgb(54, 131, 67);
+}
+.game-mode.d, .game-mode-select.d {
+    background-color: rgb(148, 117, 49);
+}
+
+.game-mode-icon {
+    transform: rotate(-10deg);
+}
+
+.game-mode p {
+    padding: 10px;
+}
+
+.game-mode::after {
+    content:"";
+    display: block;
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    left: 0; top: 0;
+    background-color:rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transition: opacity 500ms;
+}
+.game-mode:hover::after {
+    opacity: 1;
 }
 
 #main-area {

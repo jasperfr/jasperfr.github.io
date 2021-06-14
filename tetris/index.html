@@ -12,6 +12,7 @@
     <script src="jetris.js"></script>
     <script src="js/score.js"></script>
     <script src="js/level.js"></script>
+    <script src="js/particle.js"></script>
 
     <!-- discord uwu -->
     <meta property="og:title" content="JETRIS">
@@ -24,9 +25,187 @@
 
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>Jetris</title>
+
+    <script>
+        $(() => {
+            return; // prevent this for now
+
+            class Menuparticle {
+                constructor(xv, yv) {
+                    this.x = 1920 / 2;
+                    this.y = 1080 / 2;
+                    this.xv = xv;
+                    this.yv = yv;
+                    this.$el = $(`<img src="img/glowpiece.png" style="position:absolute;">`);
+                    // angle = tan-1(y/x)
+                    let angle = Math.atan2(yv, xv) * 180 / Math.PI;
+                    this.$el.css('transform', `rotate(${angle}deg)`);
+                    this.$el.css('left', `${this.x}px`);
+                    this.$el.css('top', `${this.y}px`);
+                    $('#particle-container').append(this.$el);
+                }
+
+                render() {
+                    this.x += this.xv * 2;
+                    this.y += this.yv * 2;
+                    this.$el.css('left', `${this.x}px`);
+                    this.$el.css('top', `${this.y}px`);
+                    if(this.x < 0 || this.x > 1920 || this.y < 0 || this.y > 1080) {
+                        this.$el.remove();
+                        _particles.splice(_particles.indexOf(this), 1);
+                    }
+                }
+            }
+
+            $(document).on('mousemove', function(e) {
+                let x = (1920/2 - e.pageX) / 10;
+                let y = (1080/2 - e.pageY) / 10;
+                $('#menu').css('transform', `translate(${x}px, ${y}px)`)
+            });
+
+            const _particles = [];
+            setInterval(() => {
+                for(let _ = 0; _ < 10; _++) {
+                    let _vx = Math.random() * 10 - Math.random() * 10;
+                    let _vy = Math.random() * 10 - Math.random() * 10;
+                    _particles.push(new Menuparticle(_vx, _vy));
+                }
+            }, 100);
+            setInterval(() => {
+                for(let p of _particles) {
+                    p.render();
+                }
+            }, 17);
+
+            $('.game-mode').on('click', function(e) {
+                let c = e.target.classList[1];
+                $('.logo').slideToggle();
+                $(`#menu-game-modes`).slideToggle();
+                $(`.game-mode-select.${c}`).slideToggle();
+            });
+
+        })
+
+        function toMenu() {
+            $('.logo').slideDown();
+            $(`#menu-game-modes`).slideDown();
+            $(`.game-mode-select`).slideUp();
+        }
+    </script>
 </head>
 <body style="overflow:hidden;">
     <center>
+
+        <!--
+        <div id="particle-container" style="z-index: -1000;">
+
+        </div>
+        <div id="menu">
+            <img class="logo" src="img/logot.png">
+            <div id="menu-game-modes">
+                <div class="game-mode a">
+                    <h1>MARATHON</h1>
+                    <img class="game-mode-icon" src="img/marathon.png">
+                    <p>Clear 150 lines while grinding for the high score!</p>
+                </div>
+                <div class="game-mode b">
+                    <h1>SPRINT</h1>
+                    <img class="game-mode-icon" src="img/sprint.png">
+                    <p>Race against the clock to clear 40 lines as fast as possible!</p>
+                </div>
+                <div class="game-mode c">
+                    <h1>BLITZ</h1>
+                    <img class="game-mode-icon" src="img/blitz.png">
+                    <p>Get the highest score in two minutes!</p>
+                </div>
+                <div class="game-mode d">
+                    <h1>MODE B</h1>
+                    <img class="game-mode-icon" src="img/garbage.png">
+                    <p>Clear all the garbage in the lowest time possible!</p>
+                </div>
+            </div>
+            <div id="menu-game-modes-select">
+                <div class="game-mode-select a">
+                    <span class="back" onclick="toMenu()">X</span>
+                    <h1>MARATHON</h1>
+                    <p>Clear 150 lines while grinding for the high score!</p>
+                    <h1>HIGH SCORES</h1>
+                    <table>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                    </table>
+                    <button>PLAY</button>
+                </div>
+                <div class="game-mode-select b">
+                    <span class="back" onclick="toMenu()">X</span>
+                    <h1>SPRINT</h1>
+                    <p>Race against the clock to clear 40 lines as fast as possible!</p>
+                    <h1>HIGH SCORES</h1>
+                    <table>
+                        <tr><td>99:99:99.9999</td><td>TEST</td></tr>
+                        <tr><td>99:99:99.9999</td><td>TEST</td></tr>
+                        <tr><td>99:99:99.9999</td><td>TEST</td></tr>
+                        <tr><td>99:99:99.9999</td><td>TEST</td></tr>
+                        <tr><td>99:99:99.9999</td><td>TEST</td></tr>
+                        <tr><td>99:99:99.9999</td><td>TEST</td></tr>
+                        <tr><td>99:99:99.9999</td><td>TEST</td></tr>
+                        <tr><td>99:99:99.9999</td><td>TEST</td></tr>
+                        <tr><td>99:99:99.9999</td><td>TEST</td></tr>
+                        <tr><td>99:99:99.9999</td><td>TEST</td></tr>
+                    </table>
+                    <button>PLAY</button>
+                </div>
+                <div class="game-mode-select c">
+                    <span class="back" onclick="toMenu()">X</span>
+                    <h1>BLITZ</h1>
+                    <p>Get the highest score in two minutes!</p>
+                    <table>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                    </table>
+                    <button>PLAY</button>
+                </div>
+                <div class="game-mode-select d">
+                    <span class="back" onclick="toMenu()">X</span>
+                    <h1>MODE B</h1>
+                    <p>Clear all the garbage in the lowest time possible!</p>
+                    <table>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                        <tr><td>0</td><td>TEST</td></tr>
+                    </table>
+                    <button>PLAY</button>
+                </div>
+            </div>
+        </div>
+    -->
+
+
+        <div id="particles"></div>
+
         <div class="container">
             <div id="game">
                 <div id="div-action-text">
