@@ -531,7 +531,7 @@ function drawGrid(ctx) {
 }
 
 // J L T O I S Z
-const pcs = ['J', 'L', 'T', 'O', 'I', 'S', 'Z'];
+const pcs = ['J', 'L', 'T', 'O', 'I', 'S', 'Z', 'H'];
 fillStyles = ['#0000FF', '#FF8000', '#FF00FF', '#FFFF00', '#00FFFF', '#00FF00', '#FF0000', '#808080']
 function drawPieces(ctx) {
     for(let y = 0; y < 20; y++) {
@@ -661,6 +661,9 @@ function newPiece(isHold = false) {
     if(warning) $('#game').addClass('warning');
     else $('#game').removeClass('warning');
 
+    triggerLockDelay = false;
+    lockTimer = 0;
+
     posX = 3;
     posY = -1;
     rotation = 0;
@@ -708,7 +711,7 @@ function removeKey(key) {
     }
 }
 
-var dropRate = 25, dropTimer = 0, lockDelay = 30000, lockTimer = 0, triggerLockDelay = false;
+var dropRate = 25, dropTimer = 0, lockDelay = 30, lockTimer = 0, triggerLockDelay = false;
 
 function canMoveTo(xpos, ypos, r) {
     let pieceMatrix = pieces[currentPiece].grid[r];
@@ -851,6 +854,8 @@ var $canvas, ctx;
 var game = 'running';
 
 function gameRestart() {
+    restart();
+    paused = true;
     clearInterval(interval);
     interval = undefined;
     gy = 1;
@@ -860,7 +865,7 @@ function gameRestart() {
         $('#game').css('transform', `translateY(0px) rotate(0deg)`);
         $('#game').css('opacity', '1');
         $('#background').css('opacity', '0');
-        restart();
+        paused = false;
     });
 }
 
@@ -878,6 +883,8 @@ function gameOver() {
         }
     }, 17);
 }
+
+var dropButtonPresses = 0;
 
 function tick() {
     sWarning++;
@@ -908,8 +915,13 @@ function tick() {
         lockTimer++;
         if(lockTimer > lockDelay) {
             newPiece();
+            checkTetraLines(tspin);
+            playSound('softdrop');
+            kick = -1;
             triggerLockDelay = false;
             lockTimer = 0;
+            dropButtonPresses = 0;
+            lockDelay = 30 - Level.getLevel();
         }
     }
 
@@ -927,6 +939,9 @@ function tick() {
                 if(canMoveTo(posX - 1, posY, rotation)) {
                     posX--;
                     tspin = 0;
+                    triggerLockDelay = false;
+                    lockTimer = dropButtonPresses;
+                    dropButtonPresses++;
                     if(!dasEnabled) playSound('move');
                 } else {
                     bx -= 6;
@@ -936,6 +951,9 @@ function tick() {
                 if(canMoveTo(posX + 1, posY, rotation)) {
                     posX++;
                     tspin = 0;
+                    triggerLockDelay = false;
+                    lockTimer = dropButtonPresses;
+                    dropButtonPresses++;
                     if(!dasEnabled) playSound('move');
                 } else {
                     bx += 6;
@@ -970,6 +988,10 @@ function tick() {
         playSound('harddrop');
         by = 40;
         kick = -1;
+        triggerLockDelay = false;
+        lockTimer = 0;
+        dropButtonPresses = 0;
+        lockDelay = 30 - Level.getLevel();
     }
 
     // Hold
@@ -992,6 +1014,10 @@ function tick() {
             posY = -1;
             posX = 3;
         }
+
+        triggerLockDelay = false;
+        lockTimer = dropButtonPresses;
+        dropButtonPresses++;
     }
 
     // Soft drop.
@@ -1022,6 +1048,9 @@ function tick() {
         if(tspin) {
             playSound('spin');
         }
+        triggerLockDelay = false;
+        lockTimer = dropButtonPresses;
+        dropButtonPresses++;
     }
 
     // Rotate clockwise
@@ -1032,6 +1061,9 @@ function tick() {
             boardRotate += 5;
             playSound('spin');
         }
+        triggerLockDelay = false;
+        lockTimer = dropButtonPresses;
+        dropButtonPresses++;
     }
 
     // Rotate counterclockwise
@@ -1042,6 +1074,9 @@ function tick() {
             boardRotate -= 5;
             playSound('spin');
         }
+        triggerLockDelay = false;
+        lockTimer = dropButtonPresses;
+        dropButtonPresses++;
     }
 
     // Remove restart keypress.
