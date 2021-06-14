@@ -25,54 +25,104 @@
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>Jetris</title>
 </head>
-<body style="overflow:hidden;">
-    <center>
-        <div class="container">
-            <div id="game">
-                <div id="div-action-text">
-                    <h3 id="line-clear">TRIPLE</h3>
-                    <h3 id="combo">COMBO <span id="combo-count">x2</span></h3>
-                    <h3 class="t" id="tspin">T-SPIN</h3>
-                    <h4 class="t" id="tspin-count">SINGLE</h4>
-                </div>
-                <div id="div-hold">
-                    <h2>HOLD</h2>
-                    <canvas id="hold" width="100" height="80"></canvas>
-                    <div id="stats">
-                        <h3>TIME</h3>
-                        <h5 id="time"></h5>
-                        <h3>PPS</h3>
-                        <h5 id="pieces-per-second"></h5>
-                        <h3>LINES</h3>
-                        <h5 id="lines"></h5>
-                        <h3>LEVEL</h3>
-                        <h5 id="level">1</h5>
-                    </div>
-                </div>
-                <div id="main-area">
-                    <canvas id="main" width="200" height="400"></canvas>
-                    <div id="score-box">
-                        <h2><span class="zeroes">0000000</span><span class="score">74500</span></h2>
-                    </div>
-                </div>
-                <div id="line-progress">
-                    <div class="progressbar"></div>
-                </div>
-                <div id="div-next">
-                    <h2>NEXT</h2>
-                    <canvas id="next" width="100" height="320"></canvas>
+<body>
+    <div id="background"></div>
+
+    <div id="gameover" hidden>
+        <h1 class="score-box">
+            0
+        </h1>
+        <br>
+        <h2>STATS</h2>
+        <table class="statistics">
+            <tr>
+                <td>PIECES PLACED</td>
+                <td id="s-pieces-placed">0</td>
+            </tr>
+            <tr>
+                <td>PIECES PER SECOND</td>
+                <td id="s-pieces-per-second">0</td>
+            </tr>
+            <tr>
+                <td>LINES CLEARED</td>
+                <td id="s-lines-cleared">0</td>
+            </tr>
+            <tr>
+                <td>SINGLES</td>
+                <td id="s-singles">0</td>
+            </tr>
+            <tr>
+                <td>DOUBLES</td>
+                <td id="s-doubles">0</td>
+            </tr>
+            <tr>
+                <td>TRIPLES</td>
+                <td id="s-triples">0</td>
+            </tr>
+            <tr>
+                <td>QUADS</td>
+                <td id="s-quads">0</td>
+            </tr>
+            <tr>
+                <td>T-SPINS</td>
+                <td id="s-tspins">0</td>
+            </tr>
+            <tr>
+                <td>ALL CLEARS</td>
+                <td id="s-all-clears">0</td>
+            </tr>
+        </table>
+        <br>
+        <div class="buttongroup">
+            <button onclick="gameRestart()">REPLAY</button>
+            <button>QUIT</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="game">
+            <div id="div-action-text">
+                <h3 id="line-clear">TRIPLE</h3>
+                <h3 id="combo">COMBO <span id="combo-count">x2</span></h3>
+                <h3 class="t" id="tspin">T-SPIN</h3>
+                <h4 class="t" id="tspin-count">SINGLE</h4>
+            </div>
+            <div id="div-hold">
+                <h2>HOLD</h2>
+                <canvas id="hold" width="100" height="80"></canvas>
+                <div id="stats">
+                    <h3>TIME</h3>
+                    <h5 id="time"></h5>
+                    <h3>PPS</h3>
+                    <h5 id="pieces-per-second"></h5>
+                    <h3>LINES</h3>
+                    <h5 id="lines"></h5>
+                    <h3>LEVEL</h3>
+                    <h5 id="level">1</h5>
                 </div>
             </div>
-
-            <div id="settings">
-                <h1>PAUSED</h1> <br>
-                <h2>Settings</h2> <br>
-                <span title="Soft Drop Factor, how fast pieces drop.">SDF 1</span><input type="range" min="1" max="20" value="10" id="sdf"><span>20</span> <span id="sdf-val">10</span><br>
-                <span title="Delayed Auto Shift, how long it takes before a piece to repeat movement.">DAS 0</span><input type="range" min="0" max="50" value="25" id="das"><span>50</span> <span id="das-val">25</span><br>
-                <span title="Automatic Repeat Rate, how fast pieces repeadetly move.">ARR 1</span><input type="range" min="1" max="10" value="1" id="arr"><span>10</span> <span id="arr-val">10</span><br>
+            <div id="main-area">
+                <canvas id="main" width="200" height="400"></canvas>
+                <div id="score-box">
+                    <h2><span class="zeroes">0000000</span><span class="score">74500</span></h2>
+                </div>
+            </div>
+            <div id="line-progress">
+                <div class="progressbar"></div>
+            </div>
+            <div id="div-next">
+                <h2>NEXT</h2>
+                <canvas id="next" width="100" height="320"></canvas>
             </div>
         </div>
-    </center>
-    <a style="position:absolute;bottom:20px;width:100%;" href="../index.html">Back</a>
+
+        <div id="settings">
+            <h1>PAUSED</h1> <br>
+            <h2>Settings</h2> <br>
+            <span title="Soft Drop Factor, how fast pieces drop.">SDF 1</span><input type="range" min="1" max="20" value="10" id="sdf"><span>20</span> <span id="sdf-val">10</span><br>
+            <span title="Delayed Auto Shift, how long it takes before a piece to repeat movement.">DAS 0</span><input type="range" min="0" max="50" value="25" id="das"><span>50</span> <span id="das-val">25</span><br>
+            <span title="Automatic Repeat Rate, how fast pieces repeadetly move.">ARR 1</span><input type="range" min="1" max="10" value="1" id="arr"><span>10</span> <span id="arr-val">10</span><br>
+        </div>
+    </div>
 </body>
 </html>

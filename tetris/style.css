@@ -1,16 +1,105 @@
 body {
-    background-color: #222;
     color: white;
-    font-family: Roboto;
     background-image:url('https://images.pexels.com/photos/933054/pexels-photo-933054.jpeg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+    position: relative;
+    margin: 0;
 }
 
 .container {
-    transform: translateY(25vh) scale(160%);
+    transform: translateY(150px) scale(150%);
+}
+
+#background {
+    transition: opacity 500ms;
+    background-color: black;
+    opacity: 0;
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+    z-index: -9999;
+}
+
+#gameover {
+    z-index: 9999;
+    margin: auto;
+    padding: 10px;
+    width: 50vw;
+    background-color: #0D5EB4;
+    border-left: 4px solid rgba(255, 255, 255, 0.2);
+    border-top: 4px solid rgba(255, 255, 255, 0.2);
+    border-right: 4px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+    transform: translateY(25%);
+    top: 0px !important;
+}
+
+#gameover * {
+    margin: 0;
+}
+
+#gameover .statistics {
+    border-collapse: collapse;
+    background-color: #154477;
+    border-right: 4px solid rgba(88, 88, 88, 0.2);
+    border-bottom: 4px solid rgba(88, 88, 88, 0.2);
+    border-left: 4px solid rgba(0, 0, 0, 0.2);
+    border-top: 4px solid rgba(0, 0, 0, 0.2);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#gameover .statistics tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+#gameover .statistics tr td:nth-child(even) {
+    text-align: right;
+}
+
+#gameover .score-box {
+    width: 100%;
+    box-sizing: border-box;
+    height: 128px;
+    text-align: center;
+    background-color: #154477;
+    border-right: 4px solid rgba(88, 88, 88, 0.2);
+    border-bottom: 4px solid rgba(88, 88, 88, 0.2);
+    border-left: 4px solid rgba(0, 0, 0, 0.2);
+    border-top: 4px solid rgba(0, 0, 0, 0.2);
+    font-family: monospace;
+    font-size: 72pt;
+    font-weight: 600;
+    line-height: 120px;
+
+}
+
+#gameover .buttongroup {
+    display: flex;
+    justify-content: space-between;
+}
+
+#gameover button {
+    width: 256px;
+    height: 64px;
+    color: white;
+    background-color: #184e88;
+    border-left: 4px solid rgba(255, 255, 255, 0.2);
+    border-top: 4px solid rgba(255, 255, 255, 0.2);
+    border-right: 4px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 4px solid rgba(0, 0, 0, 0.2);
+    font-size: 32px;
+    cursor: pointer;
+}
+#gameover button:active {
+    border-right: 4px solid rgba(88, 88, 88, 0.2);
+    border-bottom: 4px solid rgba(88, 88, 88, 0.2);
+    border-left: 4px solid rgba(0, 0, 0, 0.2);
+    border-top: 4px solid rgba(0, 0, 0, 0.2);
 }
 
 #main-area {
@@ -201,6 +290,7 @@ body {
 
 .container {
     position: relative;
+    pointer-events: none;
 }
 
 #div-action-text {

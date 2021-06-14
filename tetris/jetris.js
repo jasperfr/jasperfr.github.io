@@ -497,6 +497,10 @@ function getNextPiece() {
 }
 
 function restart() {
+    Score.set(0);
+    Level.restart();
+    kick = -1;
+    tspin = 0;
     bags = shuffle(BAG.slice()).concat(shuffle(BAG.slice()));
     posX = 3;
     posY = 0;
@@ -662,6 +666,7 @@ function newPiece(isHold = false) {
     rotation = 0;
     currentPiece = getNextPiece();
     // if(piecesPlaced % 4 == 0) addGarbage(1);
+    if(!canMoveTo(3, -1, 0)) gameOver();
 }
 
 function drawLine(ctx, x0, y0, x1, y1) {
@@ -843,6 +848,37 @@ var holdBool = false;
 var kick = -1, tspin = 0, warning = 0; sWarning = 0;
 
 var $canvas, ctx;
+var game = 'running';
+
+function gameRestart() {
+    clearInterval(interval);
+    interval = undefined;
+    gy = 1;
+    $('#game').css('opacity', '0');
+    game = 'running';
+    $('#gameover').hide('drop', {easing: 'easeOutCubic', duration: 1000}, function() {
+        $('#game').css('transform', `translateY(0px) rotate(0deg)`);
+        $('#game').css('opacity', '1');
+        $('#background').css('opacity', '0');
+        restart();
+    });
+}
+
+var interval;
+var gy = 1;
+function gameOver() {
+    game = 'over';
+    interval = setInterval(() => {
+        $('#game').css('transform', `translateY(${gy}px) rotate(${gy / 50}deg)`);
+        $('#game').css('opacity', (50 / gy));
+        gy = Math.min(gy * 1.05 + 5, 1500);
+        if(gy > 400) {
+            $('#background').css('opacity', '0.5');
+            $('#gameover').show('drop', {easing: 'easeOutCubic', duration: 1000});
+        }
+    }, 17);
+}
+
 function tick() {
     sWarning++;
     if(sWarning >= 60 && warning) {
@@ -850,7 +886,7 @@ function tick() {
         playSound('warning');
     }
 
-    if(paused) return;
+    if(paused || game == 'over') return;
 
     dropTimer += Level.getLevel() * 2;
     if(dropTimer > dropRate) {
@@ -878,6 +914,11 @@ function tick() {
     }
 
     /* Handle keys */
+
+    // DEBUG game over (q)
+    if(pressedKeys.some(i => [81].includes(i))) {
+        gameOver();
+    }
 
     // LEFT
     if(pressedKeys.some(i => [37, 39].includes(i))) {
@@ -972,10 +1013,6 @@ function tick() {
     // Restart.
     if(pressedKeys.some(i => [82].includes(i))) {
         restart();
-        Score.set(0);
-        Level.restart();
-        kick = -1;
-        tspin = 0;
     }
 
     // Flip
@@ -1036,6 +1073,7 @@ function tick() {
 
 var bx = 0, by = 0;
 function boardBounce() {
+    if(gy > 1) return;
     bx = bx / 1.2;
     by = by / 1.15;
     boardRotate /= 1.1;
