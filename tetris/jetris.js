@@ -37,7 +37,7 @@ const SRSX = {
 }
 
 function createAllClear() {
-    let $element = $(`<h1 id="all-clear">PERFECT CLEAR!</h1>`);
+    let $element = $(`<h1 id="all-clear" style="z-index:9999;">PERFECT CLEAR!</h1>`);
     $('#game').prepend($element);
     setTimeout(() => {
         $element.remove();
@@ -94,6 +94,7 @@ $(() => {
     sprites.T = new Image(20, 20); sprites.T.src = 'sprites/T.png';
     sprites.H = new Image(20, 20); sprites.H.src = 'sprites/H.png';
     sprites.G = new Image(20, 20); sprites.G.src = 'sprites/G.png';
+    sprites.X = new Image(20, 20); sprites.X.src = 'sprites/X.png';
 });
 
 var sprites = {};
@@ -158,6 +159,26 @@ function getKickTable(piece, board, xpos, ypos, rotationFrom, rotationTo) {
 }
 
 const _BOARD_ = [
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -503,7 +524,7 @@ function restart() {
     tspin = 0;
     bags = shuffle(BAG.slice()).concat(shuffle(BAG.slice()));
     posX = 3;
-    posY = 0;
+    posY = 16;
     holdPiece = null;
     currentPiece = getNextPiece();
     board = JSON.parse(JSON.stringify(_BOARD_));
@@ -519,28 +540,45 @@ function restart() {
 
 const s = 20; // piece size
 function drawGrid(ctx) {
-    ctx.clearRect(0, 0, 200, 400);
-    ctx.strokeStyle = '#444';
+    ctx.clearRect(0, 0, 204, 484);
 
+    ctx.fillStyle = '#000000CC';
+    ctx.fillRect(0, 80, 204, 484);
+
+    ctx.strokeStyle = '#444';
     for(let x = 0; x < 10; x++) {
-        drawLine(ctx, x * s, 0, x * s, 400);
+        drawLine(ctx, 2 + x * s, 82, 2 + x * s, 484);
     }
     for(let y = 0; y < 20; y++) {
-        drawLine(ctx, 0, y * s, 200, y * s);
+        drawLine(ctx, 2, 82 + y * s, 204, 82 + y  * s);
     }
 }
+
+function drawBorder(ctx) {
+    ctx.strokeStyle = warning ? '#ff0000' : '#ffffff';
+    drawLine(ctx, 0.5, 80, 0.5, 484);
+    drawLine(ctx, 1.5, 80, 1.5, 484);
+
+    drawLine(ctx, 202.5, 80, 202.5, 484);
+    drawLine(ctx, 203.5, 80, 203.5, 484);
+
+    drawLine(ctx, 0, 482.5, 204, 482.5);
+    drawLine(ctx, 0, 483.5, 204, 483.5);
+}
+
+const MARGIN = 2;
 
 // J L T O I S Z
 const pcs = ['J', 'L', 'T', 'O', 'I', 'S', 'Z', 'H'];
 fillStyles = ['#0000FF', '#FF8000', '#FF00FF', '#FFFF00', '#00FFFF', '#00FF00', '#FF0000', '#808080']
 function drawPieces(ctx) {
-    for(let y = 0; y < 20; y++) {
-        for(let x = 0; x < 20; x++) {
+    for(let y = 15; y < 40; y++) {
+        for(let x = 0; x < 10; x++) {
             let piece = board[y][x + 1];
             if(piece == 0) continue;
             let px = pcs[piece - 1];
             if(px == undefined) continue;
-            ctx.drawImage(sprites[px], x * s, y * s);
+            ctx.drawImage(sprites[px], MARGIN + x * s, MARGIN + (y - 20) * s + 80);
         }
     }
 }
@@ -559,7 +597,7 @@ function drawHoldPiece() {
             let current = p.grid[0][y * 4 + x];
             if (current == 1) {
                 if(holdPiece == 'I') {
-                    ctxh.drawImage(sprite, x * 20 + 10, y * 20 + 10);
+                    ctxh.drawImage(sprite,  x * 20 + 10, y * 20 + 10);
                 }
                 else if(holdPiece == 'O')
                     ctxh.drawImage(sprite, x * 20 + 10, y * 20);
@@ -599,7 +637,7 @@ function drawNext() {
 
 var rotation = 0;
 var posX = 3;
-var posY = -1;
+var posY = 16;
 var rotation = 0;
 var currentPiece = getNextPiece();
 var holdPiece = null;
@@ -611,7 +649,7 @@ function drawPiece(ctx, x, y, piece, r) {
         for(let _y = 0; _y < 4; _y++) {
             let current = p.grid[r][_y * 4 + _x];
             if (current == 1) {
-                ctx.drawImage(sprites[piece], (_x + x) * s, (_y + y) * s);
+                ctx.drawImage(sprites[piece], MARGIN + (_x + x) * s, MARGIN + (_y + y - 20) * s + 80);
             }
         }
     }
@@ -630,7 +668,7 @@ function drawShadowPiece(ctx, x, y, piece, r) {
         for(let _y = 0; _y < 4; _y++) {
             let current = p.grid[r][_y * 4 + _x];
             if (current == 1) {
-                ctx.drawImage(sprites.G, (_x + x) * s, (_y + y + dy) * s);
+                ctx.drawImage(sprites.G, MARGIN + (_x + x) * s, MARGIN + (_y + y + dy - 20) * s + 80);
             }
         }
     }
@@ -665,11 +703,76 @@ function newPiece(isHold = false) {
     lockTimer = 0;
 
     posX = 3;
-    posY = -1;
+    posY = 16;
     rotation = 0;
     currentPiece = getNextPiece();
     // if(piecesPlaced % 4 == 0) addGarbage(1);
-    if(!canMoveTo(3, -1, 0)) gameOver();
+    if(!canMoveTo(3, 16, 0)) gameOver();
+}
+
+function drawWarning(ctx) {
+    let p = pieces[bags[0]];
+    ctx.fillStyle = p.color;
+    for(let _x = 0; _x < 4; _x++) {
+        for(let _y = 0; _y < 4; _y++) {
+            let current = p.grid[0][_y * 4 + _x];
+            if (current == 1) {
+                ctx.drawImage(sprites['X'], MARGIN + (_x + 3) * s, MARGIN + (_y + 16 - 20) * s + 80);
+            }
+        }
+    }
+}
+
+let critical = false;
+function checkCritical(x, y, r, piece) {
+    // todo fix, make a 4x4 array grid thing ugh
+    let next = pieces[bags[0]].grid[0];
+    let curr = pieces[piece].grid[r];
+
+    let dy = 0;
+    do {
+        dy++
+    } while (canMoveTo(x, y + dy, r));
+    dy--;
+
+    let gridNext = [
+        next.slice(0, 4),
+        next.slice(4, 8),
+        next.slice(8, 12),
+        next.slice(12, 16),
+    ];
+
+    let gridCurr = [
+        curr.slice(0, 4),
+        curr.slice(4, 8),
+        curr.slice(8, 12),
+        curr.slice(12, 16),
+    ];
+
+    let __x = x - 3;
+    let __y = y - 16;
+
+    for(let _y = 0; _y < 4; _y++) {
+        let rowNext = gridNext[_y];
+        let rowCurr = gridCurr[_y - __y - dy];
+        if(rowCurr == undefined) continue;
+        for(let _x = 0; _x < 4; _x++) {
+            let xyNext = rowNext[_x];
+            let xyCurr = rowCurr[_x - __x];
+            if(xyCurr == undefined) continue;
+            if(xyNext != 0 && xyNext == xyCurr) return true;
+        }
+    }
+
+    // check board
+    for(let i = 0; i <= 15; i++) {
+        let x = 3 + i % 4;
+        let y = 16 + Math.floor(i / 4);
+        if(board[y] == undefined) continue;
+        if(board[y][x + 1] != 0 && pieces[bags[0]].grid[0][i] == 1) return true;
+    }
+
+    return false;
 }
 
 function drawLine(ctx, x0, y0, x1, y1) {
@@ -765,14 +868,14 @@ function checkTetraLines(spin) {
     hide($tSpinCount);
     if(spin) show($tSpinHeader);
     let clear = 0;
-    for(let y = 0; y < 20; y++) {
+    for(let y = 0; y < 40; y++) {
         let line = board[y];
         if(!line.some(i => i == 0)) {
             // remove this line and add an empty on top of the board
             let l = board.splice(y, 1)[0];
             for(let p = 1; p < l.length - 1; p++) {
                 for(let _ = 0; _ < 10 + Math.floor(Math.random() * 10); _++) {
-                    addParticle(p * 20, y * 20, l[p]);
+                    addParticle(p * 20, y * 10 + 80, l[p]);
                 }
             }
 
@@ -824,7 +927,7 @@ function checkTetraLines(spin) {
     // Check if all clear
     // createAllClear();
     let pc = true;
-    for(let y = 0; y < 20; y++) {
+    for(let y = 0; y < 40; y++) {
         for(let x = 0; x < 10; x++) {
             if(board[y][x + 1]) pc = false;
         }
@@ -837,7 +940,7 @@ function checkTetraLines(spin) {
 
     // Generate warning
     warning = false;
-    for(let y = 0; y < 6; y++) {
+    for(let y = 0; y < 24; y++) {
         for(let x = 1; x < 10; x++) {
             if(board[y][x] != 0) warning = true;
         }
@@ -873,6 +976,7 @@ var interval;
 var gy = 1;
 function gameOver() {
     game = 'over';
+    playSound('topout')
     interval = setInterval(() => {
         $('#game').css('transform', `translateY(${gy}px) rotate(${gy / 50}deg)`);
         $('#game').css('opacity', (50 / gy));
@@ -887,13 +991,19 @@ function gameOver() {
 var dropButtonPresses = 0;
 
 function tick() {
+    if(paused || game == 'over') return;
+    lockTimer = 0;
+
     sWarning++;
-    if(sWarning >= 60 && warning) {
+    if(sWarning >= 60 && warning && !critical) {
         sWarning = 0;
         playSound('warning');
     }
+    if(sWarning >= 40 && critical) {
+        sWarning = 0;
+        playSound('critical');
+    }
 
-    if(paused || game == 'over') return;
 
     dropTimer += Level.getLevel() * 2;
     if(dropTimer > dropRate) {
@@ -977,7 +1087,7 @@ function tick() {
 
     // Hard drop
     if(pressedKeys.some(i => [32].includes(i))) {
-        for(let i = 0; i < 20; i++)
+        for(let i = 0; i < 40; i++)
         if(canMoveTo(posX, posY + 1, rotation)) {
             posY++;
             Score.add(2);
@@ -1011,7 +1121,7 @@ function tick() {
         else {
             [currentPiece, holdPiece] = [holdPiece, currentPiece];
             rotation = 0;
-            posY = -1;
+            posY = 16;
             posX = 3;
         }
 
@@ -1098,9 +1208,15 @@ function tick() {
     drawPieces(ctx);
     drawHoldPiece();
     drawNext();
+    drawBorder(ctx);
     getPPS();
     getTime();
     getLines();
+    critical = false;
+    if(warning) {
+        drawWarning(ctx);
+        critical = checkCritical(posX, posY, rotation, currentPiece);
+    }
     particles.forEach(p => p.render(ctx));
     Score.tick(); // TODO move
 

@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-    transform: translateY(150px) scale(150%);
+    transform: translateY(250px) scale(150%);
 }
 
 #background {
@@ -105,6 +105,7 @@ body {
 #main-area {
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
 #score-box {
@@ -116,13 +117,15 @@ body {
     border-bottom-left-radius: 5px;
     border-top:none;
     font-family: monospace;
+    box-sizing: border-box;
 }
 
 #line-progress {
+    box-sizing: border-box;
     position: relative;
     display: block;
     width: 16px;
-    height: 427px;
+    height: 429px;
     border: 2px solid white;
     background-color: black;
     border-left:none;
@@ -141,6 +144,12 @@ body {
 
 #score-box h2 {
     margin: 0;
+    text-align: center;
+}
+
+#stats {
+    text-align: right;
+    margin: 4px;
 }
 
 #score-box .zeroes {
@@ -184,7 +193,7 @@ body {
 #all-clear {
     position: absolute;
     left: 50%;
-    top: 40%;
+    top: 30%;
     margin: 0 auto;
     text-align: center;
     width: 200px;
@@ -232,7 +241,7 @@ body {
     background-color: red;
 }
 
-#main, #hold, #next {
+#hold, #next {
     border: 2px solid white;
     background-color: black;
 }
@@ -251,7 +260,7 @@ body {
 }
 
 #div-hold h5 {
-    margin: 2px;
+    margin: 8px;
 }
 
 #div-hold h2 {
