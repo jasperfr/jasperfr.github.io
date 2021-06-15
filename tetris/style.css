@@ -295,6 +295,7 @@ body {
     border: 1px solid white;
     background-color: black;
     box-shadow: 2px 2px 0 white;
+    pointer-events: all !important;
 }
 
 .container {
