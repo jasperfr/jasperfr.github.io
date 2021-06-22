@@ -1,0 +1,99 @@
+body {
+    background-color: #222;
+    color: #eee;
+    font-family: Roboto, monospace;
+    height: 100vh;
+    background: url('https://unblast.com/wp-content/uploads/2021/01/Space-Background-Images.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    overflow: hidden;
+}
+.base {
+    text-decoration: underline;
+}
+td {
+    width: 100px;
+    font-size: 20px;
+}
+div.autobuyers table tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.navigation button {
+    background-color: black;
+    color: white;
+    cursor:pointer;
+}
+button.nav-ordinal {
+    border: 2px solid rgb(0, 212, 212);
+}
+button.nav-sigma {
+    border: 2px solid rgb(38, 0, 255);
+}
+button.nav-singularity {
+    border: 2px solid orange;
+}
+button.nav-hyperfold {
+    border: 2px solid rgb(29, 248, 0);
+    box-shadow:  0 0 2px rgb(29, 248, 0);
+}
+button.nav-omega {
+    border: 2px solid rgb(248, 244, 0);
+    box-shadow:  0 0 2px rgb(248, 244, 0);
+}
+
+button.button-ordinal {
+    cursor:pointer;
+    border: 2px solid rgb(0, 212, 212);
+    box-shadow:  0 0 2px rgb(0, 212, 212);
+    width: 256px;
+    height: 64px;
+}
+
+button.button-hyperfold {
+    background-color: black;
+    color: white;
+    cursor:pointer;
+    border: 2px solid rgb(29, 248, 0);
+    box-shadow:  0 0 2px rgb(29, 248, 0);
+    width: 256px;
+    height: 80px;
+}
+
+button.button-omega {
+    background-color: black;
+    color: white;
+    cursor:pointer;
+    border: 2px solid rgb(248, 244, 0);
+    box-shadow:  0 0 8px rgb(248, 244, 0);
+    width: 256px;
+    height: 80px;
+}
+
+button.button-warning {
+    background-color: black;
+    color: white;
+    cursor:pointer;
+    border: 2px solid rgb(248, 0, 0);
+    box-shadow:  0 0 8px rgb(248, 0, 0);
+    width: 256px;
+    height: 80px;
+}
+
+span.psi {
+    color: orange;
+    text-shadow: 0 0 2px orange;
+}
+
+span.omega, h1.omega {
+    color: yellow;
+    text-shadow: 0 0 2px yellow;
+}
+
+span.warning {
+    color:red;
+}
+
+nav {
+    margin: 8px;
+}

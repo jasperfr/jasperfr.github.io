@@ -99,33 +99,6 @@ $(() => {
 
 var sprites = {};
 
-var sounds = {
-    harddrop: 'audio/harddrop.ogg',
-    softdrop: 'audio/softdrop.ogg',
-    rotate: 'audio/rotate.ogg',
-    move: 'audio/move.ogg',
-    hold: 'audio/hold.ogg',
-    spin: 'audio/spin.ogg',
-    spinend: 'audio/spinend.ogg',
-    clearline: 'audio/clearline.ogg',
-    clearquad: 'audio/clearquad.ogg',
-    line_1: 'audio/line_1.ogg',
-    line_2: 'audio/line_2.ogg',
-    line_3: 'audio/line_3.ogg',
-    line_4: 'audio/line_4.ogg',
-    line_5: 'audio/line_5.ogg',
-    line_6: 'audio/line_6.ogg',
-    line_7: 'audio/line_7.ogg',
-    line_8: 'audio/line_8.ogg',
-    line_9: 'audio/line_9.ogg',
-    line_10: 'audio/line_10.ogg',
-    line_11: 'audio/line_11.ogg',
-    line_12: 'audio/line_12.ogg',
-    line_13: 'audio/line_13.ogg',
-    line_14: 'audio/line_14.ogg',
-    line_15: 'audio/line_15.ogg',
-    warning: 'audio/warning.ogg'
-};
 function playSound(sound) {
     new Audio(`audio/${sound}.ogg`).play();
 };

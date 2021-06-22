@@ -1,4 +1,3 @@
-var base = 10;
 let ordinals = [0];
 
 function toBase(number) {
@@ -7,8 +6,8 @@ function toBase(number) {
     let ordinals = [number];
     for(let i = 0; i < ordinals.length; i++) {
         let ord = ordinals[i];
-        let cut = Math.floor(ord / base);
-        let rem = ord % base;
+        let cut = Math.floor(ord / Game.base);
+        let rem = ord % Game.base;
         if(cut > 0)
             if (ordinals[i + 1] === undefined) ordinals.push(cut);
             else ordinals[i + 1] += cut;
@@ -45,24 +44,12 @@ function getOrdinal5(number) {
         return 'ω<sup>ω<sup>ω</sup></sup>'
     } else return ''
 }
-
-function debase() {
-    ordinals = [0];
-    if(base > 2) base--;
-    update();
-}
-
-function up() {
-    ordinals[0] += 1;
-    update();
-}
-
 function update() {
-
+    
     for(let i = 0; i < ordinals.length; i++) {
         let ord = ordinals[i];
-        let cut = Math.floor(ord / base);
-        let rem = ord % base;
+        let cut = Math.floor(ord / Game.base);
+        let rem = ord % Game.base;
         if(cut > 0)
             if (ordinals[i + 1] === undefined) ordinals.push(cut);
             else ordinals[i + 1] += cut;
@@ -72,23 +59,34 @@ function update() {
     let string = 'φ<sub>';
     let sjoin = [];
     
+    let j = 0;
     for(let i = ordinals.length - 1; i >= 0; i--) {
         let ord = ordinals[i];
         if(ord == 0) continue;
-        //  style="color:hsl(${(5 * i)},80%,50%);"
+        j++;
+        if(j > 3) continue;
         sjoin.push(`<span>${getOrdinal5(toBase(i))}${(i > 0 && ord == 1) ? '' : ord}</span>`);
-        // ${ord == 1 && i != 0 ? '' : ord}${i > 0 ? 'ω<sup>' + (i == 1 ? '' : getOrdinal((i + 1) - base)) + '</sup>' : ''}
     }
 
     let s = ordinals.slice();
-    let sum = new Exadecimal(0);
+    Game.OP = new Exadecimal(0);
     for(let i = 0; i < ordinals.length; i++) {
-        sum.add(ordinals[i] * Math.pow(10, toBase(i)));
+        Game.OP.add(ordinals[i] * Math.pow(10, toBase(i)));
+    }
+
+    if(Game.OP.toString() == '∞') {
+        $('.ordinal').html('φ<sub>ω<sup>ω<sup>ω</sup></sup></sub> = ∞μ');
+        $('div.singularity').show();
+        return;
+    } else {
+        $('div.singularity').hide();
     }
 
     string += sjoin.join('+');
-    string += `</sub><sup class="base">${base}</sup> = ${sum.toString()}μ`;
+    string += `</sub>${j > 3 ? '...' : ''}<sup class="base">${Game.base}</sup> = ${Game.OP.toString()}μ`;
     $('.ordinal').html(string);
 }
 
-$(() => update())
+$(() => {
+    setInterval(update, 17);
+});

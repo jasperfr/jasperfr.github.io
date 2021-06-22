@@ -125,6 +125,14 @@ class Exadecimal {
         return false;
     }
 
+    set(other) {
+        if(!is.exadecimal(other)) {
+            other = new Exadecimal(other);
+        }
+        this.exponent = other.exponent;
+        this.mantissa = other.mantissa;
+    }
+
     /**
      * Adds another Exadecimal to this Exadecimal.
      * @param {Exadecimal} other 
@@ -234,6 +242,10 @@ class Exadecimal {
             this.mantissa *= 10;
             this.exponent--;
         }
+    }
+
+    toSmallNumber() {
+        return parseFloat(this.mantissa + 'e+' + this.exponent);
     }
 
 }
