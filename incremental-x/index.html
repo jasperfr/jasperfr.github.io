@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <title>Incremental X</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <script src="exadecimal.js"></script>
+    <script src="game.js"></script>
+    <script src="ordinal.js"></script>
+</head>
+
+<body>
+    <h1 class="ordinal">0</h1>
+    <h1 class="count">α<sub>0</sub> = 0</h1>
+    <h2>ℵ₀ is [0...1ee308]</h2>
+    <div class="buttongroup">
+        <button class="big" onclick="up()">Gain 1 α.</button>
+        <button class="big" onclick="autogain()">Autogain +1 α<sub>/s</sub>.<br>(needs 10<sup id="auto-cost">1</sup>, lose α)</button>
+        <button class="big" onclick="up()">Unlock β<br>(needs 1ee10 α, lose your α)</button>
+        <button class="big" onclick="up()">Decrease ℵ₀ by 1 ee<br>(needs λ)</button>
+    </div>
+
+    <div class="skilltree">
+        <h1>You have <span id="amu">0</span> α<sub>μ</sub>.</h1>
+        <p>You gain 0.01 α<sub>μ</sub> per gain and 0.001 α<sub>μ</sub> per auto.</p>
+        <table>
+            <tr>
+                <th>Manual</th>
+                <th>Autoclick</th>
+                <th>Boosters</th>
+            </tr>
+            <tr>
+                <td>
+                    <button class="skill unlocked">
+                        α<sub>/click</sub> is x2.<br>
+                        10 α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill unlocked">
+                        α<sub>/s</sub> is 2x<br>more powerful.<br>
+                        10 α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill unlocked">
+                        Start α resets with 100 α.
+                        100 α<sub>μ</sub>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="skill locked">
+                        α<sub>/click</sub> is x4.<br>
+                        100 α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        α<sub>/s</sub> is 5x<br>more powerful.<br>
+                        1000 α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        Gain 25% more α<sub>μ</sub>.<br>
+                        2500 α<sub>μ</sub>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="skill locked">
+                        α<sub>/click</sub> is x10.<br>
+                        1000 α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        α<sub>/s</sub> is 10x<br>more powerful.<br>
+                        1e5 α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        Unlock <b>α-challenges</b>.<br>
+                        ℵ₀ <= { 0 .. 1ee75 }
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="skill locked">
+                        α<sub>/click</sub> is x1000.<br>
+                        1e10 α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        +0.1 auto for each α<sub>/s</sub><br>per manual gain.<br>
+                        1e20 α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        Unlock <b>Automators</b>.<br>
+                        ℵ₀ <= { 0 .. 1ee50 }
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="skill locked">
+                        Gain 1% of your α<sub>/click</sub><br>(+1 if zero)<br>
+                        1ee10 α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        Each α<sub>/s</sub> adds +1 auto<br>
+                        1e100 α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        Unlock <b>Singularities</b>.<br>
+                        ℵ₀ <= { 0 .. 1ee10 }
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="skill locked">
+                        Gain 50% of your α<sub>/click</sub><br>(+1000 if zero)<br>
+                        1ee100 α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        Manual gain multiplies α<sub>/s</sub><br>
+                        1ee100 α<sub>μ</sub><br>and ℵ₀ <= { 0 .. 1ee100 }
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        <b>ℵ₀ divides itself by 10 per tick</b>.<br>
+                        ℵ₀ <= { 0 .. 1e10 }
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="skill locked">
+                        Gain 100% of your α<sub>/click</sub><br>(+1e10 if zero)<br>
+                        ω<sup>ω</sup> α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        α<sub>/s</sub> boost each other. <br>(UNSTABLE)<br>
+                        ω<sup>ω<sup>ω</sup></sup> α<sub>μ</sub>
+                    </button>
+                </td>
+                <td>
+                    <button class="skill locked">
+                        <b>Break infinity.</b><br>
+                        ℵ₀ = 10
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>

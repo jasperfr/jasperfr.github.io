@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <title>Ordinal X</title>
+    <script src="exadecimal.js"></script>
+    <script src="ordinal.js"></script>
+
+    <style>
+        body {
+            background-color: #222;
+            color: #eee;
+            font-family: Roboto, monospace;
+            height: 100vh;
+            margin: 0;
+            background: url('https://unblast.com/wp-content/uploads/2021/01/Space-Background-Images.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        .ordinal {
+            margin: auto;
+            text-align: center;
+            font-size: 500%;
+            vertical-align: middle;
+            line-height: 25vh;
+            text-shadow: 0 0 10px white;
+        }
+        .buttongroup, .singularity, .autobuyers {
+            margin: auto;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            text-align: center;
+        }
+        .singularity, .autobuyers {
+            flex-direction: column;
+        }
+        .buttongroup button, .singularity button {
+            padding: 20px 60px;
+            font-size: 20px;
+            margin: 4px;
+            max-width: 300px;
+        }
+        .singularity button {
+            margin: auto;
+        }
+        .base {
+            text-decoration: underline;
+        }
+        td {
+            width: 100px;
+            font-size: 40px;
+        }
+        table tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <h1 class="ordinal">0</h1>
+    <div class="singularity" style="display: none;">
+        <h1>The universe has collapsed due to an infinite amount of μ.</h1>
+        <button onclick="up()">Compress into 1 singularity</button>
+    </div>
+    <div class="buttongroup">
+        <button onclick="up()">Increase φ by 1.</button>
+        <button onclick="debase()">Reduce the base by 1.<br>Needs: <span class="base-cost">100</span> μ.</button>
+        <button onclick="debase()">Unlock ξ.<br>Needs: <span class="base-cost">1e10</span> μ. and base < 10.</button>
+    </div>
+    <div class="autobuyers">
+        <h1>You have 0 ξ.</h1>
+        <h3>Each ξ increases φ by 1 per second.</h3>
+        <table class="dimensions">
+            <tr>
+                <td>ξ<sub>0</sub></td>
+                <td>0</td>
+                <td>
+                    <button>Cost: 1</button>
+                    <button>Max, cost: 1e39</button>
+                </td>
+            </tr>
+            <tr>
+                <td>ξ<sub>1</sub></td>
+                <td>0</td>
+                <td>
+                    <button>Cost: 1</button>
+                    <button>Max, cost: 1e39</button>
+                </td>
+            </tr>
+            <tr>
+                <td>ξ<sub>2</sub></td>
+                <td>0</td>
+                <td>
+                    <button>Cost: 1</button>
+                    <button>Max, cost: 1e39</button>
+                </td>
+            </tr>
+            <tr>
+                <td>ξ<sub>3</sub></td>
+                <td>0</td>
+                <td>
+                    <button>Cost: 1</button>
+                    <button>Max, cost: 1e39</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
