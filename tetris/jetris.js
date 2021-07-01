@@ -2,6 +2,75 @@ function fmod(a, b) {
     return (a < 0 && b + a) || a % b;
 }  
 
+const HANDLING_GUIDELINE = {
+    left: 'ArrowLeft',
+    right: 'ArrowRight',
+    softDrop: 'ArrowDown',
+    hardDrop: ' ',
+    rotateCW: 'ArrowUp,x',
+    rotateCCW: 'z',
+    rotate180: 'a',
+    hold: 'Shift'
+}
+
+var settings = {
+    boundKeys: {
+        left: 'ArrowLeft',
+        right: 'ArrowRight',
+        softDrop: 'ArrowDown',
+        hardDrop: ' ',
+        rotateCW: 'ArrowUp,x',
+        rotateCCW: 'z',
+        rotate180: 'a',
+        hold: 'Shift'
+    },
+    ARR: 0,
+    DAS: 0,
+    SDF: 0,
+    boardBounce: true,
+    boardShake: true,
+    volume: 100
+};
+
+function setSettingsValues() {
+    $('input[name="left"]').val(settings.boundKeys.left);
+    $('input[name="right"]').val(settings.boundKeys.right);
+    $('input[name="softdrop"]').val(settings.boundKeys.softDrop);
+    $('input[name="harddrop"]').val(settings.boundKeys.hardDrop);
+    $('input[name="rotatecw"]').val(settings.boundKeys.rotateCW);
+    $('input[name="rotateccw"]').val(settings.boundKeys.rotateCCW);
+    $('input[name="flip"]').val(settings.boundKeys.rotate180);
+    $('input[name="hold"]').val(settings.boundKeys.hold);
+}
+
+function loadSettings() {
+    if(localStorage.settings) {
+        settings = JSON.parse(atob(localStorage.settings));
+        setSettingsValues();
+    }
+}
+
+function saveSettings() {
+    settings.boundKeys.left = $('input[name="left"]').val();
+    settings.boundKeys.right = $('input[name="right"]').val();
+    settings.boundKeys.softDrop = $('input[name="softdrop"]').val();
+    settings.boundKeys.hardDrop = $('input[name="harddrop"]').val();
+    settings.boundKeys.rotateCW = $('input[name="rotatecw"]').val();
+    settings.boundKeys.rotateCCW = $('input[name="rotateccw"]').val();
+    settings.boundKeys.rotate180 = $('input[name="flip"]').val();
+    settings.boundKeys.hold = $('input[name="hold"]').val();
+
+    localStorage.settings = btoa(JSON.stringify(settings));
+    setSettingsValues();
+}
+
+function changeSetting(setting, value) {
+    settings[setting] = value;
+    setSettingsValues();
+};
+
+$(() => loadSettings());
+
 const SRSX = {
     "_comment1": "Kicks",
     "N0-1": [[ 0, 0], [-1, 0], [-1, 1], [ 0,-2], [-1,-2]],
@@ -77,6 +146,16 @@ $(() => {
     $('#das').on('input', function() {
         DAS = $('#das').val();
         $('#das-val').text($('#das').val());
+    });
+    $('#garb').on('input', function() {
+        let delay = parseInt($('#garb').val());
+        if(delay == 0) {
+            garbageDelay = 0;
+            $('#garb-val').text('OFF');
+        } else {
+            garbageDelay = 11 - delay;
+            $('#garb-val').text($('#garb').val());
+        }
     });
     window.addEventListener('keydown', function(e) {
         if(e.keyCode == 27) {
@@ -671,11 +750,9 @@ function newPiece(isHold = false) {
         }
     }
     if(warning) {
-        $('#background').css('opacity', '1');
         $('#game').addClass('warning');
     }
     else {
-        $('#background').css('opacity', '2');
         $('#game').removeClass('warning');
     }
 
@@ -777,12 +854,12 @@ function addGarbage(lines) {
 /* Key handling */
 const pressedKeys = [];
 function keyDownEvent(e) {
-    if(pressedKeys.indexOf(e.keyCode) == -1) {
-        pressedKeys.push(e.keyCode);
+    if(pressedKeys.indexOf(e.key) == -1) {
+        pressedKeys.push(e.key);
     }
 }
 function keyUpEvent(e) {
-    let index = pressedKeys.indexOf(e.keyCode);
+    let index = pressedKeys.indexOf(e.key);
     if(index != -1) {
         pressedKeys.splice(index, 1);
     }
@@ -791,6 +868,11 @@ function removeKey(key) {
     let index = pressedKeys.indexOf(key);
     if(index != -1) {
         pressedKeys.splice(index, 1);
+    }
+}
+function removeAllKeys(keys) {
+    for(let k of keys.split(',')) {
+        removeKey(k);
     }
 }
 
@@ -1037,29 +1119,31 @@ $(() => setInterval(() => {
 
 var sBounce = 0;
 
-var garbageTimer = 0, garbageDelay = 3, garbageAppear = false;
+var garbageTimer = 0, garbageDelay = 0, garbageAppear = false;
 
 function tick() {
     if(paused || game == 'over') return;
 
-    garbageTimer++;
-    if(!garbageAppear) {
-        $('#garbage-progress .progressbar').css('height', `${garbageTimer / garbageDelay}%`);
-        if((garbageTimer / garbageDelay) > 99.9) {
-            garbageAppear = true;
-            $('#garbage-progress .progressbar').css('animation', 'flash 200ms infinite');
-            setTimeout(() => {
-                addGarbage(1);
-                garbageAppear = false;
-                garbageTimer = 0;
-                $('#garbage-progress .progressbar').css('animation', '');
-                var interval = setInterval(() => {
-                    bx += (Math.random() - Math.random() * 10);
-                    by += (Math.random() - Math.random() * 10);
-                }, 17);
-                setTimeout(() => clearInterval(interval), 100);
-                playSound('combobreak');
-            }, 500);
+    if(garbageDelay != 0) {
+        garbageTimer++;
+        if(!garbageAppear) {
+            $('#garbage-progress .progressbar').css('height', `${garbageTimer / garbageDelay}%`);
+            if((garbageTimer / garbageDelay) > 99.9) {
+                garbageAppear = true;
+                $('#garbage-progress .progressbar').css('animation', 'flash 200ms infinite');
+                setTimeout(() => {
+                    addGarbage(1);
+                    garbageAppear = false;
+                    garbageTimer = 0;
+                    $('#garbage-progress .progressbar').css('animation', '');
+                    var interval = setInterval(() => {
+                        bx += (Math.random() - Math.random() * 10);
+                        by += (Math.random() - Math.random() * 10);
+                    }, 17);
+                    setTimeout(() => clearInterval(interval), 100);
+                    playSound('combobreak');
+                }, 500);
+            }
         }
     }
 
@@ -1083,6 +1167,14 @@ function tick() {
             e.element.css('background-color', 'red');
             particles2.push(e);
         }
+    }
+    if(warning) {
+        $('#background').css('opacity', '0.5');
+        $('#game').addClass('warning');
+    }
+    else {
+        $('#background').css('opacity', '0');
+        $('#game').removeClass('warning');
     }
 
     preventHD = Math.min(preventHD + 1, 5);
@@ -1119,16 +1211,12 @@ function tick() {
     }
 
     /* Handle keys */
-
-    // DEBUG game over (q)
-    if(pressedKeys.some(i => [81].includes(i))) {
-        gameOver();
-    }
+    const keys = settings.boundKeys;
 
     // LEFT
-    if(pressedKeys.some(i => [37, 39].includes(i))) {
+    if(pressedKeys.some(i => keys.right.split(',').includes(i) || keys.left.split(',').includes(i))) {
         if((!dasTrigger && !dasEnabled) || dasEnabled && dasTrigger) {
-            if(pressedKeys.some(i => [37].includes(i))) {
+            if(pressedKeys.some(i => keys.left.split(',').includes(i))) {
                 if(canMoveTo(posX - 1, posY, rotation)) {
                     posX--;
                     tspin = 0;
@@ -1140,7 +1228,7 @@ function tick() {
                     bx -= 6;
                 }
             }
-            if(pressedKeys.some(i => [39].includes(i))) {
+            if(pressedKeys.some(i => keys.right.split(',').includes(i))) {
                 if(canMoveTo(posX + 1, posY, rotation)) {
                     posX++;
                     tspin = 0;
@@ -1169,7 +1257,7 @@ function tick() {
     }
 
     // Hard drop
-    if(pressedKeys.some(i => [32].includes(i)) && preventHD >= 5) {
+    if(pressedKeys.some(i => keys.hardDrop.split(',').includes(i)) && preventHD >= 5) {
         for(let i = 0; i < 40; i++)
         if(canMoveTo(posX, posY + 1, rotation)) {
             posY++;
@@ -1188,7 +1276,7 @@ function tick() {
     }
 
     // Hold
-    if(!holdBool && pressedKeys.some(i => [16].includes(i))) {
+    if(!holdBool && pressedKeys.some(i => keys.hold.split(',').includes(i))) {
         tspin = 0;
 
         holdBool = true;
@@ -1214,7 +1302,7 @@ function tick() {
     }
 
     // Soft drop.
-    if(pressedKeys.some(i => [83, 40].includes(i))) {
+    if(pressedKeys.some(i => keys.softDrop.split(',').includes(i))) {
         if(canMoveTo(posX, posY + 1, rotation)) {
             for(let i = 0; i < SDF; i++) {
                 if(canMoveTo(posX, posY + 1, rotation)) {
@@ -1230,12 +1318,12 @@ function tick() {
     }
 
     // Restart.
-    if(pressedKeys.some(i => [82].includes(i))) {
+    if(pressedKeys.some(i => ['r'].includes(i))) {
         restart();
     }
 
     // Flip
-    if(pressedKeys.some(i => [65].includes(i))) {
+    if(pressedKeys.some(i => keys.rotate180.split(',').includes(i))) {
         [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, fmod((rotation + 2), 4));
         tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
         if(tspin) {
@@ -1247,7 +1335,7 @@ function tick() {
     }
 
     // Rotate clockwise
-    if(pressedKeys.some(i => [38, 88].includes(i))) {
+    if(pressedKeys.some(i => keys.rotateCW.split(',').includes(i))) {
         [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, (rotation + 1) % 4);
         tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
         if(tspin) {
@@ -1260,7 +1348,7 @@ function tick() {
     }
 
     // Rotate counterclockwise
-    if(pressedKeys.some(i => [90].includes(i))) {
+    if(pressedKeys.some(i => keys.rotateCCW.split(',').includes(i))) {
         [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, fmod((rotation - 1), 4));
         tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
         if(tspin) {
@@ -1273,16 +1361,15 @@ function tick() {
     }
 
     // Remove restart keypress.
-    removeKey(82);
+    removeKey('r');
     // Remove rotation keypresses.
-    removeKey(65);
-    removeKey(38);
-    removeKey(88);
-    removeKey(90);
+    removeAllKeys(keys.rotateCW);
+    removeAllKeys(keys.rotateCCW);
+    removeAllKeys(keys.rotate180);
     // Remove hard drop keypress.
-    removeKey(32);
+    removeAllKeys(keys.hardDrop);
     // Remove hold keypress.
-    removeKey(16);
+    removeAllKeys(keys.hold);
 
     /* Render */
     drawGrid(ctx);

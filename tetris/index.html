@@ -220,11 +220,58 @@
         </div>
 
         <div id="settings">
-            <h1>PAUSED</h1> <br>
-            <h2>Settings</h2> <br>
+            <h1>PAUSED</h1>
+            <br>
+            <h2>Handling</h2>
             <span title="Soft Drop Factor, how fast pieces drop.">SDF 1</span><input type="range" min="1" max="20" value="10" id="sdf"><span>20</span> <span id="sdf-val">10</span><br>
             <span title="Delayed Auto Shift, how long it takes before a piece to repeat movement.">DAS 0</span><input type="range" min="0" max="50" value="25" id="das"><span>50</span> <span id="das-val">25</span><br>
             <span title="Automatic Repeat Rate, how fast pieces repeadetly move.">ARR 1</span><input type="range" min="1" max="10" value="1" id="arr"><span>10</span> <span id="arr-val">10</span><br>
+            <span>Garbage rate</span> 0<input type="range" min="0" max="10" value="0" id="garb"><span>10</span> <span id="garb-val">OFF</span><br>
+            <br>
+            <h3>Controls</h3>
+            <button onclick="changeSetting('boundKeys', HANDLING_GUIDELINE);">Revert to Guideline</button>
+            <p>
+                Separate multiple keys with commas.<br>
+                Arrow keys are "ArrowLeft", "ArrowRight", "ArrowUp" and "ArrowDown".<br>
+                Modifier keys are capitalized ("Shift" for shift).<br>
+                "&nbsp;" for space bar.
+            </p>
+            <table>
+                <tr>
+                    <td>Left</td>
+                    <td><input type="text" name="left"></td>
+                </tr>
+                <tr>
+                    <td>Right</td>
+                    <td><input type="text" name="right"></td>
+                </tr>
+                <tr>
+                    <td>Rotate CW</td>
+                    <td><input type="text" name="rotatecw"></td>
+                </tr>
+                <tr>
+                    <td>Rotate CCW</td>
+                    <td><input type="text" name="rotateccw"></td>
+                </tr>
+                <tr>
+                    <td>Rotate 180</td>
+                    <td><input type="text" name="flip"></td>
+                </tr>
+                <tr>
+                    <td>Soft drop</td>
+                    <td><input type="text" name="softdrop"></td>
+                </tr>
+                <tr>
+                    <td>Hard drop</td>
+                    <td><input type="text" name="harddrop"></td>
+                </tr>
+                <tr>
+                    <td>Hold</td>
+                    <td><input type="text" name="hold"></td>
+                </tr>
+            </table>
+            <br>
+            <button onclick="saveSettings();">Save settings</button>
         </div>
 
         <div id="particleField"></div>

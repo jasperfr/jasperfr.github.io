@@ -37,7 +37,7 @@ body {
 #background {
     transition: opacity 500ms;
     background-color: black;
-    opacity: 0;
+    opacity: 0.5;
     position: absolute;
     left: 0; top: 0; right: 0; bottom: 0;
     z-index: -999;
@@ -376,4 +376,13 @@ body {
 
 #div-action-text .t {
     color: magenta;
+}
+
+#settings {
+    padding: 8px;
+    font-size: 11px;
+}
+#settings * {
+    margin: 0;
+    font-size: 11px !important;
 }
