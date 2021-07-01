@@ -1,110 +1,143 @@
+/* @region Helper functions */
 function fmod(a, b) {
     return (a < 0 && b + a) || a % b;
-}  
-
-const HANDLING_GUIDELINE = {
-    left: 'ArrowLeft',
-    right: 'ArrowRight',
-    softDrop: 'ArrowDown',
-    hardDrop: ' ',
-    rotateCW: 'ArrowUp,x',
-    rotateCCW: 'z',
-    rotate180: 'a',
-    hold: 'Shift'
 }
 
-var settings = {
-    boundKeys: {
-        left: 'ArrowLeft',
-        right: 'ArrowRight',
-        softDrop: 'ArrowDown',
-        hardDrop: ' ',
-        rotateCW: 'ArrowUp,x',
-        rotateCCW: 'z',
-        rotate180: 'a',
-        hold: 'Shift'
-    },
-    ARR: 0,
-    DAS: 0,
-    SDF: 0,
-    boardBounce: true,
-    boardShake: true,
-    volume: 100
+function playSound(sound) {
+    new Audio(`audio/${sound}.ogg`).play();
+}
+
+function show($el) {
+    $el.show();
+}
+
+function hide($el) {
+    $el.hide();
+}
+
+function shuffle(array) {
+    var currentIndex = array.length, randomIndex;
+    while (0 !== currentIndex) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+}
+
+function drawLine(ctx, x0, y0, x1, y1) {
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+}
+
+/* @region constants */
+const s = 20; // piece size
+const MARGIN = 2;
+const pcs = ['J', 'L', 'T', 'O', 'I', 'S', 'Z', 'H'];
+const fillStyles = ['#0000FF', '#FF8000', '#FF00FF', '#FFFF00', '#00FFFF', '#00FF00', '#FF0000', '#808080'];
+const BAG = ['J', 'Z', 'O', 'S', 'L', 'T', 'I'];
+const TICKSPEED = 17;
+const _BOARD_ = (Array(40).fill(null).map(() => [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]).concat(Array(12).fill(1)));
+const spins = ['SINGLE', 'DOUBLE', 'TRIPLE', 'WHAT'];
+const particles2 = [];
+const pressedKeys = [];
+
+/* @region variables */
+var DAS = 20;
+var SDF = 0.1;
+var rotation = 0;
+var posX = 3;
+var posY = 16;
+var rotation = 0;
+var currentPiece = getNextPiece();
+var holdPiece = null;
+var bags = shuffle(BAG.slice()).concat(shuffle(BAG.slice()));
+var lineClears = 0;
+var piecesPlaced = 0;
+var millisecondsElapsed = 0.0001;
+var paused = false;
+var boardRotate = 0;
+var $lineClear;
+var $combo;
+var $comboCount;
+var $tSpinHeader;
+var $tSpinCount;
+var sprites = {};
+var score = 0;
+var board = JSON.parse(JSON.stringify(_BOARD_));
+var dropRate = 200;
+var dropTimer = 0;
+var lockDelay = 30;
+var lockTimer = 0;
+var triggerLockDelay = false;
+var combo = 0;
+var b2b = 0;
+var dasTimer = 100;
+var dasTime = 0;
+var dasTrigger = false;
+var dasEnabled = false;
+var holdBool = false;
+var kick = -1;
+var tspin = 0;
+var warning = 0;
+var sWarning = 0;
+var $canvas;
+var ctx;
+var game = 'running';
+var clears = {
+    single: 0,
+    double: 0,
+    triple: 0,
+    quad: 0,
+    tspin: 0,
+    allclears: 0
 };
+var maxCombo = 0;
+var maxb2b = 0;
+var interval;
+var gy = 1;
+var dropButtonPresses = 0;
+var preventHD = 0;
+var sBounce = 0;
+var garbageTimer = 0;
+var garbageDelay = 0;
+var garbageAppear = false;
+var critical = false;
+var elapsedFrames = 0;
+var elapsedTime = 0;
+var deltaTime = 0;
+var startTime = 0;
+var bx = 0;
+var by = 0;
 
-function setSettingsValues() {
-    $('input[name="left"]').val(settings.boundKeys.left);
-    $('input[name="right"]').val(settings.boundKeys.right);
-    $('input[name="softdrop"]').val(settings.boundKeys.softDrop);
-    $('input[name="harddrop"]').val(settings.boundKeys.hardDrop);
-    $('input[name="rotatecw"]').val(settings.boundKeys.rotateCW);
-    $('input[name="rotateccw"]').val(settings.boundKeys.rotateCCW);
-    $('input[name="flip"]').val(settings.boundKeys.rotate180);
-    $('input[name="hold"]').val(settings.boundKeys.hold);
-}
-
-function loadSettings() {
-    if(localStorage.settings) {
-        settings = JSON.parse(atob(localStorage.settings));
-        setSettingsValues();
+/* @region keyboard functions */
+function keyDownEvent(e) {
+    if(pressedKeys.indexOf(e.key) == -1) {
+        pressedKeys.push(e.key);
     }
 }
 
-function saveSettings() {
-    settings.boundKeys.left = $('input[name="left"]').val();
-    settings.boundKeys.right = $('input[name="right"]').val();
-    settings.boundKeys.softDrop = $('input[name="softdrop"]').val();
-    settings.boundKeys.hardDrop = $('input[name="harddrop"]').val();
-    settings.boundKeys.rotateCW = $('input[name="rotatecw"]').val();
-    settings.boundKeys.rotateCCW = $('input[name="rotateccw"]').val();
-    settings.boundKeys.rotate180 = $('input[name="flip"]').val();
-    settings.boundKeys.hold = $('input[name="hold"]').val();
-
-    localStorage.settings = btoa(JSON.stringify(settings));
-    setSettingsValues();
+function keyUpEvent(e) {
+    let index = pressedKeys.indexOf(e.key);
+    if(index != -1) {
+        pressedKeys.splice(index, 1);
+    }
 }
 
-function changeSetting(setting, value) {
-    settings[setting] = value;
-    setSettingsValues();
-};
-
-$(() => loadSettings());
-
-const SRSX = {
-    "_comment1": "Kicks",
-    "N0-1": [[ 0, 0], [-1, 0], [-1, 1], [ 0,-2], [-1,-2]],
-    "N1-0": [[ 0, 0], [ 1, 0], [ 1,-1], [ 0, 2], [ 1, 2]],
-    "N1-2": [[ 0, 0], [ 1, 0], [ 1,-1], [ 0, 2], [ 1, 2]],
-    "N2-1": [[ 0, 0], [-1, 0], [-1, 1], [ 0,-2], [-1,-2]],
-    "N2-3": [[ 0, 0], [ 1, 0], [ 1, 1], [ 0,-2], [ 1,-2]],
-    "N3-2": [[ 0, 0], [-1, 0], [-1,-1], [ 0, 2], [-1, 2]],
-    "N3-0": [[ 0, 0], [-1, 0], [-1,-1], [ 0, 2], [-1, 2]],
-    "N0-3": [[ 0, 0], [ 1, 0], [ 1, 1], [ 0,-2], [ 1,-2]], 
-
-    "_comment2": "180 Kicks",
-    "N0-2": [[ 0, 0], [ 1, 0], [ 2, 0], [ 1,-1], [ 2,-1], [-1, 0], [-2, 0], [-1,-1], [-2,-1], [ 0, 1], [ 3, 0], [-3, 0]],
-    "N1-3": [[ 0, 0], [ 0,-1], [ 0,-2], [-1,-1], [-1,-2], [ 0, 1], [ 0, 2], [-1, 1], [-1, 2], [ 1, 0], [ 0,-3], [ 0, 3]],
-    "N2-0": [[ 0, 0], [-1, 0], [-2, 0], [-1, 1], [-2, 1], [ 1, 0], [ 2, 0], [ 1, 1], [ 2, 1], [ 0,-1], [-3, 0], [ 3, 0]],
-    "N3-1": [[ 0, 0], [ 0,-1], [ 0,-2], [ 1,-1], [ 1,-2], [ 0, 1], [ 0, 2], [ 1, 1], [ 1, 2], [-1, 0], [ 0,-3], [ 0, 3]],
-
-    "_comment3": "I Piece Kicks",
-    "I0-1": [[ 0, 0], [-2, 0], [ 1, 0], [-2,-1], [ 1, 2]],
-    "I1-0": [[ 0, 0], [ 2, 0], [-1, 0], [ 2, 1], [-1,-2]],
-    "I1-2": [[ 0, 0], [-1, 0], [ 2, 0], [-1, 2], [ 2,-1]],
-    "I2-1": [[ 0, 0], [ 1, 0], [-2, 0], [ 1,-2], [-2, 1]],
-    "I2-3": [[ 0, 0], [ 2, 0], [-1, 0], [ 2, 1], [-1,-2]],
-    "I3-2": [[ 0, 0], [-2, 0], [ 1, 0], [-2,-1], [ 1, 2]],
-    "I3-0": [[ 0, 0], [ 1, 0], [-2, 0], [ 1,-2], [-2, 1]],
-    "I0-3": [[ 0, 0], [-1, 0], [ 2, 0], [-1, 2], [ 2,-1]],
-
-    "_comment4": "I Piece 180 Kicks",
-    "I0-2": [[ 0, 0], [-1, 0], [-2, 0], [ 1, 0], [ 2, 0], [ 0,-1]],
-    "I1-3": [[ 0, 0], [ 0,-1], [ 0,-2], [ 0, 1], [ 0, 2], [-1, 0]],
-    "I2-0": [[ 0, 0], [ 1, 0], [ 2, 0], [-1, 0], [-2, 0], [ 0, 1]],
-    "I3-1": [[ 0, 0], [ 0,-1], [ 0,-2], [ 0, 1], [ 0, 2], [ 1, 0]]
+function removeKey(key) {
+    let index = pressedKeys.indexOf(key);
+    if(index != -1) {
+        pressedKeys.splice(index, 1);
+    }
+    index = pressedKeys.indexOf(key.toUpperCase());
+    if(index != -1) {
+        pressedKeys.splice(index, 1);
+    }
 }
 
+/* @region game functions */
 function createAllClear() {
     let $element = $(`<h1 id="all-clear" style="z-index:9999;">PERFECT CLEAR!</h1>`);
     $('#game').prepend($element);
@@ -114,78 +147,6 @@ function createAllClear() {
     explode();
 };
 
-function show($el) {
-    $el.show();
-}
-function hide($el) {
-    $el.hide();
-}
-
-var paused = false;
-var DAS = 10, SDF = 4;
-var boardRotate = 0;
-
-var $lineClear, $combo, $comboCount, $tSpinHeader, $tSpinCount;
-
-$(() => {
-    $lineClear = $('#line-clear');
-    $combo = $('#combo');
-    $comboCount = $('#combo-count');
-    $tSpinHeader = $('#tspin');
-    $tSpinCount = $('#tspin-count');
-
-    hide($lineClear);
-    hide($combo);
-    hide($tSpinHeader);
-    hide($tSpinCount);
-
-    $('#sdf').on('input', function() {
-        SDF = $('#sdf').val();
-        $('#sdf-val').text($('#sdf').val());
-    });
-    $('#das').on('input', function() {
-        DAS = $('#das').val();
-        $('#das-val').text($('#das').val());
-    });
-    $('#garb').on('input', function() {
-        let delay = parseInt($('#garb').val());
-        if(delay == 0) {
-            garbageDelay = 0;
-            $('#garb-val').text('OFF');
-        } else {
-            garbageDelay = 11 - delay;
-            $('#garb-val').text($('#garb').val());
-        }
-    });
-    window.addEventListener('keydown', function(e) {
-        if(e.keyCode == 27) {
-            $('#settings').toggle();
-            paused ^= true;
-        }
-    });
-    $('#settings').hide();
-
-    sprites.J = new Image(20, 20); sprites.J.src = 'sprites/J.png';
-    sprites.Z = new Image(20, 20); sprites.Z.src = 'sprites/Z.png';
-    sprites.O = new Image(20, 20); sprites.O.src = 'sprites/O.png';
-    sprites.S = new Image(20, 20); sprites.S.src = 'sprites/S.png';
-    sprites.L = new Image(20, 20); sprites.L.src = 'sprites/L.png';
-    sprites.I = new Image(20, 20); sprites.I.src = 'sprites/I.png';
-    sprites.T = new Image(20, 20); sprites.T.src = 'sprites/T.png';
-    sprites.H = new Image(20, 20); sprites.H.src = 'sprites/H.png';
-    sprites.G = new Image(20, 20); sprites.G.src = 'sprites/G.png';
-    sprites.X = new Image(20, 20); sprites.X.src = 'sprites/X.png';
-});
-
-var sprites = {};
-
-function playSound(sound) {
-    new Audio(`audio/${sound}.ogg`).play();
-};
-
-var score = 0;
-
-// Returns [x, y, new rotation], or [0, 0, same rotation] if no kick has been found.
 function getKickTable(piece, board, xpos, ypos, rotationFrom, rotationTo) {
     let key = `${piece=='I'?'I':'N'}${rotationFrom}-${rotationTo}`;
     let table = SRSX[key];
@@ -210,71 +171,6 @@ function getKickTable(piece, board, xpos, ypos, rotationFrom, rotationTo) {
     }
     return [xpos, ypos, rotationFrom, -1];
 }
-
-const _BOARD_ = [
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-];
-
-var lineClears = 0;
-const TICKSPEED = 17;
-var piecesPlaced = 0, millisecondsElapsed = 0.0001;
-function getPPS() {
-    millisecondsElapsed += TICKSPEED;
-    let $pps = $('#pieces-per-second');
-    let pps = piecesPlaced / millisecondsElapsed * 1000;
-    $pps.text(pps.toFixed(2));
-};
-function getTime() {
-    let $time = $('#time');
-    let time = millisecondsElapsed;
-    $time.text(`${Math.floor(time / 60000)}:${('00' + Math.floor(time / 1000) % 60).slice(-2)}.${('000' + Math.floor(time % 1000)).slice(-3)}`);
-}
-function getLines() {
-    let $lines = $('#lines');
-    $lines.text(lineClears);
-}
-
-var board = JSON.parse(JSON.stringify(_BOARD_));
 
 function checkTSpin(piece, board, x, y, r, kick) {
     if(piece !== 'T') return false;
@@ -329,240 +225,8 @@ function checkTSpin(piece, board, x, y, r, kick) {
     return false;
 }
 
-const pieces = {
-    "J": {
-        color: '#0000FF',
-        fill: 1,
-        grid: [
-            [
-                0, 0, 0, 0,
-                1, 0, 0, 0,
-                1, 1, 1, 0,
-                0, 0, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 1, 1, 0,
-                0, 1, 0, 0,
-                0, 1, 0, 0,
-            ],
-            [
-                0, 0, 0, 0,
-                0, 0, 0, 0,
-                1, 1, 1, 0,
-                0, 0, 1, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 1, 0, 0,
-                1, 1, 0, 0
-            ],
-        ]
-    },
-    "L": {
-        color: '#FF8000',
-        fill: 2,
-        grid: [
-            [
-                0, 0, 0, 0,
-                0, 0, 1, 0,
-                1, 1, 1, 0,
-                0, 0, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 1, 0, 0,
-                0, 1, 1, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 0, 0, 0,
-                1, 1, 1, 0,
-                1, 0, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                1, 1, 0, 0,
-                0, 1, 0, 0,
-                0, 1, 0, 0
-            ],
-        ]
-    },
-    "T": {
-        color: '#FF00FF',
-        fill: 3,
-        grid: [
-            [
-                0, 0, 0, 0,
-                0, 1, 0, 0,
-                1, 1, 1, 0,
-                0, 0, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 1, 1, 0,
-                0, 1, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 0, 0, 0,
-                1, 1, 1, 0,
-                0, 1, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 1, 0, 0,
-                1, 1, 0, 0,
-                0, 1, 0, 0
-            ]
-        ]
-    },
-    "O": {
-        color: '#FFFF00',
-        fill: 4,
-        grid: [
-            [
-                0, 0, 0, 0,
-                0, 1, 1, 0,
-                0, 1, 1, 0,
-                0, 0, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 1, 1, 0,
-                0, 1, 1, 0,
-                0, 0, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 1, 1, 0,
-                0, 1, 1, 0,
-                0, 0, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 1, 1, 0,
-                0, 1, 1, 0,
-                0, 0, 0, 0
-            ],
-        ]
-    },
-    "I": {
-        color: '#00FFFF',
-        fill: 5,
-        grid: [
-            [
-                0, 0, 0, 0,
-                1, 1, 1, 1,
-                0, 0, 0, 0,
-                0, 0, 0, 0
-            ],
-            [
-                0, 0, 1, 0,
-                0, 0, 1, 0,
-                0, 0, 1, 0,
-                0, 0, 1, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 0, 0, 0,
-                1, 1, 1, 1,
-                0, 0, 0, 0
-            ],
-            [
-                0, 1, 0, 0,
-                0, 1, 0, 0,
-                0, 1, 0, 0,
-                0, 1, 0, 0
-            ],
-        ]
-    },
-    "S": {
-        color: '#00FF00',
-        fill: 6,
-        grid: [
-            [
-                0, 0, 0, 0,
-                0, 1, 1, 0,
-                1, 1, 0, 0,
-                0, 0, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 1, 1, 0,
-                0, 0, 1, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 0, 0, 0,
-                0, 1, 1, 0,
-                1, 1, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                1, 0, 0, 0,
-                1, 1, 0, 0,
-                0, 1, 0, 0
-            ],
-        ]
-    },
-    "Z": {
-        color: '#FF0000',
-        fill: 7,
-        grid: [
-            [
-                0, 0, 0, 0,
-                1, 1, 0, 0,
-                0, 1, 1, 0,
-                0, 0, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 0, 1, 0,
-                0, 1, 1, 0,
-                0, 1, 0, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 0, 0, 0,
-                1, 1, 0, 0,
-                0, 1, 1, 0
-            ],
-            [
-                0, 0, 0, 0,
-                0, 1, 0, 0,
-                1, 1, 0, 0,
-                1, 0, 0, 0
-            ],
-        ]
-    },
-}
-
-function shuffle(array) {
-    var currentIndex = array.length,  randomIndex;
-
-    // While there remain elements to shuffle...
-    while (0 !== currentIndex) {
-
-    // Pick a remaining element...
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-        array[randomIndex], array[currentIndex]];
-    }
-
-    return array;
-}
-
-const BAG = ['J', 'Z', 'O', 'S', 'L', 'T', 'I'];
-var bags = shuffle(BAG.slice()).concat(shuffle(BAG.slice()));
 function getNextPiece() {
+    if(!bags) bags = shuffle(BAG.slice()).concat(shuffle(BAG.slice()));
     let piece = bags.shift();
     if(bags.length < 7) {
         bags = bags.concat(shuffle(BAG.slice()));
@@ -571,6 +235,10 @@ function getNextPiece() {
 }
 
 function restart() {
+
+    startTime += elapsedTime;
+    console.log(startTime);
+
     Score.set(0);
     Level.restart();
     kick = -1;
@@ -588,143 +256,7 @@ function restart() {
     lineClears = 0;
     holdBool = false;
     warning = false;
-    $('#game').removeClass('warning');
-}
-
-const s = 20; // piece size
-function drawGrid(ctx) {
-    ctx.clearRect(0, 0, 204, 484);
-
-    ctx.fillStyle = '#000000CC';
-    ctx.fillRect(0, 80, 204, 484);
-
-    ctx.strokeStyle = '#444';
-    for(let x = 0; x < 10; x++) {
-        drawLine(ctx, 2 + x * s, 82, 2 + x * s, 484);
-    }
-    for(let y = 0; y < 20; y++) {
-        drawLine(ctx, 2, 82 + y * s, 204, 82 + y  * s);
-    }
-}
-
-function drawBorder(ctx) {
-    ctx.strokeStyle = warning ? '#ff0000' : '#ffffff';
-    drawLine(ctx, 0.5, 80, 0.5, 484);
-    drawLine(ctx, 1.5, 80, 1.5, 484);
-
-    drawLine(ctx, 202.5, 80, 202.5, 484);
-    drawLine(ctx, 203.5, 80, 203.5, 484);
-
-    drawLine(ctx, 0, 482.5, 204, 482.5);
-    drawLine(ctx, 0, 483.5, 204, 483.5);
-}
-
-const MARGIN = 2;
-
-// J L T O I S Z
-const pcs = ['J', 'L', 'T', 'O', 'I', 'S', 'Z', 'H'];
-fillStyles = ['#0000FF', '#FF8000', '#FF00FF', '#FFFF00', '#00FFFF', '#00FF00', '#FF0000', '#808080']
-function drawPieces(ctx) {
-    for(let y = 15; y < 40; y++) {
-        for(let x = 0; x < 10; x++) {
-            let piece = board[y][x + 1];
-            if(piece == 0) continue;
-            let px = pcs[piece - 1];
-            if(px == undefined) continue;
-            ctx.drawImage(sprites[px], MARGIN + x * s, MARGIN + (y - 20) * s + 80);
-        }
-    }
-}
-
-function drawHoldPiece() {
-    let ch = document.getElementById('hold');
-    let ctxh = ch.getContext('2d');
-    ctxh.clearRect(0, 0, 200, 150);
-
-    if(!holdPiece) return;
-    let p = pieces[holdPiece];
-    let sprite = holdBool ? sprites['H'] : sprites[holdPiece];
-    ctxh.fillStyle = p.color;
-    for(let x = 0; x < 4; x++) {
-        for(let y = 0; y < 4; y++) {
-            let current = p.grid[0][y * 4 + x];
-            if (current == 1) {
-                if(holdPiece == 'I') {
-                    ctxh.drawImage(sprite,  x * 20 + 10, y * 20 + 10);
-                }
-                else if(holdPiece == 'O')
-                    ctxh.drawImage(sprite, x * 20 + 10, y * 20);
-                else 
-                    ctxh.drawImage(sprite, x * 20 + 20, y * 20);
-            }
-        }
-    }
-}
-
-function drawNext() {
-    let cn = document.getElementById('next');
-    let ctxn = cn.getContext('2d');
-    ctxn.clearRect(0, 0, 100, 320);
-
-    for(let i = 0; i < 5; i++) {
-        let offset = i * 64;
-        let p = pieces[bags[i]];
-        let pc = bags[i];
-        let sprite = sprites[pc];
-        for(let x = 0; x < 4; x++) {
-            for(let y = 0; y < 4; y++) {
-                let current = p.grid[0][y * 4 + x];
-                if (current == 1) {
-                    if(pc == 'I') {
-                        ctxn.drawImage(sprite, x * 20 + 10, i * 60 + y * 20 + 10);
-                    }
-                    else if(pc == 'O')
-                        ctxn.drawImage(sprite, x * 20 + 10, i * 60 + y * 20);
-                    else 
-                        ctxn.drawImage(sprite, x * 20 + 20, i * 60 + y * 20);
-                }
-            }
-        }
-    }
-}
-
-var rotation = 0;
-var posX = 3;
-var posY = 16;
-var rotation = 0;
-var currentPiece = getNextPiece();
-var holdPiece = null;
-
-function drawPiece(ctx, x, y, piece, r) {
-    let p = pieces[piece];
-    ctx.fillStyle = p.color;
-    for(let _x = 0; _x < 4; _x++) {
-        for(let _y = 0; _y < 4; _y++) {
-            let current = p.grid[r][_y * 4 + _x];
-            if (current == 1) {
-                ctx.drawImage(sprites[piece], MARGIN + (_x + x) * s, MARGIN + (_y + y - 20) * s + 80);
-            }
-        }
-    }
-}
-
-function drawShadowPiece(ctx, x, y, piece, r) {
-    let p = pieces[piece];
-    ctx.fillStyle = '#808080';
-    let dy = 0;
-    do {
-        dy++
-    } while (canMoveTo(x, y + dy, r));
-    dy--;
-
-    for(let _x = 0; _x < 4; _x++) {
-        for(let _y = 0; _y < 4; _y++) {
-            let current = p.grid[r][_y * 4 + _x];
-            if (current == 1) {
-                ctx.drawImage(sprites.G, MARGIN + (_x + x) * s, MARGIN + (_y + y + dy - 20) * s + 80);
-            }
-        }
-    }
+    critical = false;
 }
 
 function newPiece(isHold = false) {
@@ -767,20 +299,6 @@ function newPiece(isHold = false) {
     if(!canMoveTo(3, 16, 0)) gameOver();
 }
 
-function drawWarning(ctx) {
-    let p = pieces[bags[0]];
-    ctx.fillStyle = p.color;
-    for(let _x = 0; _x < 4; _x++) {
-        for(let _y = 0; _y < 4; _y++) {
-            let current = p.grid[0][_y * 4 + _x];
-            if (current == 1) {
-                ctx.drawImage(sprites['X'], MARGIN + (_x + 3) * s, MARGIN + (_y + 16 - 20) * s + 80);
-            }
-        }
-    }
-}
-
-let critical = false;
 function checkCritical(x, y, r, piece) {
     // todo fix, make a 4x4 array grid thing ugh
     let next = pieces[bags[0]].grid[0];
@@ -832,13 +350,6 @@ function checkCritical(x, y, r, piece) {
     return false;
 }
 
-function drawLine(ctx, x0, y0, x1, y1) {
-    ctx.beginPath();
-    ctx.moveTo(x0, y0);
-    ctx.lineTo(x1, y1);
-    ctx.stroke();
-}
-
 function addGarbage(lines) {
     let bottom = board.pop();
     let arr = [1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1];
@@ -851,32 +362,11 @@ function addGarbage(lines) {
     board.push(bottom);
 }
 
-/* Key handling */
-const pressedKeys = [];
-function keyDownEvent(e) {
-    if(pressedKeys.indexOf(e.key) == -1) {
-        pressedKeys.push(e.key);
-    }
-}
-function keyUpEvent(e) {
-    let index = pressedKeys.indexOf(e.key);
-    if(index != -1) {
-        pressedKeys.splice(index, 1);
-    }
-}
-function removeKey(key) {
-    let index = pressedKeys.indexOf(key);
-    if(index != -1) {
-        pressedKeys.splice(index, 1);
-    }
-}
 function removeAllKeys(keys) {
     for(let k of keys.split(',')) {
         removeKey(k);
     }
 }
-
-var dropRate = 25, dropTimer = 0, lockDelay = 99999999930, lockTimer = 0, triggerLockDelay = false;
 
 function canMoveTo(xpos, ypos, r) {
     let pieceMatrix = pieces[currentPiece].grid[r];
@@ -889,42 +379,6 @@ function canMoveTo(xpos, ypos, r) {
     return true;
 }
 
-class Particle {
-    constructor(x, y, c) {
-        this.x = x;
-        this.y = y;
-        this.c = c;
-        this.vx = Math.random() * 10 - Math.random() * 10;
-        this.vy = Math.random() * 10 - Math.random() * 10;
-    }
-    render(context) {
-        // update
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vx /= 1.1;
-        this.vy /= 1.1;
-        // render
-        context.fillStyle = fillStyles[this.c - 1];
-        let size = Math.min(this.vx * 4, 8);
-        context.fillRect(this.x - size / 2, this.y - size / 2, size, size);
-
-        if(this.vx < 0.1 && this.vy < 0.1) {
-            this.remove();
-        }
-    }
-    remove() {
-        particles.splice(particles.indexOf(this), 1);
-    }
-}
-const particles = [];
-
-function addParticle(x, y, color) {
-    particles.push(new Particle(x, y, color));
-}
-
-const spins = ['SINGLE', 'DOUBLE', 'TRIPLE', 'WHAT'];
-var combo = 0;
-var b2b = 0;
 function checkTetraLines(spin) {
     hide($tSpinHeader);
     hide($tSpinCount);
@@ -1025,13 +479,6 @@ function checkTetraLines(spin) {
     else $('#game').removeClass('warning');
 }
 
-var dasTimer = 10; dasTime = 0; dasTrigger = false; dasEnabled = false;
-var holdBool = false;
-var kick = -1, tspin = 0, warning = 0; sWarning = 0;
-
-var $canvas, ctx;
-var game = 'running';
-
 function gameRestart() {
     restart();
     paused = true;
@@ -1057,19 +504,6 @@ function gameRestart() {
     };
 }
 
-var clears = {
-    single: 0,
-    double: 0,
-    triple: 0,
-    quad: 0,
-    tspin: 0,
-    allclears: 0
-};
-
-var maxCombo = 0;
-var maxb2b = 0;
-var interval;
-var gy = 1;
 function gameOver() {
     game = 'over';
     playSound('topout')
@@ -1084,46 +518,29 @@ function gameOver() {
     }, 17);
 
     // set statistics
-    let time = millisecondsElapsed;
-    let pps = piecesPlaced / millisecondsElapsed * 1000;
+    const pps = piecesPlaced / (elapsedTime * 0.001);
+    const m = Math.floor(elapsedTime / 60000);
+    const s = ('00' + Math.floor(elapsedTime / 1000) % 60).slice(-2);
+    const ms =('000' + Math.floor(elapsedTime % 1000)).slice(-3);
+
     $('.score-box').text(Score.get());
-    
     $('#s-level').text(Level.getLevel());
-    
-    $('#s-time-played').text(`${Math.floor(time / 60000)}:${('00' + Math.floor(time / 1000) % 60).slice(-2)}.${('000' + Math.floor(time % 1000)).slice(-3)}`);
+    $('#s-time-played').text(`${m}:${s}.${ms}`);
     $('#s-pieces-placed').text(piecesPlaced);
     $('#s-pieces-per-second').text(pps.toFixed(2));
     $('#s-lines-cleared').text(lineClears);
-
     $('#s-singles').text(clears.single);
     $('#s-doubles').text(clears.double);
     $('#s-triples').text(clears.triple);
     $('#s-quads').text(clears.quad);
     $('#s-tspins').text(clears.tspin);
     $('#s-all-clears').text(clears.allclears);
-
     $('#s-max-combo').text(maxCombo + 1);
     $('#s-max-b2b').text(maxb2b);
 
 }
 
-var dropButtonPresses = 0, preventHD = 0;
-
-const particles2 = [];
-$(() => setInterval(() => {
-    for(let p of particles2) {
-        p.update();
-        p.render();
-    }
-}), 17);
-
-var sBounce = 0;
-
-var garbageTimer = 0, garbageDelay = 0, garbageAppear = false;
-
-function tick() {
-    if(paused || game == 'over') return;
-
+function addGarbage() {
     if(garbageDelay != 0) {
         garbageTimer++;
         if(!garbageAppear) {
@@ -1146,40 +563,35 @@ function tick() {
             }
         }
     }
+}
 
+/* @region event functions */
+function warningEvent() {
     sWarning++;
-    sBounce++;
-    if(sBounce > 21) {
-        sBounce = 0;
-        //by -= 10;
+    if(warning && sWarning > 20) {
+        let e = new Shiny(particles2, 10);
+        e.element.css('background-color', 'red');
+        particles2.push(e);
     }
     if(sWarning >= 60 && warning && !critical) {
         sWarning = 0;
         playSound('warning');
     }
-    if(sWarning >= 14 && critical) {
+    if(sWarning >= 60 && critical) {
         sWarning = 0;
         playSound('critical');
     }
     if(warning) {
-        for(let i = 0; i < 5; i++) {
-            let e = new Shiny(particles2, 10);
-            e.element.css('background-color', 'red');
-            particles2.push(e);
-        }
-    }
-    if(warning) {
-        $('#background').css('opacity', '0.5');
+        $('#background').css('opacity', '1');
         $('#game').addClass('warning');
     }
     else {
         $('#background').css('opacity', '0');
         $('#game').removeClass('warning');
     }
+}
 
-    preventHD = Math.min(preventHD + 1, 5);
-
-    dropTimer += Level.getLevel() * 2;
+function lockTimerEvent() {
     if(dropTimer > dropRate) {
         if(canMoveTo(posX, posY + 1, rotation)) {
             posY++;
@@ -1187,8 +599,6 @@ function tick() {
         }
         dropTimer = 0;
     }
-
-    /* Lock delay. */
     if(canMoveTo(posX, posY + 1, rotation)) {
         triggerLockDelay = false;
         lockTimer = 0;
@@ -1209,12 +619,21 @@ function tick() {
             preventHD = 0;
         }
     }
+}
 
-    /* Handle keys */
+function keyHandleEvent() {
+    function isKeyDown(keyMap) {
+        const map = keyMap.split(',');
+        return pressedKeys.some(i =>
+            map.includes(i) ||
+            map.map(m => m.toUpperCase()).includes(i)
+        );
+    }
+
     const keys = settings.boundKeys;
 
     // LEFT
-    if(pressedKeys.some(i => keys.right.split(',').includes(i) || keys.left.split(',').includes(i))) {
+    if(isKeyDown(keys.right) || isKeyDown(keys.left)) {
         if((!dasTrigger && !dasEnabled) || dasEnabled && dasTrigger) {
             if(pressedKeys.some(i => keys.left.split(',').includes(i))) {
                 if(canMoveTo(posX - 1, posY, rotation)) {
@@ -1276,7 +695,7 @@ function tick() {
     }
 
     // Hold
-    if(!holdBool && pressedKeys.some(i => keys.hold.split(',').includes(i))) {
+    if(!holdBool && isKeyDown(keys.hold)) {
         tspin = 0;
 
         holdBool = true;
@@ -1302,7 +721,7 @@ function tick() {
     }
 
     // Soft drop.
-    if(pressedKeys.some(i => keys.softDrop.split(',').includes(i))) {
+    if(isKeyDown(keys.softDrop)) {
         if(canMoveTo(posX, posY + 1, rotation)) {
             for(let i = 0; i < SDF; i++) {
                 if(canMoveTo(posX, posY + 1, rotation)) {
@@ -1318,12 +737,12 @@ function tick() {
     }
 
     // Restart.
-    if(pressedKeys.some(i => ['r'].includes(i))) {
+    if(isKeyDown('r')) {
         restart();
     }
 
     // Flip
-    if(pressedKeys.some(i => keys.rotate180.split(',').includes(i))) {
+    if(isKeyDown(keys.rotate180)) {
         [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, fmod((rotation + 2), 4));
         tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
         if(tspin) {
@@ -1335,7 +754,7 @@ function tick() {
     }
 
     // Rotate clockwise
-    if(pressedKeys.some(i => keys.rotateCW.split(',').includes(i))) {
+    if(isKeyDown(keys.rotateCW)) {
         [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, (rotation + 1) % 4);
         tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
         if(tspin) {
@@ -1348,7 +767,7 @@ function tick() {
     }
 
     // Rotate counterclockwise
-    if(pressedKeys.some(i => keys.rotateCCW.split(',').includes(i))) {
+    if(isKeyDown(keys.rotateCCW)) {
         [posX, posY, rotation, kick] = getKickTable(currentPiece, board, posX, posY, rotation, fmod((rotation - 1), 4));
         tspin = checkTSpin(currentPiece, board, posX, posY, rotation, kick);
         if(tspin) {
@@ -1370,47 +789,234 @@ function tick() {
     removeAllKeys(keys.hardDrop);
     // Remove hold keypress.
     removeAllKeys(keys.hold);
+}
 
-    /* Render */
-    drawGrid(ctx);
-    drawShadowPiece(ctx, posX, posY, currentPiece, rotation);
-    drawPiece(ctx, posX, posY, currentPiece, rotation);
-    drawPieces(ctx);
-    drawHoldPiece();
-    drawNext();
-    drawBorder(ctx);
-    getPPS();
-    getTime();
-    getLines();
-    critical = false;
+function drawEvent() {
+    const piece = pieces[currentPiece];
+
+    // Draw the background
+    ctx.clearRect(0, 0, 204, 484);
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 80, 204, 484);
+
+    // Draw the grid
+    ctx.strokeStyle = '#444';
+    for(let x = 0; x < 10; x++) drawLine(ctx, 2 + x * s, 82, 2 + x * s, 484);
+    for(let y = 0; y < 20; y++) drawLine(ctx, 2, 82 + y * s, 204, 82 + y  * s);
+
+    // Draw the border
+    ctx.strokeStyle = warning ? '#ff0000' : '#ffffff';
+    drawLine(ctx, 0.5, 80, 0.5, 484);
+    drawLine(ctx, 1.5, 80, 1.5, 484);
+
+    drawLine(ctx, 202.5, 80, 202.5, 484);
+    drawLine(ctx, 203.5, 80, 203.5, 484);
+
+    drawLine(ctx, 0, 482.5, 204, 482.5);
+    drawLine(ctx, 0, 483.5, 204, 483.5);
+
+    // Draw the shadow piece
+    ctx.fillStyle = '#808080';
+    let dy = 0;
+    do { dy++ } while (canMoveTo(posX, posY + dy, rotation));
+    dy--;
+    for(let _x = 0; _x < 4; _x++) {
+        for(let _y = 0; _y < 4; _y++) {
+            let current = piece.grid[rotation][_y * 4 + _x];
+            if (current == 1) {
+                ctx.drawImage(sprites.G, MARGIN + (_x + posX) * s, MARGIN + (_y + posY + dy - 20) * s + 80);
+            }
+        }
+    }
+
+    // Draw the current piece
+    ctx.fillStyle = '#808080';
+    for(let _x = 0; _x < 4; _x++) {
+        for(let _y = 0; _y < 4; _y++) {
+            let current = piece.grid[rotation][_y * 4 + _x];
+            if (current == 1) {
+                ctx.drawImage(sprites[currentPiece], MARGIN + (_x + posX) * s, MARGIN + (_y + posY - 20) * s + 80);
+            }
+        }
+    }
+
+    // Draw the board pieces
+    for(let y = 15; y < 40; y++) {
+        for(let x = 0; x < 10; x++) {
+            let piece = board[y][x + 1];
+            if(piece == 0) continue;
+            let px = pcs[piece - 1];
+            if(px == undefined) continue;
+            ctx.drawImage(sprites[px], MARGIN + x * s, MARGIN + (y - 20) * s + 80);
+        }
+    }
+
+    // Draw the hold piece
+    const ch = document.getElementById('hold');
+    const ctxh = ch.getContext('2d');
+    ctxh.clearRect(0, 0, 200, 150);
+    if(holdPiece) {
+        const p = pieces[holdPiece];
+        const sprite = holdBool ? sprites['H'] : sprites[holdPiece];
+        ctxh.fillStyle = p.color;
+        for(let x = 0; x < 4; x++) {
+            for(let y = 0; y < 4; y++) {
+                let current = p.grid[0][y * 4 + x];
+                if (current == 1) {
+                    if(holdPiece == 'I') {
+                        ctxh.drawImage(sprite,  x * 20 + 10, y * 20 + 10);
+                    }
+                    else if(holdPiece == 'O')
+                        ctxh.drawImage(sprite, x * 20 + 10, y * 20);
+                    else 
+                        ctxh.drawImage(sprite, x * 20 + 20, y * 20);
+                }
+            }
+        }
+    }
+    
+    // Draw the next queue
+    const cn = document.getElementById('next');
+    const ctxn = cn.getContext('2d');
+    ctxn.clearRect(0, 0, 100, 320);
+
+    for(let i = 0; i < 5; i++) {
+        const p = pieces[bags[i]];
+        const pc = bags[i];
+        const sprite = sprites[pc];
+        for(let x = 0; x < 4; x++) {
+            for(let y = 0; y < 4; y++) {
+                let current = p.grid[0][y * 4 + x];
+                if (current == 1) {
+                    if(pc == 'I') {
+                        ctxn.drawImage(sprite, x * 20 + 10, i * 60 + y * 20 + 10);
+                    }
+                    else if(pc == 'O')
+                        ctxn.drawImage(sprite, x * 20 + 10, i * 60 + y * 20);
+                    else 
+                        ctxn.drawImage(sprite, x * 20 + 20, i * 60 + y * 20);
+                }
+            }
+        }
+    }
+
+    // Draw the warning (X) pieces.
     if(warning) {
-        drawWarning(ctx);
+        let p = pieces[bags[0]];
+        ctx.fillStyle = p.color;
+        for(let _x = 0; _x < 4; _x++) {
+            for(let _y = 0; _y < 4; _y++) {
+                let current = p.grid[0][_y * 4 + _x];
+                if (current == 1) {
+                    ctx.drawImage(sprites['X'], MARGIN + (_x + 3) * s, MARGIN + (_y + 16 - 20) * s + 80);
+                }
+            }
+        }
         critical = checkCritical(posX, posY, rotation, currentPiece);
     }
     particles.forEach(p => p.render(ctx));
-    Score.tick(); // TODO move
 
+    // Render the score GUI.
+    Score.tick();
 }
 
-var bx = 0, by = 0;
-function boardBounce() {
-    if(gy > 1) return;
-    bx = bx / 1.2;
-    by = by / 1.3;
-    boardRotate /= 1.1;
-    $('#game').css('transform', `translateX(${bx}px) translateY(${by}px) rotate(${boardRotate}deg)`);
+function statisticsEvent() {
+    // Set pieces per second
+    const pps = piecesPlaced / (elapsedTime * 0.001);
+    $('#pieces-per-second').text(pps.toFixed(2));
+
+    // set time played
+    const m = Math.floor(elapsedTime / 60000);
+    const s = ('00' + Math.floor(elapsedTime / 1000) % 60).slice(-2);
+    const ms =('000' + Math.floor(elapsedTime % 1000)).slice(-3);
+    $('#time').text(`${m}:${s}.${ms}`);
+
+    // set line clears
+    $('#lines').text(lineClears);
 }
+
+function step(now) {
+    if(game == 'over') {
+        particles2.forEach(p => p.delete());
+        requestAnimationFrame(step);
+        return;
+    }
+
+    elapsedFrames++;
+    deltaTime = now * 0.001 - deltaTime;
+    elapsedTime = now - startTime;
+
+    preventHD = Math.min(preventHD + 1, 5);
+    dropTimer += Level.getLevel() * 2;
+
+    addGarbage();
+    warningEvent();
+    lockTimerEvent();
+    keyHandleEvent();
+    drawEvent();
+    statisticsEvent();
+    requestAnimationFrame(step);
+}
+requestAnimationFrame(step);
 
 $(() => {
     var $canvas = document.getElementById('main');
     ctx = $canvas.getContext('2d');
-
     window.addEventListener('keydown', keyDownEvent);
     window.addEventListener('keyup', keyUpEvent);
-    window.setInterval(tick, 17);
-    window.setInterval(boardBounce, 17);
+    
+    $lineClear = $('#line-clear');
+    $combo = $('#combo');
+    $comboCount = $('#combo-count');
+    $tSpinHeader = $('#tspin');
+    $tSpinCount = $('#tspin-count');
 
-    console.log('kagari isn\'t real');
-    console.log('and even if she was');
-    console.log('she would hate me');
+    hide($lineClear);
+    hide($combo);
+    hide($tSpinHeader);
+    hide($tSpinCount);
+
+    $('#sdf').on('input', function() {
+        SDF = $('#sdf').val();
+        $('#sdf-val').text($('#sdf').val());
+    });
+    $('#das').on('input', function() {
+        DAS = $('#das').val();
+        $('#das-val').text($('#das').val());
+    });
+    $('#garb').on('input', function() {
+        let delay = parseInt($('#garb').val());
+        if(delay == 0) {
+            garbageDelay = 0;
+            $('#garb-val').text('OFF');
+        } else {
+            garbageDelay = 11 - delay;
+            $('#garb-val').text($('#garb').val());
+        }
+    });
+    window.addEventListener('keydown', function(e) {
+        if(e.keyCode == 27) {
+            $('#settings').toggle();
+            paused ^= true;
+        }
+    });
+    $('#settings').hide();
+
+    sprites.J = new Image(20, 20); sprites.J.src = 'sprites/J.png';
+    sprites.Z = new Image(20, 20); sprites.Z.src = 'sprites/Z.png';
+    sprites.O = new Image(20, 20); sprites.O.src = 'sprites/O.png';
+    sprites.S = new Image(20, 20); sprites.S.src = 'sprites/S.png';
+    sprites.L = new Image(20, 20); sprites.L.src = 'sprites/L.png';
+    sprites.I = new Image(20, 20); sprites.I.src = 'sprites/I.png';
+    sprites.T = new Image(20, 20); sprites.T.src = 'sprites/T.png';
+    sprites.H = new Image(20, 20); sprites.H.src = 'sprites/H.png';
+    sprites.G = new Image(20, 20); sprites.G.src = 'sprites/G.png';
+    sprites.X = new Image(20, 20); sprites.X.src = 'sprites/X.png';
+    
+    setInterval(() => {
+        for(let p of particles2) {
+            p.update();
+            p.render();
+        }
+    }, 17);
 });

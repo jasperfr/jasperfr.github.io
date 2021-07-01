@@ -274,10 +274,6 @@ body {
     transition: background-color 500ms;
 }
 
-#game.warning {
-    transform:scale(200%);
-}
-
 #game.warning #main,
 #game.warning canvas,
 #game.warning #score-box,
