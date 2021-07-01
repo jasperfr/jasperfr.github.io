@@ -7,6 +7,8 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     overflow: hidden;
+    overflow-y: scroll;
+    background-attachment: fixed;
 }
 .base {
     text-decoration: underline;

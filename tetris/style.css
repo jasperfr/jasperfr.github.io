@@ -27,6 +27,7 @@ body {
     width: 32px;
     height: 2px;
     background-color: white;
+    z-index: -2;
 }
 
 .container {
@@ -39,7 +40,7 @@ body {
     opacity: 0;
     position: absolute;
     left: 0; top: 0; right: 0; bottom: 0;
-    z-index: -9999;
+    z-index: -999;
 }
 
 #gameover {
@@ -132,7 +133,6 @@ body {
     margin: 0;
     font-weight: 200;
     height: 25px;
-    border-bottom-left-radius: 5px;
     border-top:none;
     font-family: monospace;
     box-sizing: border-box;
@@ -150,7 +150,19 @@ body {
     border-bottom-right-radius: 5px;
 }
 
-#line-progress .progressbar {
+#garbage-progress {
+    box-sizing: border-box;
+    position: relative;
+    display: block;
+    width: 16px;
+    height: 429px;
+    border: 2px solid white;
+    background-color: black;
+    border-right: none;
+    border-bottom-left-radius: 5px;
+}
+
+#line-progress .progressbar, #garbage-progress .progressbar {
     background-color: #0D5EB4;
     position: absolute;
     bottom:0;
@@ -158,6 +170,19 @@ body {
     right:0;
     height: 0%;
     transition: height 1000ms;
+}
+
+@keyframes flash {
+    from {
+        background-color: #b40d0d;
+    } to {
+        background-color: #f6fa17;
+    }
+}
+
+#garbage-progress .progressbar {
+    background-color: #b40d0d;
+    transition: height 20ms;
 }
 
 #score-box h2 {
@@ -249,13 +274,22 @@ body {
     transition: background-color 500ms;
 }
 
-#game.warning #main, #game.warning canvas, #game.warning #score-box {
+#game.warning {
+    transform:scale(200%);
+}
+
+#game.warning #main,
+#game.warning canvas,
+#game.warning #score-box,
+#game.warning #line-progress,
+#game.warning #garbage-progress,
+#game.warning #stats {
     border-color: red;
 }
 #game.warning #score-box .zeroes {
     color: black;
 }
-#game.warning h2 {
+#game.warning h2, #game.warning .progressbar {
     background-color: red;
 }
 

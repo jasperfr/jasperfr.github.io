@@ -145,6 +145,14 @@
         <table>
             <tr>
                 <td>
+                    <button class="button-singularity 2x_singular" onclick="Game.singularity.unlock('2x_singular');">
+                        You gain 2x more Ψ.<br>Currently <span class="increment">x1.0</span><span class="cap" hidden>
+                            (capped)</span><br>
+                        <span class="price-tag"></span>Cost: <span class=cost>2</span> Ψ</button>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <button class="button-singularity 100_u" onclick="Game.singularity.unlock('100_u');">
                         You start singularities with 100 μ,<br>
                         and a static automatic raise to φ by 1 per second.<br>
@@ -169,13 +177,20 @@
                         <span class="price-tag">Cost: 1 Ψ</span>
                     </button>
                 </td>
+                <td>
+                    <button class="button-singularity nerf_speed" onclick="Game.singularity.unlock('nerf_speed');">
+                        The dimension speed boost starting cost is decreased from 1e10 to 10.<br>
+                        <span class="price-tag">Cost: 1 Ψ</span>
+                    </button>
+                </td>
             </tr>
             <tr>
                 <td>
-                    <button class="button-singularity 2x_singular" onclick="Game.singularity.unlock('2x_singular');">
-                        You gain 2x more Ψ.<br>Currently <span class="increment">x1.0</span><span class="cap" hidden>
-                            (capped)</span><br>
-                        <span class="price-tag"></span>Cost: <span class=cost>2</span> Ψ</button>
+                    <button class="button-singularity remove_cap" onclick="Game.singularity.unlock('remove_cap');">
+                        Remove the cap for the conversion rate, up until Infinity.<br>
+                        1e100 -> 1.79e308<br>
+                        <span class="price-tag">Cost: <span class=cost>2</span> Ψ</span>
+                    </button>
                 </td>
                 <td>
                     <button class="button-singularity e_gain" onclick="Game.singularity.unlock('e_gain');">
@@ -200,10 +215,16 @@
                         <span class="price-tag">Cost: <span class=cost>5</span> Ψ</span>
                     </button>
                 </td>
+                <td>
+                    <button class="button-singularity increase_speed" onclick="Game.singularity.unlock('increase_speed');">
+                        Increase the dimension speed.<br>
+                        <span class="increment">+0.15x -> +0.20x</span><span class="cap" hidden><br>(capped)</span><br>
+                        <span class="price-tag">Cost: <span class=cost>5</span> Ψ</span>
+                    </button>
+                </td>
             </tr>
-            <tr>
-                <td><button class="button-singularity">Remove the cap for the conversion rate, up until Infinity.<br>1e100 ->
-                        1.79e308<br>Cost: 5 Ψ</button></td>
+            <tr class="unavailable">
+                <td><button class="button-singularity">These upgrades are unavailable for purchase right now.</button></td>
                 <td><button class="button-singularity">The dimension speed boost cost increase is reduced.<br>x10 ->
                         x9<br>Cost: 10 Ψ</button></td>
                 <td><button class="button-singularity">Reduce the dimension cost increase.<br>x3 -> x2.8<br>Cost: 10

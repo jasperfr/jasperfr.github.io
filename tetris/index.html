@@ -26,18 +26,30 @@
     <title>Jetris</title>
     <script>
         class Shiny {
-            constructor() {
+            constructor(arr, speed = 50) {
+                this.arr = arr;
                 this.element = $('<div class="shiny">');
                 this.x = 0;
                 this.y = 0;
-                this.vx = (Math.random() - Math.random()) * 50;
-                this.vy = (Math.random() - Math.random()) * 50;
-                $(document.body).append(this.element);
+                this.vx = (Math.random() - Math.random()) * speed;
+                this.vy = (Math.random() - Math.random()) * speed;
+                $('#particleField').append(this.element);
+                this.ticks = 0;
             }
 
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
+                this.ticks++;
+                if(this.ticks > 100) this.delete();
+            }
+
+            delete() {
+                this.element.remove();
+                this.arr.splice(this.arr.indexOf(this), 1);
+            }
+
+            render() {
                 let dir = Math.atan2(this.y, this.x) * 180 / Math.PI;
                 this.element.css({
                     left: `calc(50% + ${this.x}px)`,
@@ -189,6 +201,9 @@
                     <h5 id="level">1</h5>
                 </div>
             </div>
+            <div id="garbage-progress">
+                <div class="progressbar"></div>
+            </div>
             <div id="main-area" style="transform:translateY(-80px);">
                 <canvas id="main" width="204" height="484"></canvas>
                 <div id="score-box">
@@ -211,6 +226,8 @@
             <span title="Delayed Auto Shift, how long it takes before a piece to repeat movement.">DAS 0</span><input type="range" min="0" max="50" value="25" id="das"><span>50</span> <span id="das-val">25</span><br>
             <span title="Automatic Repeat Rate, how fast pieces repeadetly move.">ARR 1</span><input type="range" min="1" max="10" value="1" id="arr"><span>10</span> <span id="arr-val">10</span><br>
         </div>
+
+        <div id="particleField"></div>
     </div>
 </body>
 </html>

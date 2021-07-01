@@ -670,8 +670,14 @@ function newPiece(isHold = false) {
             if(board[y][x] != 0) warning = true;
         }
     }
-    if(warning) $('#game').addClass('warning');
-    else $('#game').removeClass('warning');
+    if(warning) {
+        $('#background').css('opacity', '1');
+        $('#game').addClass('warning');
+    }
+    else {
+        $('#background').css('opacity', '2');
+        $('#game').removeClass('warning');
+    }
 
     triggerLockDelay = false;
     lockTimer = 0;
@@ -764,7 +770,7 @@ function addGarbage(lines) {
         board.splice(0, 1);
         board.push(arr.slice());
     }
-
+    posY--;
     board.push(bottom);
 }
 
@@ -1021,17 +1027,62 @@ function gameOver() {
 
 var dropButtonPresses = 0, preventHD = 0;
 
+const particles2 = [];
+$(() => setInterval(() => {
+    for(let p of particles2) {
+        p.update();
+        p.render();
+    }
+}), 17);
+
+var sBounce = 0;
+
+var garbageTimer = 0, garbageDelay = 3, garbageAppear = false;
+
 function tick() {
     if(paused || game == 'over') return;
 
+    garbageTimer++;
+    if(!garbageAppear) {
+        $('#garbage-progress .progressbar').css('height', `${garbageTimer / garbageDelay}%`);
+        if((garbageTimer / garbageDelay) > 99.9) {
+            garbageAppear = true;
+            $('#garbage-progress .progressbar').css('animation', 'flash 200ms infinite');
+            setTimeout(() => {
+                addGarbage(1);
+                garbageAppear = false;
+                garbageTimer = 0;
+                $('#garbage-progress .progressbar').css('animation', '');
+                var interval = setInterval(() => {
+                    bx += (Math.random() - Math.random() * 10);
+                    by += (Math.random() - Math.random() * 10);
+                }, 17);
+                setTimeout(() => clearInterval(interval), 100);
+                playSound('combobreak');
+            }, 500);
+        }
+    }
+
     sWarning++;
+    sBounce++;
+    if(sBounce > 21) {
+        sBounce = 0;
+        //by -= 10;
+    }
     if(sWarning >= 60 && warning && !critical) {
         sWarning = 0;
         playSound('warning');
     }
-    if(sWarning >= 40 && critical) {
+    if(sWarning >= 14 && critical) {
         sWarning = 0;
         playSound('critical');
+    }
+    if(warning) {
+        for(let i = 0; i < 5; i++) {
+            let e = new Shiny(particles2, 10);
+            e.element.css('background-color', 'red');
+            particles2.push(e);
+        }
     }
 
     preventHD = Math.min(preventHD + 1, 5);
@@ -1258,7 +1309,7 @@ var bx = 0, by = 0;
 function boardBounce() {
     if(gy > 1) return;
     bx = bx / 1.2;
-    by = by / 1.15;
+    by = by / 1.3;
     boardRotate /= 1.1;
     $('#game').css('transform', `translateX(${bx}px) translateY(${by}px) rotate(${boardRotate}deg)`);
 }
