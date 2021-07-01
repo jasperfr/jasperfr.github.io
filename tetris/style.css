@@ -11,6 +11,24 @@ body {
     margin: 0;
 }
 
+.boom {
+    position: absolute;
+    left: calc(50% + -320px);
+    top: calc(50% + -320px);
+    width: 640px;
+    height: 640px;
+    border-radius: 100%;
+    box-sizing: border-box;
+    backdrop-filter: invert(1);
+}
+
+.shiny {
+    position: absolute;
+    width: 32px;
+    height: 2px;
+    background-color: white;
+}
+
 .container {
     transform: translateY(250px) scale(150%);
 }

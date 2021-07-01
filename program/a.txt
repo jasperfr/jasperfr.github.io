@@ -1,0 +1,6 @@
+MEM 0 10
+
+CIN
+MOV 1
+CPY 1
+MOV @1

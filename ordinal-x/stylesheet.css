@@ -50,6 +50,26 @@ button.button-ordinal {
     height: 64px;
 }
 
+button.button-singularity {
+    background-color: black;
+    color: white;
+    cursor:pointer;
+    border: 2px solid orange;
+    box-shadow:  0 0 2px orange;
+    width: 256px;
+    height: 128px;
+}
+
+button.button-singularity.bought {
+    background-color: orange;
+    color: black;
+    cursor:pointer;
+    border: 2px solid orange;
+    box-shadow:  0 0 2px orange;
+    width: 256px;
+    height: 128px;
+}
+
 button.button-hyperfold {
     background-color: black;
     color: white;
@@ -70,6 +90,49 @@ button.button-omega {
     height: 80px;
 }
 
+button.button-reality {
+    color: white;
+    cursor:pointer;
+    position: relative;
+    overflow: hidden;
+    background-color: transparent;
+    border:none;
+    width: 500px;
+    height: 200px;
+}
+
+button.button-reality:before {
+    content: "";
+    width: 1000px;
+    height: 1000px;
+    position: absolute;
+    background:conic-gradient(
+        #fd004c,
+        #fe9000,
+        #fff020,
+        #3edf4b,
+        #3363ff,
+        #b102b7,
+        #fd004c
+    );
+    left: -250px;
+    top: -400px;
+    z-index:-1;
+    animation: spin 5s infinite linear;
+}
+@keyframes spin {
+    100% {
+        transform: rotate(-360deg);
+    }
+}
+
+
+button.button-reality p {
+    background-color: black;
+    margin: 0;
+    padding: 32px 30px;
+}
+
 button.button-warning {
     background-color: black;
     color: white;
@@ -78,6 +141,11 @@ button.button-warning {
     box-shadow:  0 0 8px rgb(248, 0, 0);
     width: 256px;
     height: 80px;
+}
+
+span.sigma {
+    color: rgb(38, 0, 255);
+    text-shadow: 0 0 2px rgb(38, 0, 255);
 }
 
 span.psi {
@@ -96,4 +164,36 @@ span.warning {
 
 nav {
     margin: 8px;
+}
+
+nav > button.locked {
+    display: none;
+}
+
+tr.unavailable td button {
+    background-color: rgba(51, 22, 22, 0.2) !important;
+    border-color: transparent;
+    box-shadow: none;
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* Sigma dimensions ================================================================================== */
+table.dimensions {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+table.dimensions button, .section-sigma .buttongroup button {
+    border: 2px solid rgb(38, 0, 255);
+    background-color: black;
+    color: white;
+    cursor:pointer;
+    padding: 8px;
+    width: 180px;
+    transition: background-color 200ms;
+}
+
+table.dimensions button:hover {
+    background-color: rgb(18, 0, 117);
 }

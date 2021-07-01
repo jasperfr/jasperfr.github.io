@@ -42,7 +42,6 @@ function createAllClear() {
     setTimeout(() => {
         $element.remove();
     }, 3000);
-    explode();
 };
 
 function show($el) {
@@ -656,7 +655,7 @@ function newPiece(isHold = false) {
         let p = pieces[currentPiece];
         let fill = p.fill;
         let matrix = p.grid[rotation];
-        for(let i = 0; i <= 15; i++) {
+        for(let i = 0; i < 15; i++) {
             let x = posX + i % 4;
             let y = posY + Math.floor(i / 4);
             if(board[y] == undefined) continue;
@@ -788,7 +787,7 @@ function removeKey(key) {
     }
 }
 
-var dropRate = 25, dropTimer = 0, lockDelay = 99999999930, lockTimer = 0, triggerLockDelay = false;
+var dropRate = 25, dropTimer = 0, lockDelay = 30, lockTimer = 0, triggerLockDelay = false;
 
 function canMoveTo(xpos, ypos, r) {
     let pieceMatrix = pieces[currentPiece].grid[r];
@@ -858,29 +857,13 @@ function checkTetraLines(spin) {
             clear++;
         }
     }
-
-    // Check if all clear
-    // createAllClear();
-    let pc = true;
-    for(let y = 0; y < 40; y++) {
-        for(let x = 0; x < 10; x++) {
-            if(board[y][x + 1]) pc = false;
-        }
-    }
-    if(pc) {
-        clears.allclears++;
-        playSound('allclear');
-        createAllClear();
-        score += 4000;
-    }
-
     if(clear == 4) {
-        if(!pc) playSound(b2b ? 'clearbtb' : 'clearquad');
+        playSound(b2b ? 'clearbtb' : 'clearquad');
         Score.add(b2b ? 1200 : 800);
         b2b++;
     } else if(spin) {
         clears.tspin++;
-        if(!pc) playSound('spinend');
+        playSound('spinend');
         $tSpinCount.text(spins[clear - 1]);
         show($tSpinCount);
         switch(clear) {
@@ -897,13 +880,13 @@ function checkTetraLines(spin) {
             case 1: Score.add(100); break;
         }
 
-        if(b2b > 1) if(!pc) playSound('btb_break');
-        if(!pc) playSound(combo ? `combo_${Math.min(combo, 16)}` : 'clearline');
+        if(b2b > 1) playSound('btb_break');
+        playSound(combo ? `combo_${Math.min(combo, 16)}` : 'clearline');
         maxb2b = Math.max(b2b, maxb2b);
         b2b = 0;
         combo++;
     } else {
-        if(combo > 1) if(!pc) playSound('combobreak');
+        if(combo > 1) playSound('combobreak');
         maxCombo = Math.max(combo, maxCombo);
         combo = 0;
     }
@@ -924,6 +907,21 @@ function checkTetraLines(spin) {
         case 3: clears.triple++; break;
         case 2: clears.double++; break;
         case 1: clears.single++; break;
+    }
+
+    // Check if all clear
+    // createAllClear();
+    let pc = true;
+    for(let y = 0; y < 40; y++) {
+        for(let x = 0; x < 10; x++) {
+            if(board[y][x + 1]) pc = false;
+        }
+    }
+    if(pc) {
+        clears.allclears++;
+        playSound('allclear');
+        createAllClear();
+        score += 4000;
     }
 
     // Generate warning
@@ -1062,7 +1060,7 @@ function tick() {
             triggerLockDelay = false;
             lockTimer = 0;
             dropButtonPresses = 0;
-            lockDelay = 99999999930 - Level.getLevel();
+            lockDelay = 30 - Level.getLevel();
             preventHD = 0;
         }
     }
@@ -1133,7 +1131,7 @@ function tick() {
         triggerLockDelay = false;
         lockTimer = 0;
         dropButtonPresses = 0;
-        lockDelay = 99999999930 - Level.getLevel();
+        lockDelay = 30 - Level.getLevel();
     }
 
     // Hold

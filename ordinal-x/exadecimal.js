@@ -112,14 +112,21 @@ class Exadecimal {
         );
     }
 
-    isSmallerThan(other) {
-
-    }
-
-    isLargerThan(other) {
+    isSmallerThan(other, orEqualTo = false) {
         if(!is.exadecimal(other)) {
             other = new Exadecimal(other);
         }
+        if(orEqualTo && this.exponent == other.exponent && this.mantissa == other.mantissa) return true;
+        if(this.exponent < other.exponent) return true;
+        else if(this.exponent == other.exponent && this.mantissa < other.mantissa) return true;
+        return false;
+    }
+
+    isLargerThan(other, orEqualTo = false) {
+        if(!is.exadecimal(other)) {
+            other = new Exadecimal(other);
+        }
+        if(orEqualTo && this.exponent == other.exponent && this.mantissa == other.mantissa) return true;
         if(this.exponent > other.exponent) return true;
         else if(this.exponent == other.exponent && this.mantissa > other.mantissa) return true;
         return false;
@@ -245,7 +252,11 @@ class Exadecimal {
     }
 
     toSmallNumber() {
-        return parseFloat(this.mantissa + 'e+' + this.exponent);
+        if(this.exponent < 0) {
+            return parseFloat(this.mantissa + 'e' + this.exponent);
+        } else {
+            return parseFloat(this.mantissa + 'e+' + this.exponent);
+        }
     }
 
 }

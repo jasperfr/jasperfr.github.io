@@ -19,7 +19,7 @@
             $('.button-warning').mouseenter(() => shake = true);
             $('.button-warning').mouseleave(() => shake = false);
             setInterval(() => {
-                if(!shake) return;
+                if (!shake) return;
                 $('.button-warning')
                     .css(
                         'transform',
@@ -41,23 +41,35 @@
 <body>
     <nav class="navigation">
         <button class="nav-ordinal">Ordinals</button>
-        <button class="nav-sigma">Sigma Dimensions</button>
+        <button class="nav-sigma locked">Sigma Dimensions</button>
         <button class="nav-singularity">Singularity</button>
-        <button class="nav-hyperfold">Hyperfold</button>
-        <button class="nav-omega">Beyond Infinity</button>
+        <button class="nav-hyperfold locked">Hyperfold</button>
+        <button class="nav-omega locked">Beyond Infinity</button>
+        <button class="nav-reality">Break Reality</button>
+        <button class="nav-options">Settings</button>
+        <button class="nav-achievements">Achievements</button>
     </nav>
 
     <div class="section section-ordinal">
         <h1 class="ordinal">0</h1>
-        <p>
-            You currently have no <span class="sigma">ξ</span>.<br>
-            Purchase the upgrade to unlock them and gain an automated boost<br>
-            to ordinal points.
-        </p>
+        <div class="compress">
+            <h2>The universe has collapsed due to excess amounts of μ.</h2>
+            <button
+                onclick="if(confirm('Are you ABSOLUTELY SURE you want to reset your progress?\nYou will lose:\nAll your φ, μ and ξ\nYou will gain:\n1x Ψ')){ Game.singularity.compress(); }">Compress
+                into Singularity, and gain 1 Ψ.</button><br>
+            <span class="warning">This will unlock the next layer, and reset <u>everything</u> up to this
+                point.<br></span>
+            <br>
+        </div>
+        <button class="debugger" onclick="ordinals[0] = 1e100">Debugger: gain enough to unlock Sigma
+            Dimensions.</button>
+        <button class="debugger" onclick="ordinals[0] = 1e308">Debugger: gain enough to unlock Singularities.</button>
         <div class="buttongroup">
             <button class="button-ordinal" onclick="Game.up()">Increase φ by 1,<br>and markup when possible.</button>
-            <button class="button-ordinal" onclick="Game.debase()">Reduce the base by 1.<br>Needs: <span class="base-cost">100</span> μ.</button>
-            <button class="button-ordinal" onclick="Game.unlockE()">Unlock ξ.<br>Needs: <span class="base-cost">100</span> μ and base < 10.</button>
+            <button class="button-ordinal" onclick="Game.debase()">Reduce the base by 1.<br>Needs: <span
+                    class="base-cost">100</span> μ.</button>
+            <button class="button-ordinal unlock-sigma" onclick="Game.sigma.unlock()">Unlock ξ.<br>Needs:
+                2.2×10<sup>2</sup>μ and base < 10.</button>
         </div>
     </div>
 
@@ -66,56 +78,163 @@
         <p>
             You have <span class="sigma-count">0</span> <span class="sigma">ξ</span>.
         </p>
+        <button class="debugger" onclick="Game.sigma.count = 1e100">Debugger: gain 1e100 Ψ.</button>
         <p>
             Sigma Dimensions raise φ automatically.<br>
             You can get Sigma Dimensions when you reached Base 9.<br>
             Each <abbr title="Sigma balls lmao gotemm">Sigma</abbr> dimension produces the sigma dimension below it.<br>
-            Each <span class="sigma">ξ</span> increases φ by 1 per second.
+            Each <span class="sigma">ξ<sub>0</sub></span> increases φ by 1 per second.<br>
+            You gain ξ based on the amount of μ you have.<br>
+            <span class="warning">You will lose your base and μ when you Convert.</span>
         </p>
+        <div class="buttongroup">
+            <button onclick="Game.sigma.convert()">
+                Convert all μ to ξ<br>
+                Conversion rate: 10:1<br>
+                You will gain <span class="sigma-gain">0</span> ξ. <span class="sigma-gain-capped"></span>
+            </button>
+            <button onclick="Game.sigma.conversion.boost()">
+                Increase the conversion rate by ^1.05.<br>
+                Currently: x<sup><span class="sigma-conversion-rate">x1.0</span></sup><span
+                    class="sigma-conversion-capped"></span>.
+                Cost: <span class="sigma-conversion-cost"></span> ξ
+            </button>
+            <button onclick="Game.sigma.speed.boost()">
+                Boost dimension speed by +0.15x.<br>
+                Currently: x<span class="sigma-speed-rate"></span><span class="sigma-speed-capped"></span>.
+                Cost: <span class="sigma-speed-cost"></span> ξ
+            </button>
+        </div>
         <table class="dimensions">
-            <tr class="sigma-1">
+            <tr class="sigma-0">
                 <td>ξ<sub>0</sub></td>
-                <td class="count">0</td>
-                <td>
-                    <button>Cost: 1</button>
-                    <button>Max, cost: 1e39</button>
-                </td>
+                <td class="count"></td>
+                <td><button onclick="Game.sigma.buy(0)"></button></td>
             </tr>
-            <tr class="sigma-2"> 
+            <tr class="sigma-1">
                 <td>ξ<sub>1</sub></td>
-                <td class="count">0</td>
-                <td>
-                    <button>Cost: 1</button>
-                    <button>Max, cost: 1e39</button>
-                </td>
+                <td class="count"></td>
+                <td><button onclick="Game.sigma.buy(1)"></button></td>
+            </tr>
+            <tr class="sigma-2">
+                <td>ξ<sub>2</sub></td>
+                <td class="count"></td>
+                <td><button onclick="Game.sigma.buy(2)"></button></td>
             </tr>
             <tr class="sigma-3">
-                <td>ξ<sub>2</sub></td>
-                <td class="count">0</td>
-                <td>
-                    <button>Cost: 1</button>
-                    <button>Max, cost: 1e39</button>
-                </td>
-            </tr>
-            <tr class="sigma-4">
                 <td>ξ<sub>3</sub></td>
-                <td class="count">0</td>
-                <td>
-                    <button>Cost: 1</button>
-                    <button>Max, cost: 1e39</button>
-                </td>
+                <td class="count"></td>
+                <td><button onclick="Game.sigma.buy(3)"></button></td>
             </tr>
         </table>
     </div>
 
     <div class="section section-singularity">
         <h1>Singularity</h1>
-        <p>You have 0 <span class="psi">Ψ</span>.</p>
+        <p>You have <span class="psi-count">0</span> <span class="psi">Ψ</span>.</p>
         <p>
             You gain singularities when you reach φ<sub>ω<sup>ω<sup>ω</sup></sup></sub>.<br>
             The amount of singularities you get is determined by the amount of Hyperfold upgrades you have,<br>
-            as well as the amount of <abbr title="This does not include Hyperfold upgrade 1.">manual</abbr> base shifts you have done in the current singularity run.
+            as well as the amount of <abbr title="This does not include the upgrade.">manual</abbr> base shifts you have
+            done in the current singularity run.
         </p>
+        <h3>Your fastest singularity took <span class="fastest-singularity">forever. Unless you are the developer, or
+                found this by cheating. you are not supposed to see this yet</span>.</h3>
+        <button class="debugger" onclick="Game.singularity.count++;">Debugger: gain 1 Ψ.</button>
+        <button class="debugger" onclick="Game.singularity.count += 1e100;">Debugger: gain 1e100 Ψ.</button>
+        <table>
+            <tr>
+                <td>
+                    <button class="button-singularity 100_u" onclick="Game.singularity.unlock('100_u');">
+                        You start singularities with 100 μ,<br>
+                        and a static automatic raise to φ by 1 per second.<br>
+                        <span class="price-tag">Cost: Free</span>
+                    </button>
+                </td>
+                <td>
+                    <button class="button-singularity 10_e1_dims" onclick="Game.singularity.unlock('10_e1_dims');">
+                        You start with 10 ξ<sub>1</sub>-dimensions.<br>
+                        <span class="price-tag">Cost: 1 Ψ</span>
+                    </button>
+                </td>
+                <td>
+                    <button class="button-singularity sigma_unlock" onclick="Game.singularity.unlock('sigma_unlock');">
+                        Start Singularities with Sigma Dimensions unlocked.<br>
+                        <span class="price-tag">Cost: 1 Ψ</span>
+                    </button>
+                </td>
+                <td>
+                    <button class="button-singularity auto_base" onclick="Game.singularity.unlock('auto_base');">
+                        Base reduction is automated.<br>
+                        <span class="price-tag">Cost: 1 Ψ</span>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <button class="button-singularity 2x_singular" onclick="Game.singularity.unlock('2x_singular');">
+                        You gain 2x more Ψ.<br>Currently <span class="increment">x1.0</span><span class="cap" hidden>
+                            (capped)</span><br>
+                        <span class="price-tag"></span>Cost: <span class=cost>2</span> Ψ</button>
+                </td>
+                <td>
+                    <button class="button-singularity e_gain" onclick="Game.singularity.unlock('e_gain');">
+                        Gain +5%
+                        of your expected ξ-gain per second.<br>
+                        Currently: <span class="increment">0%</span><span class="cap" hidden> (capped)</span><br>
+                        <span class="price-tag">Cost: <span class=cost>2</span> Ψ</span>
+                    </button>
+                </td>
+                <td>
+                    <button class="button-singularity inc_conv_exp" onclick="Game.singularity.unlock('inc_conv_exp');">
+                        Automate Sigma Dimensions and Sigma Dimension upgrades.<br>
+                        <span class="price-tag">Cost: <span class=cost>3</span> Ψ</span>
+                    </button>
+                </td>
+                <td>
+                    <button class="button-singularity inc_conv_exp_cap"
+                        onclick="Game.singularity.unlock('inc_conv_exp_cap');">
+                        Increase the conversion exponent cap.<br>
+                        Useful for base <= 4.<br>
+                        <span class="increment">x<sup>3.00</sup> -> x<sup>3.10</sup></span><span class="cap" hidden><br>(capped)</span><br>
+                        <span class="price-tag">Cost: <span class=cost>5</span> Ψ</span>
+                    </button>
+                </td>
+            </tr>
+            <tr>
+                <td><button class="button-singularity">Remove the cap for the conversion rate, up until Infinity.<br>1e100 ->
+                        1.79e308<br>Cost: 5 Ψ</button></td>
+                <td><button class="button-singularity">The dimension speed boost cost increase is reduced.<br>x10 ->
+                        x9<br>Cost: 10 Ψ</button></td>
+                <td><button class="button-singularity">Reduce the dimension cost increase.<br>x3 -> x2.8<br>Cost: 10
+                        Ψ</button></td>
+                <td><button class="button-singularity">All Sigma Dimensions are 10x stronger.<br>Cost: 25 Ψ</button>
+                </td>
+            </tr>
+            <tr class="unavailable">
+                <td><button class="button-singularity">You start with 1 4th Sigma Dimension.<br>Cost: 1000 Ψ</button>
+                </td>
+                <td><button class="button-singularity">Sigma Dimensions are automated.<br>Cost: 1e4 Ψ</button></td>
+                <td><button class="button-singularity">You keep your Sigma Dimensions on singularity.<br>Cost: 1e4
+                        Ψ</button></td>
+                <td><button class="button-singularity">Reduce <u>all</u> base costs by x0.1.<br>(1e100 -> 1e99)<br>Cost:
+                        1e4 Ψ</button></td>
+            </tr>
+            <tr class="unavailable">
+                <td><button class="button-singularity">Increase the ξ-gain cap by +1e10.<br>1e100 -> 1e110<br>Cost: 1e4
+                        Ψ</button></td>
+                <td><button class="button-singularity">Base reduction does not reset your μ.<br>Cost: 1e5 Ψ</button>
+                </td>
+                <td><button class="button-singularity">ξ<sub>0</sub>-dimensions are multiplied by your Ψ.<br>(+ 0.1x per
+                        Ψ)<br>Cost: 1e6 Ψ</button></td>
+                <td><button class="button-singularity" title="You can gain a maximum of 1e308 Ψ per minute if you can perform a singularity within under 60 seconds.
+This number decreases by x0.1 per second, up until 1e100 per minute.
+Then, the amount decreases by x0.1 per minute.
+The minimal amount of Ψ that can be gained is at most 100 per minute.
+This gain is NOT affected by your x2 Ψ-gain upgrades.">Gain 0 -> 5% Ψ based on your your fastest singularity.<br>Hover
+                        for more information.<br>Currently: 0 Ψ/m<br>Cost: 1e7 Ψ</button></td>
+            </tr>
+        </table>
     </div>
 
     <div class="section section-hyperfold">
@@ -123,18 +242,23 @@
         <p>You have 0 Θ.</p>
         <p>
             You gain singularities when you reach 1.79e308 <span class="psi">Ψ</span>.<br>
-            Hyperfolding <span class="warning">resets <abbr title="Well, except Ψ. But that would have been trivial, wouldn't it?">everything</abbr> up until this point</span>, but you will unlock powerful upgrades<br>
+            Hyperfolding <span class="warning">resets <abbr
+                    title="Well, except Ψ. But that would have been trivial, wouldn't it?">everything</abbr> up until
+                this point</span>, but you will unlock powerful upgrades<br>
             that help you regain production.
         </p>
         <table>
             <tr>
-                <td><button class="button-hyperfold">Permanently reduce the base by 1.<br>10 -> 9<br>Cost: 1 Θ</button></td>
-                <td><button class="button-hyperfold">Permanently gain 5x more <span class="psi">Ψ</span>.<br>Currently: x1<br>Cost: 1 Θ</button></td>
+                <td><button class="button-hyperfold">Permanently reduce the base by 1.<br>10 -> 9<br>Cost: 1 Θ</button>
+                </td>
+                <td><button class="button-hyperfold">Permanently gain 5x more <span class="psi">Ψ</span>.<br>Currently:
+                        x1<br>Cost: 1 Θ</button></td>
                 <td><button class="button-hyperfold">Base reduction does not reset your ξ.<br>Cost: 100 Θ</button></td>
             </tr>
             <tr>
                 <td><button class="button-hyperfold">ξ increases φ by 10x more.<br>Cost: 50 Θ</button></td>
-                <td><button class="button-hyperfold">Permanently gain 2x more Θ.<br>Currently: x1<br>Cost: 1 Θ</button></td>
+                <td><button class="button-hyperfold">Permanently gain 2x more Θ.<br>Currently: x1<br>Cost: 1 Θ</button>
+                </td>
                 <td><button class="button-hyperfold">Unlock Hyperfold Challenges.<br>Cost: 1000 Θ</button></td>
             </tr>
             <tr>
@@ -144,7 +268,9 @@
             </tr>
             <tr>
                 <td></td>
-                <td><button class="button-hyperfold">Collapse the universe and gain 1 <span class="omega">Ω</span>.<br>Cost: 1B Θ and 25 challenge completions.<br><span class="warning">You will lose <u>everything</u> up to this point.</u></span></button></td>
+                <td><button class="button-hyperfold">Collapse the universe and gain 1 <span
+                            class="omega">Ω</span>.<br>Cost: 1B Θ and 25 challenge completions.<br><span
+                            class="warning">You will lose <u>everything</u> up to this point.</u></span></button></td>
                 <td></td>
             </tr>
         </table>
@@ -156,26 +282,52 @@
         <p>
             Welcome to the last part of the game.<br>
             The skill tree contains powerful upgrades that break the game even more.<br>
-            Spend your first <abbr title="I'm not talking about the laundry detergent.">Omega Point</abbr> on an Omega Study.
+            Spend your first <abbr title="I'm not talking about the laundry detergent.">Omega Point</abbr> on an Omega
+            Study.
         </p>
 
         <table>
             <tr>
                 <td><button class="button-omega">You start singularities with 10 of each Sigma Dimension.</button></td>
                 <td><button class="button-omega">Unlock Omega Challenges.</button></td>
-                <td><button class="button-omega">Generate Hyperfolds based on your fastest Universal collapse.</button></td>
+                <td><button class="button-omega">Generate Hyperfolds based on your fastest Universal collapse.</button>
+                </td>
             </tr>
             <tr>
                 <td><button class="button-omega">Numbers now use ExpantaNum.</button></td>
                 <td><button class="button-omega">Unlock Omega Challenges.</button></td>
-                <td><button class="button-omega">Generate Hyperfolds based on your fastest Universal collapse.</button></td>
+                <td><button class="button-omega">Generate Hyperfolds based on your fastest Universal collapse.</button>
+                </td>
             </tr>
             <tr>
                 <td></td>
-                <td><button class="button-warning" title="I MEAN IT.">The base is now 1.<br><span class="warning">This is not a good idea.</span></button></td>
+                <td><button class="button-warning" title="I MEAN IT.">The base is now 1.<br><span class="warning">This
+                            is not a good idea.</span></button></td>
                 <td></td>
             </tr>
         </table>
+    </div>
+
+    <div class="section section-reality">
+        <h1 class="reality">Break Reality</h1>
+        <p>You have 0 <span class="reality">α</span>-tachyons, boosting the effect of β-preons by x1 and Sigma
+            Automation by x<sup>1.00</sup>.</p>
+        <p>You have 0 <span class="reality">β</span>-preons, boosting the effect of γ-bosons by x1 and Ordinal by x1.
+        </p>
+        <p>You have 0 <span class="reality">γ</span>-bosons, boosting α-tachyons and β-preons by <b>x1.0</b>.</p>
+        <p>You have 0 <span class="reality">Reality Frames</span>, reducing the nerf to <b>^0.001</b>.</p>
+
+        <button class="button-reality">
+            <p>
+                Break reality.<br>
+                EVERYTHING is slowed down to ^0.001.<br>
+                You will gain α, β and γ - particles based on your OP, Sigma Dimensions, and Singularities.<br>
+                Hyperfolding is disabled. You gain static Reality Frames, which reduce the nerf of the break.<br>
+                <span class="warning">You will not be able to unbreak Reality until you have reached the
+                    goal.</span><br>
+                Goal: φ<sub>ω<sup>ω<sup>ω</sup></sup></sub>
+            </p>
+        </button>
     </div>
 </body>
 

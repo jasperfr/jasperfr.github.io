@@ -24,6 +24,78 @@
 
     <link rel="stylesheet" type="text/css" href="style.css">
     <title>Jetris</title>
+    <script>
+        class Shiny {
+            constructor() {
+                this.element = $('<div class="shiny">');
+                this.x = 0;
+                this.y = 0;
+                this.vx = (Math.random() - Math.random()) * 50;
+                this.vy = (Math.random() - Math.random()) * 50;
+                $(document.body).append(this.element);
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                let dir = Math.atan2(this.y, this.x) * 180 / Math.PI;
+                this.element.css({
+                    left: `calc(50% + ${this.x}px)`,
+                    top: `calc(50% + ${this.y}px)`,
+                    transform: `rotate(${dir}deg)`
+                });
+            }
+        }
+        function explode() {
+            let size = 10;
+            let boom = $('<div class="boom">');
+            let boom2 = $('<div class="boom">');
+            boom.css({
+                width: `${size}px`,
+                height: `${size}px`,
+                left: `calc(50% + -${size / 2}px)`,
+                top: `calc(50% + -${size / 2}px)`,
+            });
+            boom2.css({
+                width: `${size - 100}px`,
+                height: `${size - 100}px`,
+                left: `calc(50% + -${(size - 100) / 2}px)`,
+                top: `calc(50% + -${(size - 100) / 2}px)`,
+            });
+            $(document.body).append(boom);
+            $(document.body).append(boom2);
+
+            let $els = Array(100).fill(null).map(e => e = new Shiny());
+
+            let interval = setInterval(() => {
+                $els.forEach(e => e.update());
+                size += 50;
+                boom.css({
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    left: `calc(50% + -${size / 2}px)`,
+                    top: `calc(50% + -${size / 2}px)`,
+                });
+                boom2.css({
+                    width: `${size - 100}px`,
+                    height: `${size - 100}px`,
+                    left: `calc(50% + -${(size - 100) / 2}px)`,
+                    top: `calc(50% + -${(size - 100) / 2}px)`,
+                });
+            }, 17);
+
+            setTimeout(() => {
+                boom.remove();
+                boom2.remove();
+                $els.forEach(e => e.element.remove());
+                clearInterval(interval);
+                interval = undefined;
+                $els = undefined;
+                boom = undefined;
+                boom2 = undefined;
+            }, 3000);
+        }
+    </script>
 </head>
 <body>
     <div id="background"></div>

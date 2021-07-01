@@ -65,7 +65,7 @@ function update() {
         if(ord == 0) continue;
         j++;
         if(j > 3) continue;
-        sjoin.push(`<span>${getOrdinal5(toBase(i))}${(i > 0 && ord == 1) ? '' : ord}</span>`);
+        sjoin.push(`<span>${getOrdinal5(toBase(i))}${(i > 0 && ord == 1) ? '' : Math.floor(ord)}</span>`);
     }
 
     let s = ordinals.slice();
