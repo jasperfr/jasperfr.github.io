@@ -112,14 +112,17 @@ var elapsedFrames = 0;
 var elapsedTime = 0;
 var deltaTime = 0;
 var startTime = 0;
+var startFrames = 0;
 var bx = 0;
 var by = 0;
 var then = 0;
+var replay = new Replay();
 
 /* @region keyboard functions */
 function keyDownEvent(e) {
     if(pressedKeys.indexOf(e.key) == -1) {
         pressedKeys.push(e.key);
+        replay.addFrame(e.key, 1);
     }
 }
 
@@ -127,6 +130,7 @@ function keyUpEvent(e) {
     let index = pressedKeys.indexOf(e.key);
     if(index != -1) {
         pressedKeys.splice(index, 1);
+        replay.addFrame(e.key, 0);
     }
 }
 
@@ -134,10 +138,12 @@ function removeKey(key) {
     let index = pressedKeys.indexOf(key);
     if(index != -1) {
         pressedKeys.splice(index, 1);
+        replay.addFrame(key, 0);
     }
     index = pressedKeys.indexOf(key.toUpperCase());
     if(index != -1) {
         pressedKeys.splice(index, 1);
+        replay.addFrame(key, 0);
     }
 }
 
@@ -234,6 +240,8 @@ function getNextPiece() {
 function restart() {
 
     startTime += elapsedTime;
+    elapsedFrames = 0;
+    replay.reset();
 
     Score.set(0);
     Level.restart();
@@ -964,6 +972,11 @@ function step(now) {
         keyHandleEvent();
         drawEvent();
         statisticsEvent();
+
+        $('#debugger').text(`
+            FRAME: ${elapsedFrames},
+            START FRAME: ${startFrames}
+        `);
     }
 }
 requestAnimationFrame(step);

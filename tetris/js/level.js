@@ -28,6 +28,10 @@ const Level = (() => {
         refresh();
     }
 
+    const getPercentile = function() {
+        return lines / linesRequired * 100;
+    }
+
     const getLevel = function() {
         return level;
     }
@@ -46,7 +50,8 @@ const Level = (() => {
         init: init,
         add: addLine,
         restart: restart,
-        getLevel: getLevel
+        getLevel: getLevel,
+        getPercentile: getPercentile
     }
 
 })();
