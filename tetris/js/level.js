@@ -14,7 +14,6 @@ const Level = (() => {
         linesRequired = 5 + level * 2;
         let percentage = lines / linesRequired * 100;
         $progressBar.css('height', percentage + '%');
-        console.log(percentage);
         $level.text(level);
     }
 

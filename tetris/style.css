@@ -209,6 +209,10 @@ body {
     border-bottom: 2px solid white;
 }
 
+table#handling tr input {
+    width: 500px;
+}
+
 .level {
     position: absolute;
     left: 50%;
@@ -335,11 +339,11 @@ body {
 }
 
 #settings {
-    width: 400px;
-    height: 400px;
+    width: 800px;
+    height: 500px;
     position: absolute;
-    left: calc(-200px + 50%);
-    top: calc(-200px + 50%);
+    left: calc(-400px + 50%);
+    top: calc(-250px + 50%);
     border: 1px solid white;
     background-color: black;
     box-shadow: 2px 2px 0 white;

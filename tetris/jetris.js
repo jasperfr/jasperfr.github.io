@@ -39,14 +39,17 @@ const pcs = ['J', 'L', 'T', 'O', 'I', 'S', 'Z', 'H'];
 const fillStyles = ['#0000FF', '#FF8000', '#FF00FF', '#FFFF00', '#00FFFF', '#00FF00', '#FF0000', '#808080'];
 const BAG = ['J', 'Z', 'O', 'S', 'L', 'T', 'I'];
 const TICKSPEED = 17;
-const _BOARD_ = (Array(40).fill(null).map(() => [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]).concat(Array(12).fill(1)));
+const _BOARD_ = (Array(40).fill(null).map(() => [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]).concat([Array(12).fill(1)]));
 const spins = ['SINGLE', 'DOUBLE', 'TRIPLE', 'WHAT'];
 const particles2 = [];
 const pressedKeys = [];
+const INTERVAL = 1000 / 60;
 
 /* @region variables */
 var DAS = 20;
-var SDF = 0.1;
+var DCD = 0;
+var SDF = 0;
+var ARR = 0;
 var rotation = 0;
 var posX = 3;
 var posY = 16;
@@ -111,6 +114,7 @@ var deltaTime = 0;
 var startTime = 0;
 var bx = 0;
 var by = 0;
+var then = 0;
 
 /* @region keyboard functions */
 function keyDownEvent(e) {
@@ -183,12 +187,9 @@ function checkTSpin(piece, board, x, y, r, kick) {
         bottomRight: board[y + 3][x + 3] != 0
     }
 
-    //console.log(corners);
-
     let facingCorners = 0;
     let behindCorners = 0;
 
-    //console.log('Rotation: ' + r);
     switch(r) {
         case 0: // ┴
         facingCorners = corners.topLeft + corners.topRight;
@@ -208,16 +209,12 @@ function checkTSpin(piece, board, x, y, r, kick) {
         break;
     }
 
-    //console.log('facing corners: ' + facingCorners);
-    //console.log('corners behind T: ' + behindCorners);
     if(kick == 4) console.log('Exception: kick table is 4.')
 
     if(facingCorners + behindCorners >= 3) {
         if(facingCorners == 1 && kick != 4) {
-            //console.log('This is a T-Spin mini.');
             return 1;
         } else {
-            //console.log('This is a T-Spin.');
             return 2;
         }
     }
@@ -237,7 +234,6 @@ function getNextPiece() {
 function restart() {
 
     startTime += elapsedTime;
-    console.log(startTime);
 
     Score.set(0);
     Level.restart();
@@ -350,7 +346,7 @@ function checkCritical(x, y, r, piece) {
     return false;
 }
 
-function addGarbage(lines) {
+function addGarbageLine(lines) {
     let bottom = board.pop();
     let arr = [1, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 1];
     arr[1 + Math.floor(Math.random() * 10)] = 0;
@@ -358,8 +354,8 @@ function addGarbage(lines) {
         board.splice(0, 1);
         board.push(arr.slice());
     }
-    posY--;
     board.push(bottom);
+    posY--;
 }
 
 function removeAllKeys(keys) {
@@ -549,14 +545,10 @@ function addGarbage() {
                 garbageAppear = true;
                 $('#garbage-progress .progressbar').css('animation', 'flash 200ms infinite');
                 setTimeout(() => {
-                    addGarbage(1);
+                    addGarbageLine(1);
                     garbageAppear = false;
                     garbageTimer = 0;
                     $('#garbage-progress .progressbar').css('animation', '');
-                    var interval = setInterval(() => {
-                        bx += (Math.random() - Math.random() * 10);
-                        by += (Math.random() - Math.random() * 10);
-                    }, 17);
                     setTimeout(() => clearInterval(interval), 100);
                     playSound('combobreak');
                 }, 500);
@@ -632,35 +624,39 @@ function keyHandleEvent() {
 
     const keys = settings.boundKeys;
 
+    // LEFT-RIGHT (DAS)
+    arrTimer = dasEnabled ? arrTimer + 1 : 0;
+    let antiWhile = 0;
+    while(arrTimer > ARR && antiWhile < 20) {
+        arrTimer -= ARR;
+        antiWhile++;
+        if((isKeyDown(keys.right) || isKeyDown(keys.left)) && (dasEnabled && dasTrigger)) {
+            if(isKeyDown(keys.left) && canMoveTo(posX - 1, posY, rotation)) { posX--; tspin = 0; }
+            if(isKeyDown(keys.right) && canMoveTo(posX + 1, posY, rotation)) { posX++; tspin = 0; }
+        }
+    };
+
     // LEFT
     if(isKeyDown(keys.right) || isKeyDown(keys.left)) {
-        if((!dasTrigger && !dasEnabled) || dasEnabled && dasTrigger) {
+        if(!dasTrigger && !dasEnabled) {
             if(pressedKeys.some(i => keys.left.split(',').includes(i))) {
                 if(canMoveTo(posX - 1, posY, rotation)) {
                     posX--;
                     tspin = 0;
-                    triggerLockDelay = false;
-                    lockTimer = dropButtonPresses;
-                    dropButtonPresses++;
                     if(!dasEnabled) playSound('move');
-                } else {
-                    bx -= 6;
                 }
             }
             if(pressedKeys.some(i => keys.right.split(',').includes(i))) {
                 if(canMoveTo(posX + 1, posY, rotation)) {
                     posX++;
                     tspin = 0;
-                    triggerLockDelay = false;
-                    lockTimer = dropButtonPresses;
-                    dropButtonPresses++;
                     if(!dasEnabled) playSound('move');
-                } else {
-                    bx += 6;
                 }
             }
         }
-        dasTrigger = true;
+        if(!dasTrigger) {
+            dasTrigger = true;
+        }
     } else {
         dasEnabled = false;
         dasTrigger = false;
@@ -669,8 +665,7 @@ function keyHandleEvent() {
 
     if(dasTrigger) {
         dasTime++;
-        if(dasTime > DAS) {
-            if(!dasEnabled) playSound('move');
+        if(dasTime > (DAS) && !dasEnabled) {
             dasEnabled = true;
         }
     }
@@ -723,12 +718,20 @@ function keyHandleEvent() {
     // Soft drop.
     if(isKeyDown(keys.softDrop)) {
         if(canMoveTo(posX, posY + 1, rotation)) {
-            for(let i = 0; i < SDF; i++) {
-                if(canMoveTo(posX, posY + 1, rotation)) {
+            if(SDF > 40) {
+                while(canMoveTo(posX, posY + 1, rotation)) {
                     posY++;
                     Score.add(1);
                 }
+            } else {
+                for(let i = 0; i < SDF / 10; i++) {
+                    if(canMoveTo(posX, posY + 1, rotation)) {
+                        posY++;
+                        Score.add(1);
+                    }
+                }
             }
+
             if(!canMoveTo(posX, posY + 1, rotation)) playSound('softdrop');
             Score.add(1);
         } else {
@@ -936,26 +939,32 @@ function statisticsEvent() {
 }
 
 function step(now) {
+
+    requestAnimationFrame(step);
+
     if(game == 'over') {
         particles2.forEach(p => p.delete());
-        requestAnimationFrame(step);
         return;
     }
 
-    elapsedFrames++;
-    deltaTime = now * 0.001 - deltaTime;
-    elapsedTime = now - startTime;
+    let elapsed = now - then;
+    if(elapsed > INTERVAL) {
+        then = now - (elapsed % INTERVAL);
 
-    preventHD = Math.min(preventHD + 1, 5);
-    dropTimer += Level.getLevel() * 2;
-
-    addGarbage();
-    warningEvent();
-    lockTimerEvent();
-    keyHandleEvent();
-    drawEvent();
-    statisticsEvent();
-    requestAnimationFrame(step);
+        elapsedFrames++;
+        deltaTime = now * 0.001 - deltaTime;
+        elapsedTime = now - startTime;
+    
+        preventHD = Math.min(preventHD + 1, 5);
+        dropTimer += Level.getLevel() * 2;
+    
+        addGarbage();
+        warningEvent();
+        lockTimerEvent();
+        keyHandleEvent();
+        drawEvent();
+        statisticsEvent();
+    }
 }
 requestAnimationFrame(step);
 
@@ -976,14 +985,6 @@ $(() => {
     hide($tSpinHeader);
     hide($tSpinCount);
 
-    $('#sdf').on('input', function() {
-        SDF = $('#sdf').val();
-        $('#sdf-val').text($('#sdf').val());
-    });
-    $('#das').on('input', function() {
-        DAS = $('#das').val();
-        $('#das-val').text($('#das').val());
-    });
     $('#garb').on('input', function() {
         let delay = parseInt($('#garb').val());
         if(delay == 0) {
