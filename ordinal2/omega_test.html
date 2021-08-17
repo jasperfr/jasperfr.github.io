@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <title>Ordinal Markup 2</title>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+</head>
+
+<body>
+    <h1 class="ordinal">Hψ(Ω) (3)</h1>
+
+
+    <script>
+        let o = ['', 'ω', 'ω<sup>ω</sup>', 'ω<sup>ω<sup>2</sup></sup>']
+        let ordinals = [
+            'Ω',
+            'Ω+1',
+            'Ω+2',
+            'Ω2',
+            'Ω<sub>2</sub>+1',
+            'Ω<sub>2</sub>2+2',
+            'Ω<sup>2</sup>',
+            'Ω<sup>2</sup>+1',
+            'Ω<sup>2</sup>+2',
+            'Ω<sup>2</sup>+Ω'
+        ];
+
+        let number = 0;
+        function parse() {
+            number++;
+            $('.ordinal').html(`H<sub>ψ(${o[number % 4]}) (3)`);
+        }
+        setInterval(parse, 500);
+
+        let str = 'H<sub>ψ(';
+        let v = number.toString(3);
+        for(let i = v.length; i >= 0; i--) {
+            for(let j = 0; j < parseInt(v[i]); j++) {
+                str += ordinals[i];
+                str += 'ψ(';
+            }
+        }
+        str = str.replace(/Ωψ\($/, 'Ω)</sub>');
+
+        $('.ordinal').html(str);
+    </script>
+
+</body>
+</html>
