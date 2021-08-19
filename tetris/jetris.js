@@ -182,6 +182,17 @@ function getKickTable(piece, board, xpos, ypos, rotationFrom, rotationTo) {
     return [xpos, ypos, rotationFrom, -1];
 }
 
+function canMoveTo(xpos, ypos, r) {
+    let pieceMatrix = pieces[currentPiece].grid[r];
+    for(let i = 0; i <= 15; i++) {
+        let x = xpos + i % 4;
+        let y = ypos + Math.floor(i / 4);
+        if(board[y] == undefined) continue;
+        if(board[y][x + 1] != 0 && pieces[currentPiece].grid[r][i] == 1) return false;
+    }
+    return true;
+}
+
 function checkTSpin(piece, board, x, y, r, kick) {
     if(piece !== 'T') return false;
     let pieceGrid = pieces['T']['grid'][r];
@@ -370,17 +381,6 @@ function removeAllKeys(keys) {
     for(let k of keys.split(',')) {
         removeKey(k);
     }
-}
-
-function canMoveTo(xpos, ypos, r) {
-    let pieceMatrix = pieces[currentPiece].grid[r];
-    for(let i = 0; i <= 15; i++) {
-        let x = xpos + i % 4;
-        let y = ypos + Math.floor(i / 4);
-        if(board[y] == undefined) continue;
-        if(board[y][x + 1] != 0 && pieces[currentPiece].grid[r][i] == 1) return false;
-    }
-    return true;
 }
 
 function checkTetraLines(spin) {
@@ -621,6 +621,7 @@ function lockTimerEvent() {
     }
 }
 
+var dasDirection = '';
 function keyHandleEvent() {
     function isKeyDown(keyMap) {
         const map = keyMap.split(',');
@@ -639,8 +640,8 @@ function keyHandleEvent() {
         arrTimer -= ARR;
         antiWhile++;
         if((isKeyDown(keys.right) || isKeyDown(keys.left)) && (dasEnabled && dasTrigger)) {
-            if(isKeyDown(keys.left) && canMoveTo(posX - 1, posY, rotation)) { posX--; tspin = 0; }
-            if(isKeyDown(keys.right) && canMoveTo(posX + 1, posY, rotation)) { posX++; tspin = 0; }
+            if(isKeyDown(keys.left) && dasDirection !== 'right' && canMoveTo(posX - 1, posY, rotation)) { posX--; tspin = 0; }
+            if(isKeyDown(keys.right) && dasDirection !== 'left' && canMoveTo(posX + 1, posY, rotation)) { posX++; tspin = 0; }
         }
     };
 
@@ -648,6 +649,7 @@ function keyHandleEvent() {
     if(isKeyDown(keys.right) || isKeyDown(keys.left)) {
         if(!dasTrigger && !dasEnabled) {
             if(pressedKeys.some(i => keys.left.split(',').includes(i))) {
+                dasDirection = 'left';
                 if(canMoveTo(posX - 1, posY, rotation)) {
                     posX--;
                     tspin = 0;
@@ -655,6 +657,7 @@ function keyHandleEvent() {
                 }
             }
             if(pressedKeys.some(i => keys.right.split(',').includes(i))) {
+                dasDirection = 'right';
                 if(canMoveTo(posX + 1, posY, rotation)) {
                     posX++;
                     tspin = 0;
@@ -669,6 +672,7 @@ function keyHandleEvent() {
         dasEnabled = false;
         dasTrigger = false;
         dasTime = 0;
+        dasDirection = 'none';
     }
 
     if(dasTrigger) {

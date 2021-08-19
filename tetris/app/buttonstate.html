@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="buttonstate.js"></script>
+    <style>
+        table {
+            margin:0;
+            border-collapse: collapse;
+        }
+        td {
+            width: 64px;
+            height: 64px;
+            text-align: center;
+        }
+
+        .red {
+            background-color: red;
+        }
+        .blue {
+            background-color: blue;
+        }
+        .green {
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+    <table border="1">
+        <tr>
+            <td id="hold">HOLD</td>
+            <td id="rotateCW">CW</td>
+            <td id="rotateCCW">CCW</td>
+            <td id="rotate180">180</td>
+        </tr>
+        <tr>
+            <td id="softDrop">SOFT</td>
+            <td id="hardDrop">HARD</td>
+            <td id="left">LEFT</td>
+            <td id="right">RIGHT</td>
+        </tr>
+    </table>
+    <p>
+        "DAS" fires once per tick (166ms).<br>
+        "DCD" is 5 ticks (830ms).<br>
+        Cancel DAS when changing directions: Yes.<br>
+    </p>
+</body>
+</html>

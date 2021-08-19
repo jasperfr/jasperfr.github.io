@@ -1,10 +1,58 @@
+ExpantaNum.prototype.toHTML = function() {
+    return this.toString().replace(/e/g, '×10<sup>');
+}
+
+const tickspeed = 16.67;
 const app = new Vue({
     el: '#app',
     data: {
-        particleCount: 0,
+        particles: new ExpantaNum(0),
+        quarks: {
+            up: {
+                count: new ExpantaNum(2),
+                getProduction: function() {
+                    return new ExpantaNum(1.0).plus(new ExpantaNum(this.count).pow(this.count));
+                },
+                add: function() {
+                    this.count = this.count.pow(this.count);
+                }
+            },
+            dn: new ExpantaNum(0),
+        },
+        unlocked: {
+            quarks: true
+        }
+    },
+    methods: {
+        gain: function() {
+            this.particles = this.particles.plus(1);
+        },
+        tick: function() {
+            this.particles = this.particles.plus(1 / 60).times(this.quarks.up.getProduction());
+            this.quarks.up.add();
+        },
+        purchase: function(type) {
+            switch(type) {
+                case 'quarks.up': {
+                    this.quarks.up = this.quarks.up.add(1);
+                }
+            }
+        }
+    },
+    created: function() {
+        setInterval(this.tick, tickspeed);
+    }
+})
+
+/*
+const app = new Vue({
+    el: '#app',
+    data: {
+        particleCount: new ExpantaNum(0),
         strings: 0,
         timeframes: 0,
-        upgrades: [0, 0, 0, 0, 0]
+        upgrades: [0, 0, 0, 0, 0],
+        expanta: new ExpantaNum(7)
     },
     methods: {
         gain: function() {
@@ -23,6 +71,7 @@ const app = new Vue({
                 this.particleCount -= (gain * 100);
                 this.strings += gain;
             }
+            this.expanta = this.expanta.pow(this.expanta);
         },
         timeshift: function() {
             this.timeframes += (this.upgrades[4] ? Math.floor(Math.log10(this.strings)) : 1);
@@ -65,7 +114,8 @@ const app = new Vue({
     },
     created: function() {
         setInterval(this.save, 10000);
-        setInterval(this.tick, 16.67);
+        setInterval(this.tick, 500);
         this.load();
     }
 });
+*/

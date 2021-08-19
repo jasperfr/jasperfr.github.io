@@ -2,6 +2,7 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     color: white;
     background-color: black;
+    text-align: center;
 }
 
 button {
@@ -10,7 +11,6 @@ button {
     background-color: black;
     padding: 10px 20px;
     border-radius: 5px;
-    font-size: 20px;
     cursor: pointer;
     transition: color 500ms, background-color 500ms;
 }
@@ -20,13 +20,26 @@ button:hover {
     background-color: white;
 }
 
-.upgrades button {
-    width: 150px;
-    height: 150px;
-    font-size: 16px;
+section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }
 
-.upgrades button.bought {
-    color: black;
-    background-color: white;
+h1.nav {
+    border: 2px solid white;
+    font-weight: 200;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 10px;
+}
+
+.q-up {
+    border-color: rgb(228, 107, 107);
+    color: rgb(228, 107, 107);
+}
+
+.q-dn {
+    border-color: rgb(112, 77, 209);
+    color: rgb(112, 77, 209);
 }

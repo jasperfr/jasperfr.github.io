@@ -5,48 +5,32 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="ExpantaNum.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
 </head>
 <body>
     <div id="app">
-        <h1>You have {{ Math.floor(particleCount) }} particle<span v-if="particleCount != 1">s</span>. </h1>
-        <h2 v-if="strings > 0">You have {{ Math.floor(strings) }} string<span v-if="strings != 1">s</span>.</h2>
-        <h3 v-if="timeframes > 0">You have {{ Math.floor(timeframes) }} time frames, boosting production by x{{ getTimeSpeed().toFixed(3) }}.</h3>
-        <button v-on:click="gain">Gain 1 particle</button>
-        <button v-if="strings > 0 || particleCount >= 10" v-on:click="convert">Convert 10 particles to a string</button>
-        <button v-if="strings >= 10" v-on:click="timeshift">Reset all for {{ upgrades[4] ? Math.floor(Math.log10(strings)) : 'a' }} time frame{{ upgrades[4] && Math.floor(Math.log10(strings)) != 1 ? 's' : ''  }}.</button>
-        <br>
-        <div v-if="timeframes > 0" class="upgrades">
-            <h3>Upgrades</h3>
-            <button v-on:click="upgrade(0)" v-bind:class="{ bought: upgrades[0] }">
-                Start with 1 string.<br>
-                Cost: 2 time frames
-            </button>
-            <button v-on:click="upgrade(1)" v-bind:class="{ bought: upgrades[1] }">
-                Strings are 2x as effective.<br>
-                Cost: 10 time frames
-            </button>
-            <button v-on:click="upgrade(2)" v-bind:class="{ bought: upgrades[2] }">
-                Autoconvert 100 to a string.<br>
-                Cost: 25 time frames
-            </button>
-            <button v-on:click="upgrade(3)" v-bind:class="{ bought: upgrades[3] }">
-                Increase time exponent.<br>
-                Cost: 100 time frames
-            </button>
-            <br>
-            <button v-on:click="upgrade(4)" v-bind:class="{ bought: upgrades[4] }">
-                Option to bulk time frames.<br>
-                Cost: 5 time frames
-            </button>
-            <button v-on:click="upgrade(4)" v-bind:class="{ bought: upgrades[4] }">
-                Option to bulk time frames.<br>
-                Cost: 5 time frames
-            </button>
+        <p style="font-size:32px;">You have <b style="color:aquamarine">{{ particles.floor() }}</b> particle<span v-if="particles.floor() != 1">s</span>.</p>
+        
+        <div>
+            <h1 class="nav">Quarks</h1>
+            <section>
+                <article>
+                    Up quarks<br>
+                    You have <b class="q-up">{{ quarks.up.count.floor() }}</b> up quarks,<br>
+                    boosting particle production by x<b>{{ quarks.up.getProduction() }}</b>.<br>
+                    <button class="q-up" v-on:click="quarks.up.add()">Cost: 10</button>
+                </article>
+                <article>
+                    Down quarks<br>
+                    You have <b class="q-dn">0</b> down quarks,<br>
+                    reducing the tick interval by x<b>1.000</b>.<br>
+                    <button class="q-dn" v-on:click="purchase('quarks.dn')">Cost: 10</button>
+                </article>
+            </section>
         </div>
-
     </div>
     
     <script src="app.js"></script>
