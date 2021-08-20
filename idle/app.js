@@ -2,45 +2,77 @@ ExpantaNum.prototype.toHTML = function() {
     return this.toString().replace(/e/g, '×10<sup>');
 }
 
-const tickspeed = 16.67;
 const app = new Vue({
     el: '#app',
     data: {
+        tickspeed: new ExpantaNum(1000),
         particles: new ExpantaNum(0),
         quarks: {
             up: {
-                count: new ExpantaNum(2),
+                count: new ExpantaNum(0),
+                getPrice: function() {
+                    return new ExpantaNum(10).pow(this.count);
+                },
                 getProduction: function() {
-                    return new ExpantaNum(1.0).plus(new ExpantaNum(this.count).pow(this.count));
+                    return new ExpantaNum(1.0).plus(new ExpantaNum(0.2).times(this.count));
                 },
                 add: function() {
-                    this.count = this.count.pow(this.count);
+                    this.count = this.count.plus(1);
+                },
+                toString: function() {
+                    return this.count.toFixed(3);
                 }
             },
-            dn: new ExpantaNum(0),
+            dn: {
+                count: new ExpantaNum(0),
+                getProduction: function() {
+                    return new ExpantaNum(1.0).plus(new ExpantaNum(0.15).times(this.count));
+                },
+                getPrice: function() {
+                    return new ExpantaNum(10).pow(this.count);
+                },
+                add: function() {
+                    this.count = this.count.plus(1);
+                },
+                toString: function() {
+                    return this.count.toFixed(3);
+                }
+            },
         },
         unlocked: {
             quarks: true
         }
     },
     methods: {
+        getTickspeed: function() {
+            return new ExpantaNum(1000).div(this.quarks.dn.getProduction());
+        },
         gain: function() {
             this.particles = this.particles.plus(1);
         },
         tick: function() {
-            this.particles = this.particles.plus(1 / 60).times(this.quarks.up.getProduction());
-            this.quarks.up.add();
+            let tick = new ExpantaNum(16.67).div(this.getTickspeed());
+            this.particles = this.particles.plus(tick.times(this.quarks.up.getProduction()));
         },
         purchase: function(type) {
             switch(type) {
-                case 'quarks.up': {
-                    this.quarks.up = this.quarks.up.add(1);
+                case 'quarks.up':
+                if(this.particles.gte(this.quarks.up.getPrice())) {
+                    this.particles = this.particles.minus(this.quarks.up.getPrice());
+                    this.quarks.up.add(1);
                 }
+                break;
+                case 'quarks.dn':
+                if(this.particles.gte(this.quarks.dn.getPrice())) {
+                    this.particles = this.particles.minus(this.quarks.dn.getPrice());
+                    this.quarks.dn.add(1);
+                }
+                break;
             }
         }
     },
     created: function() {
-        setInterval(this.tick, tickspeed);
+        setInterval(this.tick, 16.67);
     }
 })
 

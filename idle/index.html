@@ -13,22 +13,54 @@
 <body>
     <div id="app">
         <p style="font-size:32px;">You have <b style="color:aquamarine">{{ particles.floor() }}</b> particle<span v-if="particles.floor() != 1">s</span>.</p>
-        
+        <p style="font-size:24px;">Tickspeed is {{ getTickspeed().toFixed(3) }} ticks per second.</p>
+
         <div>
             <h1 class="nav">Quarks</h1>
             <section>
                 <article>
                     Up quarks<br>
                     You have <b class="q-up">{{ quarks.up.count.floor() }}</b> up quarks,<br>
-                    boosting particle production by x<b>{{ quarks.up.getProduction() }}</b>.<br>
-                    <button class="q-up" v-on:click="quarks.up.add()">Cost: 10</button>
+                    boosting particle production by x<b>{{ quarks.up.getProduction().toFixed(3) }}</b>.<br><br>
+                    <button class="q-up" v-on:click="purchase('quarks.up')">Cost: {{ quarks.up.getPrice() }}</button>
+                </article>
+                <article>
+                    Electrons<br>
+                    You have <b class="q-e">0</b> electrons,<br>
+                    decreasing up and down quark price by <b>x1.000</b>.<br><br>
+                    <button class="q-e">Cost: 100</button>
                 </article>
                 <article>
                     Down quarks<br>
-                    You have <b class="q-dn">0</b> down quarks,<br>
-                    reducing the tick interval by x<b>1.000</b>.<br>
-                    <button class="q-dn" v-on:click="purchase('quarks.dn')">Cost: 10</button>
+                    You have <b class="q-dn">{{ quarks.dn.count.floor() }}</b> down quarks,<br>
+                    reducing the tick interval by /<b>{{ quarks.dn.getProduction().toFixed(3) }}</b>.<br><br>
+                    <button class="q-dn" v-on:click="purchase('quarks.dn')">Cost: {{ quarks.dn.getPrice() }}</button>
                 </article>
+            </section>
+            <h1 class="nav">Atoms</h1>
+            <section>
+                <article>
+                    Protons<br>
+                    You have <b class="a-pro">0</b> protons,<br>
+                    increasing the effect of up quarks by <b>x1.000</b>.<br><br>
+                    <button class="a-pro-up">Cost: 2 up, 1 down, 100 particles</button>
+                </article>
+                <article>
+                    Molecularize.<br>
+                    Convert matter into a H<sub>2</sub> - molecule.<br>
+                    Lose everything, but gain a H<sub>2</sub>-molecule.<br><br>
+                    <button class="a-pro-up">Cost: 2 protons, 2 electrons, 1000 particles</button>
+                </article>
+                <article>
+                    Neutrons<br>
+                    You have <b class="a-neu">0</b> neutrons,<br>
+                    increasing the effect of down quarks by <b>x1.000</b>.<br><br>
+                    <button class="a-pro-up">Cost: 1 up, 2 down, 100 particles</button>
+                </article>
+            </section>
+            <h1 class="nav">Molecules</h1>
+            <section>
+                <p style="font-size:24px;">You have 0 H<sub>2</sub> - molecules.</p>
             </section>
         </div>
     </div>
