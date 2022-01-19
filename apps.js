@@ -1,0 +1,2 @@
+const ANTREEMATTER_DIMENSIONS = new Window('Antreematter Dimensions', [600, 700], true, `<iframe style='width:100%' height='100%' src='https://raw.githack.com/jasperfr/The-Modding-Tree/refactor-start-data/index.html'></iframe>`, { padding: '10px 8px' });
+const JETRIS = new Window('Jetris', [750, 900], true, `<iframe style='width:100%' height='100%' src='https://jasperfr.github.io/tetris/index.html'></iframe>`, { padding: '10px 8px' });
