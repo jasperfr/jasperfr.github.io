@@ -19,6 +19,7 @@
     <script src="src/window.js"></script>
     <script src="src/apps.js"></script>
     <script src="src/contextmenu.js"></script>
+    <script src="src/index.js"></script>
     <link rel="stylesheet" type="text/css" href="public/css/stylesheet.css">
 
     <title>JasperFR</title>
@@ -26,23 +27,39 @@
 
 <body style="overflow:hidden;">
 
-    <div class="desktop-icon" ondblclick="Window.open(ANTREEMATTER_DIMENSIONS)">
-        <img src="public/img/antimatter.png">
-        <span>TMT</span>
+    <div id="desktop">
+        <div class="desktop-icon" ondblclick="window.location.href = 'https://github.com/jasperfr'">
+            <img src="public/img/computer.png">
+            <span>Github</span>
+        </div>
+
+        <div class="desktop-icon" ondblclick="Window.open(ANTREEMATTER_DIMENSIONS)">
+            <img src="public/img/antimatter.png">
+            <img src="public/img/shortcut.png" class="shortcut">
+            <span>TMT</span>
+        </div>
+
+        <div class="desktop-icon" ondblclick="Window.open(JETRIS)">
+            <img src="public/img/jetris.png">
+            <img src="public/img/shortcut.png" class="shortcut">
+            <span>Jetris</span>
+        </div>
+    
+        <div class="desktop-icon" ondblclick="Window.open(CUBE)">
+            <img src="public/img/cube.png">
+            <img src="public/img/shortcut.png" class="shortcut">
+            <span>GLCube</span>
+        </div>
+
+        <div class="desktop-icon" ondblclick="Window.open(FACTORY)">
+            <img src="public/img/factory.png">
+            <img src="public/img/shortcut.png" class="shortcut">
+            <span>Idle Factory</span>
+        </div>
     </div>
 
-    <div class="desktop-icon" ondblclick="Window.open(JETRIS)">
-        <img src="public/img/jetris.png">
-        <span>Jetris</span>
-    </div>
-
-    <div class="desktop-icon" ondblclick="Window.open(CUBE)">
-        <img src="public/img/cube.png">
-        <span>GLCube</span>
-    </div>
-
-    <div class="taskbar">
-        <button style="font-weight: 600;padding:2px;margin:3px;width:64px;">Start</button>
+    <div id="taskbar">
+        <button id="start-button"><img src="public/img/start.png"/><span>Start</span></button>
     </div>
 </body>
 

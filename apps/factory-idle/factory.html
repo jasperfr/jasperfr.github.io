@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="Vue.js"></script>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+    <title>Factory</title>
+</head>
+<body>
+    <div id="App">
+        <div class="header">
+            Game autosaves every 10 seconds
+            <button v-on:click="save()">Save the game</button>
+        </div>
+
+        <div class="game">
+            <div class="inventory">
+                <h3>Inventory</h3>
+                <ul>
+                    <li v-for="[item, amount] in Object.entries(inventory).filter(([i,a]) => a > 0)">
+                        {{ amount.toFixed(2) }} {{ item }}
+                    </li>
+                </ul>
+                <h3>Power status</h3>
+                <ul>
+                    <li>{{ power.generation.toFixed(3) }} kW production</li>
+                    <li>{{ getPowerConsumption().toFixed(3) }} kW consumption</li>
+                </ul>
+            </div>
+            <div class="main">
+                <h3>Mining</h3>
+                <h4>Manual mining</h4>
+                <button v-on:click="mine('copper ore')">Mine copper ore <span v-if="mineTimer.interval">({{mineTimer.time}})</span></button>
+                <button v-on:click="mine('iron ore')">Mine iron ore <span v-if="mineTimer.interval">({{mineTimer.time}})</span></button>
+                <button v-on:click="mine('stone')">Mine stone <span v-if="mineTimer.interval">({{mineTimer.time}})</span></button>
+                <button v-on:click="mine('coal')">Mine coal <span v-if="mineTimer.interval">({{mineTimer.time}})</span></button>
+
+                <h4>Automining</h4>
+                <p>You have {{miners.free}}/{{inventory.miner}} miners. Each 10 seconds miners yield 1 ore.</p>
+                <p>Miners require 150 kW/s to operate.</p>
+                <button v-on:click="miner('coal', 'sub')">-</button> {{miners['coal']}} <button v-on:click="miner('coal', 'add')">+</button> Coal Mines <br/>
+                <button v-on:click="miner('iron ore', 'sub')">-</button> {{miners['iron ore']}} <button v-on:click="miner('iron ore', 'add')">+</button> Iron Mines <br/>
+                <button v-on:click="miner('copper ore', 'sub')">-</button> {{miners['copper ore']}} <button v-on:click="miner('copper ore', 'add')">+</button> Copper Mines <br/>
+                <button v-on:click="miner('stone', 'sub')">-</button> {{miners.stone}} <button v-on:click="miner('stone', 'add')">+</button> Stone Mines <br/>
+
+                <h3>Smelting</h3>
+                Smelting requires 0.5 coal per smelting operation. <br/> <br/>
+                <button v-on:click="smelt('copper ore')">Smelt 1 copper to 1 copper plate <span v-if="smeltTimer.interval">({{smeltTimer.time}})</span></button>
+                <button v-on:click="smelt('iron ore')">Smelt 1 iron to 1 iron plate <span v-if="smeltTimer.interval">({{smeltTimer.time}})</span></button>
+                <button v-on:click="smelt('stone')">Smelt 1 stone to 1 brick <span v-if="smeltTimer.interval">({{smeltTimer.time}})</span></button>
+
+                <h4>Autosmelting</h4>
+                Autosmelting requires 0.05 coal per second.
+                <p>You have {{smelters.free}}/{{inventory.smelter}} smelteries. Each 10 seconds smelteries melt down 1 ore.</p>
+                <p>Smelteries require 60 kW/s to operate.</p>
+                <button v-on:click="smelter('iron', 'sub')">-</button> {{smelters.iron}} <button v-on:click="smelter('iron', 'add')">+</button> Iron Smeltery <br/>
+                <button v-on:click="smelter('copper', 'sub')">-</button> {{smelters.copper}} <button v-on:click="smelter('copper', 'add')">+</button> Copper Smeltery <br/>
+                <button v-on:click="smelter('stone', 'sub')">-</button> {{smelters.stone}} <button v-on:click="smelter('stone', 'add')">+</button> Stone Smeltery <br/>
+
+                <h4>Power generation</h4>
+                <p>You have {{inventory.boiler}} boilers. Each boiler consumes 0.25 coal per second and produces 5 steam per second.</p>
+                <p>You have {{inventory['steam engine']}} steam engines. Each steam engine consumes 2 steam per second and produces 360 kW of power per second.</p>
+
+                <h3>Crafting</h3>
+
+                <h4>Intermediate products</h4>
+                <button
+                    class="ingredient"
+                    v-for="[name, recipe] of Object.entries(recipes)"
+                    v-if="recipe.type === 'intermediate'"
+                    v-on:click="craft(name)">
+                    {{ getRecipeText(name, recipe) }}
+                </button>
+
+                <h4>Buildings</h4>
+                <button
+                    class="ingredient"
+                    v-for="[name, recipe] of Object.entries(recipes)"
+                    v-if="recipe.type === 'building'"
+                    v-on:click="craft(name)">
+                    {{ getRecipeText(name, recipe) }}
+                </button>
+            </div>
+        </div>
+    </div>
+    <script src="factory.js"></script>
+</body>
+</html>

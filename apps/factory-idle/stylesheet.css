@@ -1,0 +1,33 @@
+* {
+    font-family: monospace;
+}
+
+.game {
+    display: flex;
+}
+
+.inventory {
+    position: sticky;
+    left: 0;
+    top:0;
+    width: 300px;
+    height: fit-content;
+    min-width: 200px;
+}
+
+.inventory ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    font-family: monospace;
+}
+
+.main {
+    border-left: 1px solid silver;
+    padding-left: 20px;
+    flex: 1 0 auto;
+}
+
+.ingredient {
+    display: block;
+}
