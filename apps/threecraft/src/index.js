@@ -193,102 +193,104 @@ function raycast(intersections) {
 	}
 }
 
-document.addEventListener('mousedown', (event) => {
-    event.preventDefault();
-    let intersects = raycaster.intersectObjects(scene.children);
-    if(!intersects[0] || intersects[0]?.object?.name !== 'block') return;
-    let target = intersects[0];
-    let {x, y, z} = target.object.position;
-    let c = positionToChunkIndex(x, y, z);
+document.addEventListener("DOMContentLoaded", function(_event) {
+    window.addEventListener('mousedown', (event) => {
+        event.preventDefault();
+        let intersects = raycaster.intersectObjects(scene.children);
+        if(!intersects[0] || intersects[0]?.object?.name !== 'block') return;
+        let target = intersects[0];
+        let {x, y, z} = target.object.position;
+        let c = positionToChunkIndex(x, y, z);
 
-    if(event.button == 0) {
-        chunk[c.y][c.x][c.z] = 0;
-        console.warn(`[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk removed`);
-        scene.remove(target.object);
-    } else {
-        switch(target.faceIndex) {
-            case 0: case 1:
-                scene.add(ThreeUtils.createBlock(selectors[selection], x + 16, y, z));
-                chunk[c.y][c.x + 1][c.z] = 1;
-                console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
+        if(event.button == 0) {
+            chunk[c.y][c.x][c.z] = 0;
+            console.warn(`[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk removed`);
+            scene.remove(target.object);
+        } else {
+            switch(target.faceIndex) {
+                case 0: case 1:
+                    scene.add(ThreeUtils.createBlock(selectors[selection], x + 16, y, z));
+                    chunk[c.y][c.x + 1][c.z] = 1;
+                    console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
+                    break;
+                case 2: case 3:
+                    scene.add(ThreeUtils.createBlock(selectors[selection], x - 16, y, z));
+                    chunk[c.y][c.x - 1][c.z] = 1;
+                    console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
+                    break;
+                case 4: case 5:
+                    scene.add(ThreeUtils.createBlock(selectors[selection], x, y + 16, z));
+                    chunk[c.y + 1][c.x][c.z] = 1;
+                    console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
+                    break;
+                case 6: case 7:
+                    scene.add(ThreeUtils.createBlock(selectors[selection], x, y - 16, z));
+                    chunk[c.y - 1][c.x][c.z] = 1;
+                    console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
+                    break;
+                case 8: case 9:
+                    scene.add(ThreeUtils.createBlock(selectors[selection], x, y, z + 16));
+                    chunk[c.y][c.x][c.z + 1] = 1;
+                    console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
+                    break;
+                case 10: case 11:
+                    scene.add(ThreeUtils.createBlock(selectors[selection], x, y, z - 16));
+                    chunk[c.y][c.x][c.z - 1] = 1;
+                    console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
+                    break;
+            }
+        }
+    }, false );
+
+    window.addEventListener('keydown', (event) => {
+        switch ( event.keyCode ) {
+            case 49: case 50: case 51:
+            case 52: case 53: case 54:
+            case 55: case 56: case 57:
+                selection = event.keyCode - 49;
+            break;
+            case 38: case 87:
+                moveForward = true;
                 break;
-            case 2: case 3:
-                scene.add(ThreeUtils.createBlock(selectors[selection], x - 16, y, z));
-                chunk[c.y][c.x - 1][c.z] = 1;
-                console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
+            case 37: case 65:
+                moveLeft = true;
                 break;
-            case 4: case 5:
-                scene.add(ThreeUtils.createBlock(selectors[selection], x, y + 16, z));
-                chunk[c.y + 1][c.x][c.z] = 1;
-                console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
+            case 40: case 83:
+                moveBackward = true;
                 break;
-            case 6: case 7:
-                scene.add(ThreeUtils.createBlock(selectors[selection], x, y - 16, z));
-                chunk[c.y - 1][c.x][c.z] = 1;
-                console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
+            case 39: case 68:
+                moveRight = true;
                 break;
-            case 8: case 9:
-                scene.add(ThreeUtils.createBlock(selectors[selection], x, y, z + 16));
-                chunk[c.y][c.x][c.z + 1] = 1;
-                console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
-                break;
-            case 10: case 11:
-                scene.add(ThreeUtils.createBlock(selectors[selection], x, y, z - 16));
-                chunk[c.y][c.x][c.z - 1] = 1;
-                console.warn(`%c[DEBUG] block (${c.x}, ${c.y}, ${c.z}) in chunk added`, 'color: green');
+            case 32:
+                if ( canJump === true ) velocity.y += 150;
+                canJump = false;
                 break;
         }
-    }
-}, false );
+        shift = (selection * 80);
+        document.getElementById('gui_pointer').style.left = `calc(50% - 368px + ${shift}px)`;
+    });
 
-document.addEventListener('keydown', (event) => {
-	switch ( event.keyCode ) {
-		case 49: case 50: case 51:
-		case 52: case 53: case 54:
-		case 55: case 56: case 57:
-			selection = event.keyCode - 49;
-		break;
-		case 38: case 87:
-			moveForward = true;
-			break;
-		case 37: case 65:
-			moveLeft = true;
-			break;
-		case 40: case 83:
-			moveBackward = true;
-			break;
-		case 39: case 68:
-			moveRight = true;
-			break;
-		case 32:
-			if ( canJump === true ) velocity.y += 150;
-			canJump = false;
-			break;
-	}
-	shift = (selection * 80);
-	document.getElementById('gui_pointer').style.left = `calc(50% - 368px + ${shift}px)`;
+    window.addEventListener('keyup', (event) => {
+        switch ( event.keyCode ) {
+            case 38: case 87:
+                moveForward = false;
+                break;
+            case 37: case 65:
+                moveLeft = false;
+                break;
+            case 40: case 83:
+                moveBackward = false;
+                break;
+            case 39: case 68:
+                moveRight = false;
+                break;
+        }
+    })
+
+    renderClouds(scene);
+    renderWater(scene);
+    renderFloor(scene);
+
+    renderChunk();
+    render();
 });
-
-document.addEventListener('keyup', (event) => {
-    switch ( event.keyCode ) {
-		case 38: case 87:
-			moveForward = false;
-			break;
-		case 37: case 65:
-			moveLeft = false;
-			break;
-		case 40: case 83:
-			moveBackward = false;
-			break;
-		case 39: case 68:
-			moveRight = false;
-			break;
-    }
-})
-
-renderClouds(scene);
-renderWater(scene);
-renderFloor(scene);
-
-renderChunk();
-render();
