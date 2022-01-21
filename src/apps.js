@@ -1,6 +1,8 @@
 const ANTREEMATTER_DIMENSIONS = new Window('Antreematter Dimensions', [600, 700], true, `<iframe style='width:100%' height='100%' src='https://raw.githack.com/jasperfr/The-Modding-Tree/refactor-start-data/index.html'></iframe>`, { padding: '10px 8px' });
 const JETRIS = new Window('Jetris', [750, 900], true, `<iframe style='width:100%' height='100%' src='https://jasperfr.github.io/apps/jetris/index.html'></iframe>`, { padding: '10px 8px' });
 const CUBE = new Window('WebGL Cube', [640, 480], false, `<iframe style='width:100%' height='100%' src='https://jasperfr.github.io/apps/shader/index.html'></iframe>`, { padding: '10px 8px' });
+const THREECRAFT = new Window('ThreeCraft', [640, 480], false, `<iframe style='width:100%' height='100%' src='https://jasperfr.github.io/apps/threecraft/index.html'></iframe>`, { padding: '10px 8px' });
+
 const ABOUT = new Window('About Me', [300, 400], false, `
     <h1 style="margin-bottom:8px;">About Me</h1>
     <p style="font-size:10pt">

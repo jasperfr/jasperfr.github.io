@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minecraft.js</title>
+    <link rel="stylesheet" type="text/css" href="public/stylesheet.css"/>
+</head>
+<body>
+    <h3>Minecraft.js - Alpha 0.7.0</h3>
+    <h3 id="xpos" style="transform: translateY(30px)">x:</h3>
+    <h3 id="ypos" style="transform: translateY(45px)">y:</h3>
+    <h3 id="zpos" style="transform: translateY(60px)">z:</h3>
+    <div id="cursor"></div>
+
+    <div id="blocker">
+        <div id="instructions">
+            <span style="font-size:40px">Click to play</span>
+            <br />
+            (W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
+        </div>
+    </div>
+
+    <div id="selector">
+        <img id="gui_main" src="public/img/gui.png">
+        <img id="gui_pointer" src="public/img/gui_selector.png">
+    </div>
+
+    <script src="src/three/three.js"></script>
+    <script src="src/three/PointerLockControls.js"></script>
+
+    <script src="src/utils/MathUitls.js"></script>
+    <script src="src/utils/ThreeUtils.js"></script>
+    <script src="src/utils/ChunkUtils.js"></script>
+
+    <script src="src/render/clouds.js"></script>
+    <script src="src/render/floor.js"></script>
+    <script src="src/render/water.js"></script>
+
+    <script src="src/index.js"></script>
+</body>
+</html>
