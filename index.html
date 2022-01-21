@@ -1,35 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js" integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
-    <script src="window.js"></script>
-    <script src="apps.js"></script>
-    <script src="contextmenu.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"
+        integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
-    <link rel="stylesheet" type="text/css" href="stylesheet.css">
-    <title></title>
-    </head>
+
+    <script src="src/window.js"></script>
+    <script src="src/apps.js"></script>
+    <script src="src/contextmenu.js"></script>
+    <link rel="stylesheet" type="text/css" href="public/css/stylesheet.css">
+
+    <title>JasperFR</title>
+</head>
+
 <body style="overflow:hidden;">
 
     <div class="desktop-icon" ondblclick="Window.open(ANTREEMATTER_DIMENSIONS)">
-        <img src="antimatter.png">
+        <img src="public/img/antimatter.png">
         <span>TMT</span>
     </div>
 
     <div class="desktop-icon" ondblclick="Window.open(JETRIS)">
-        <img src="antimatter.png">
+        <img src="public/img/jetris.png">
         <span>Jetris</span>
+    </div>
+
+    <div class="desktop-icon" ondblclick="Window.open(CUBE)">
+        <img src="public/img/cube.png">
+        <span>GLCube</span>
     </div>
 
     <div class="taskbar">
         <button style="font-weight: 600;padding:2px;margin:3px;width:64px;">Start</button>
     </div>
 </body>
+
 </html>
