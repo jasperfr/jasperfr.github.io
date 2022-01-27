@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"
+        integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.0/themes/base/jquery-ui.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.contextMenu.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-contextmenu/2.7.1/jquery.ui.position.js"></script>
+
+    <title>Solitude</title>
+</head>
+<body bgcolor="green">
+    <button onclick="resetCards()" class="card-reset"></button>
+
+    <script>
+        const LEFT_OFFSET = 20;
+        const TOP_OFFSET = 20;
+        const DECKS = [-1, -1, -1, -1];
+        const SUITS = {
+            'HEART': '♥',
+            'CLUB': '♣',
+            'DIAMOND': '♦',
+            'SPADE': '♠',
+        }
+        let globZ = 0;
+
+        function resetCards() {
+            const cards = deck.filter(c => c.x == -10 && c.y == -10);
+            cards.forEach(card => {
+                card.type = 'QUEUE';
+                card.$element.addClass('queue');
+                card.$element.css({
+                    left: LEFT_OFFSET,
+                    top: 15,
+                    zIndex: ++globZ
+                });
+            });
+        }
+
+        class Card {
+            constructor(suit, tier) {
+                this.type = 'COVER';
+                this.x = -1;
+                this.y = -1;
+                this.suit = suit;
+                this.tier = tier;
+                this.$element = undefined;
+            }
+
+            render() {
+                this.$element = $(`<div class="card ${this.suit}">
+                    <span class="card-A">${this.tier}<br/>${SUITS[this.suit]}</span>
+                    <span class="card-B">${this.tier}<br/>${SUITS[this.suit]}</span>
+                </div>`);
+                
+                if(this.type == 'PLAY' || this.type == 'COVER') {
+                    this.$element.css({
+                        left: LEFT_OFFSET + this.x * 120,
+                        top: 240 + this.y * 25,
+                        zIndex: this.x + this.y + this.x * this.y
+                    });
+                }
+                if(this.type == 'COVER' || this.type == 'QUEUE') {
+                    this.$element.addClass('queue');
+                }
+
+                $(document.body).append(this.$element);
+
+                if(this.type == 'PLAY') {
+                    this.$element.on('mousedown', (event) => {
+                        event.preventDefault();
+                        if(this.canDrag()) {
+                            this.startDrag(event.offsetX, event.offsetY);
+                        }
+                    });
+                }
+
+                if(this.type == 'QUEUE') {
+                    this.$element.on('click', () => {
+                        this.type = 'PLAY';
+                        this.x = -10;
+                        this.y = -10;
+                        this.$element.css({
+                            left: LEFT_OFFSET + 120,
+                            top: 15,
+                            zIndex: ++globZ
+                        });
+                        this.$element.removeClass('queue');
+                        this.$element.on('mousedown', (event) => {
+                            event.preventDefault();
+                            if(this.canDrag()) {
+                                this.startDrag(event.offsetX, event.offsetY);
+                            }
+                        });
+                    });
+                }
+            }
+
+            getCoveringCard() {
+                if(this.x == -10 && this.y == -10) return false;
+                const coveringCard = deck.filter(card => card.x == this.x && card.y == this.y + 1)[0];
+                if(coveringCard) return coveringCard;
+                else return false;
+            }
+
+            canDrag() {
+                const coveringCard = deck.filter(card => card.x == this.x && card.y == this.y + 1)[0];
+                if(!coveringCard) return true;
+                if(coveringCard.suit == this.suit) return false;
+                if(coveringCard.suit == 'SPADE' && this.suit == 'CLUB') return false;
+                if(coveringCard.suit == 'CLUB' && this.suit == 'SPADE') return false;
+                if(coveringCard.suit == 'DIAMOND' && this.suit == 'HEART') return false;
+                if(coveringCard.suit == 'HEART' && this.suit == 'DIAMOND') return false;
+                if(TIER.indexOf(this.tier) != TIER.indexOf(coveringCard.tier) + 1) return false;
+                return coveringCard.canDrag();
+            }
+
+            startDrag(offsetX, offsetY) {
+                const self = this;
+
+                function drag(c, x, y) {
+                    c.$element.css({
+                        left: x,
+                        top: y,
+                        zIndex: 999
+                    });
+                    const cover = c.getCoveringCard();
+                    if(cover) drag(cover, x, y + 25);
+                }
+
+                function mouseMoveEvent(event) {
+                    drag(self, event.clientX - offsetX, event.clientY - offsetY);
+                }
+
+                function mouseUpEvent(event) {
+                    document.removeEventListener('mousemove', mouseMoveEvent);
+                    self.stopDrag(event);
+                    document.removeEventListener('mouseup', mouseUpEvent);
+                }
+
+                document.addEventListener('mousemove', mouseMoveEvent);
+                document.addEventListener('mouseup', mouseUpEvent);
+            }
+
+            stopDrag(event) {
+                function revertPosition(card) {
+                    card.$element.css({
+                        left: LEFT_OFFSET + card.x * 120,
+                        top: 240 + card.y * 25,
+                        zIndex: card.y == -9 ? TIER.indexOf(card.tier) : card.x + card.y + card.x * card.y
+                    });
+                    const cover = card.getCoveringCard();
+                    if(cover) revertPosition(cover);
+                }
+
+                // shit function
+                let left = parseInt(this.$element.css('left')) + event.offsetX;
+                let top = parseInt(this.$element.css('top')) + event.offsetY;
+
+                left = Math.max(0, ~~((left - LEFT_OFFSET) / 120));
+                top = ~~((top - 240) / 25);
+
+                console.log(left, top);
+
+                function setPosition(c, x, y) {
+                    const cover = c.getCoveringCard();
+                    c.x = x;
+                    c.y = y;
+                    if(cover) setPosition(cover, x, y + 1);
+                }
+                // -2 to -7 is the suit deck
+                // whatever i do not care
+                // literally butchered a faux drag and drop piece of shit
+                if(top <= -2 && top >= -7 && left >= 4 && left <= 7) {
+                    if(!this.getCoveringCard()) {
+                        top = -9;
+                        let placedDeck = deck.filter(card => card.x == left && card.y == top);
+                        if(placedDeck.length > 0) {
+                            if(this.suit == placedDeck[0].suit) {
+                                console.log(TIER.indexOf(this.tier));
+                                console.log(placedDeck.length);
+                                if(TIER.indexOf(this.tier) == placedDeck.length) {
+                                    setPosition(this, left, top);
+                                }
+                            }
+                        } else {
+                            if(TIER.indexOf(this.tier) == placedDeck.length) {
+                                setPosition(this, left, top);
+                            }
+                        }
+                    }
+                } else {
+                    top = Math.max(0, top);
+
+                    let placedCard = undefined;
+                    for(let i = top; i >= 0; i--) {
+                        placedCard = deck.filter(card => card.x == left && card.y == i)[0];
+                        if(placedCard) i = -1;
+                    }
+
+                    if(placedCard) {
+                        if(
+                            placedCard.suit != this.suit &&
+                            !(placedCard.suit == 'SPADE' && this.suit == 'CLUB') &&
+                            !(placedCard.suit == 'CLUB' && this.suit == 'SPADE') &&
+                            !(placedCard.suit == 'DIAMOND' && this.suit == 'HEART') &&
+                            !(placedCard.suit == 'HEART' && this.suit == 'DIAMOND') &&
+                            !(TIER.indexOf(this.tier) != TIER.indexOf(placedCard.tier) - 1)
+                        ) setPosition(this, placedCard.x, placedCard.y + 1);
+                    } else {
+                        setPosition(this, left, 0);
+                    }
+                }
+
+                revertPosition(this);
+
+                for(let card of deck.filter(c => c.type == 'COVER')) {
+                    if(!card.getCoveringCard()) {
+                        card.type = 'PLAY';
+                        card.$element.removeClass('queue');
+                        card.$element.on('mousedown', (event) => {
+                            event.preventDefault();
+                            if(card.canDrag()) {
+                                card.startDrag(event.offsetX, event.offsetY);
+                            }
+                        });
+                    }
+                }
+
+                debugger;
+            }
+        }
+        
+        const TIER = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+        var deck = ['SPADE', 'HEART', 'DIAMOND', 'CLUB'].map(suit => ['A','2','3','4','5','6','7','8','9','10','J','Q','K'].map(tier => new Card(suit, tier))).flat();
+        function shuffle(array) {
+            const baseLength = array.length;
+            let arr = [];
+            for(let i = 0; i < baseLength; i++) {
+                let nextIndex = Math.floor(Math.random() * array.length);
+                arr.push(array.splice(nextIndex, 1)[0]);
+            }
+            return arr;
+        }
+
+        // populate the field
+        deck = shuffle(deck);
+
+        let c = 0;
+        for(let x = 0; x <= 7; x++) {
+            for(let y = 0; y < x; y++) {
+                deck[c].x = x;
+                deck[c].y = y;
+                if(y == x-1) deck[c].type = 'PLAY';
+                else deck[c].type = 'COVER';
+                c++;
+            }
+        }
+        for(;c < deck.length; c++) {
+            deck[c].type = 'QUEUE';
+        }
+
+        $(() => {
+            deck.forEach(card => {
+                card.render();
+            });
+
+            for(let i = 0; i < 7; i++) {
+                $(document.body).append($('<div class="card-place">').css({ position: 'absolute', left: LEFT_OFFSET + i * 120, top: 240 }));
+            }
+
+            for(let i = 1; i < 5; i++) {
+                $(document.body).append($('<div class="card-place">').css({ position: 'absolute', left: LEFT_OFFSET + 360 + i * 120, top: 15 }));
+            }
+
+        });
+    </script>
+    
+    <style>
+        .card-reset {
+            position: absolute;
+            left: 20px;
+            top: 15px;
+            display: block;
+            width: 112.66px;
+            height: 162.66px;
+            border: 1px solid lime;
+            padding: 4pt;
+            border-radius: 5px;
+            background: #0f02;
+            cursor: pointer;
+            z-index: -999;
+        }
+
+        .card-place {
+            display: block;
+            width: 100px;
+            height: 150px;
+            border: 1px solid lime;
+            padding: 4pt;
+            border-radius: 5px;
+            background: transparent;
+            z-index: -999;
+        }
+
+        .card {
+            position: absolute;
+            cursor: pointer;
+            display: block;
+            width: 100px;
+            height: 150px;
+            background: white;
+            border: 1px solid black;
+            border-radius: 5px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-size: 16pt;
+            padding: 4pt;
+            left: 20px;
+            top: 15px;
+        }
+
+        .card.queue {
+            color: transparent !important;
+            background-color: #6677dd;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 5px,
+                rgba(255, 255, 255, 0.2) 5px,
+                rgba(255, 255, 255, 0.2) 10px
+            ),
+            repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 5px,
+                rgba(255,255,255,0.4) 5px,
+                rgba(255,255,255,0.4) 10px
+            );
+            background-attachment: fixed;
+        }
+
+        .card.HEART, .card.DIAMOND {
+            color: red;
+        }
+
+        .card-A {
+            position: absolute;
+            left: 2pt;
+            top: 2pt;
+            display: block;
+            width: 16pt;
+            text-align:center;
+            user-select: none;
+        }
+
+        .card-B {
+            position: absolute;
+            right: 2pt;
+            bottom: 2pt;
+            display: block;
+            width: 16pt;
+            text-align:center;
+            transform: rotate(180deg);
+            user-select: none;
+        }
+    </style>
+</body>
+</html>

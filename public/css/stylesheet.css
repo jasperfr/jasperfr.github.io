@@ -26,6 +26,26 @@ body {
     border-top: 1px solid white;
     outline: 1px solid silver;
     padding: 4px;
+    display: flex;
+    flex-direction: row;
+}
+
+hr.spacer {
+    display: block;
+    width:0px;
+    height: 19px;
+    margin: 0 4px;
+    padding: 0;
+    border-style: outset;
+}
+
+#taskbar button.taskbar-button {
+    width: 160px;
+    display: flex;
+    flex-direction: row;
+    padding: 2px 4px;
+    margin: 0;
+    margin-right: 4px;
 }
 
 #start-button {

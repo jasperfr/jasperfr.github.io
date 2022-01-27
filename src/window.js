@@ -10,6 +10,7 @@ class Window {
         this.css = css;
         this.maximizeable = maximizeable;
         this.maximized = false;
+        this.taskbarItem = undefined;
     }
 
     maximize() {
@@ -27,6 +28,7 @@ class Window {
         if(this.enabled) return;
         this.enabled = true;
         this.__id = Date.now().toString();
+        this.taskbarItem = new Taskbar(this.__id, this.name);
         this.hWnd = $(`
         <section class="window" id="${this.__id}" style="width:${this.size.width}px; height:${this.size.height}px"}>
             <div class="draggable-handle">
