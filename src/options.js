@@ -1,6 +1,7 @@
 const options = {
 
     save: function() {
+        console.log('Saving...')
         let $data = {};
         $data.points = player.points.toString();
         for(let entry of Object.values(player)) {
@@ -109,7 +110,7 @@ const options = {
         _challengeConfirm: true,
         _musicSrc: 'OFF',
         audioMusic: null,
-        fnAutoSaveInterval: setInterval(this.save, this._autoSaveInterval * 1000),
+        fnAutoSaveInterval: null,
 
         get music() {
             return this._musicSrc;
@@ -235,4 +236,5 @@ const options = {
 
 document.addEventListener('DOMContentLoaded', () => {
     options.load();
+    options.data.fnAutoSaveInterval = setInterval(() => options.save(), options.data.autoSaveInterval * 1000);
 });

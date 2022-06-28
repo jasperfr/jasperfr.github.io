@@ -36,7 +36,7 @@ const F = function(number, precision = 3, precisionHigh = 3) {
 }
 
 const player = {
-    points: new Decimal(4),
+    points: new Decimal(2),
 
     get pointGain() {
         return this.generator.getGeneratorAmount(1)
@@ -45,14 +45,14 @@ const player = {
 
     generator: {
         generators: {
-            1: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 2) },
-            2: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 4) },
-            3: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 8) },
-            4: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 16) },
-            5: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 24) },
-            6: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 32) },
-            7: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 48) },
-            8: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 64) },
+            1: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 1), baseCostScaling: new Decimal(2) },
+            2: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 7), baseCostScaling: new Decimal(2) },
+            3: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 12), baseCostScaling: new Decimal(4) },
+            4: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 17), baseCostScaling: new Decimal(4) },
+            5: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 27), baseCostScaling: new Decimal(6) },
+            6: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 46), baseCostScaling: new Decimal(6) },
+            7: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 64), baseCostScaling: new Decimal(8) },
+            8: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 96), baseCostScaling: new Decimal(8) },
         },
 
         buyGenerator(x) {
@@ -78,7 +78,7 @@ const player = {
         },
 
         getGeneratorCost(x) {
-            return this.generators[x].baseCost.times(Decimal.pow(8, this.generators[x].purchased));
+            return this.generators[x].baseCost.times(Decimal.pow(this.generators[x].baseCostScaling, this.generators[x].purchased));
         },
 
         getGeneratorMultiplier(x) {
@@ -137,19 +137,19 @@ const player = {
         amount: new Decimal(0),
 
         get cost() {
-            return Decimal.times(2048, Decimal.pow(4, this.amount));   
+            return Decimal.times(64, Decimal.pow(8, this.amount));   
         },
 
         get effectOne() {
-            return Decimal.plus(1, player.infinity.effect);
+            return Decimal.plus(0.05, player.infinity.effect);
         },
 
         get effect() {
-            return Decimal.times(Decimal.plus(1, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect));
+            return Decimal.times(Decimal.plus(0.05, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect));
         },
 
         get gain() {
-            return Decimal.times(Decimal.plus(1, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect).plus(1));
+            return Decimal.times(Decimal.plus(0.05, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect).plus(1));
         },
 
         get canAfford() {
@@ -251,7 +251,7 @@ const player = {
         multiplier: new Decimal(1),
 
         get canDisplay() {
-            return this.multiplier.gt(1) || player.points.gte(2 ** 100);
+            return this.multiplier.gt(1) || player.points.gte(2 ** 196);
         },
 
         get canAfford() {
@@ -274,7 +274,7 @@ const player = {
             if(!this.canAfford) return;
             this.multiplier = this.gain;
 
-            player.points = new Decimal(4);
+            player.points = new Decimal(2);
             player.generator.onReset();
             player.boost.onReset();
             player.sacrifice.onReset();
@@ -307,18 +307,20 @@ const player = {
         timer: 0,
 
         states: {
-            'ab-1': { unlocked: false, slow: true, enabled: false },
-            'ab-2': { unlocked: false, slow: true, enabled: false },
-            'ab-3': { unlocked: false, slow: true, enabled: false },
-            'ab-4': { unlocked: false, slow: true, enabled: false },
-            'ab-5': { unlocked: false, slow: true, enabled: false },
-            'ab-6': { unlocked: false, slow: true, enabled: false },
-            'ab-7': { unlocked: false, slow: true, enabled: false },
-            'ab-8': { unlocked: false, slow: true, enabled: false },
-            'ab-b': { unlocked: false, slow: true, enabled: false },
+            'ab-1': { cost: 1e10, unlocked: false, slow: true, enabled: false },
+            'ab-2': { cost: 1e15, unlocked: false, slow: true, enabled: false },
+            'ab-3': { cost: 1e20, unlocked: false, slow: true, enabled: false },
+            'ab-4': { cost: 1e25, unlocked: false, slow: true, enabled: false },
+            'ab-5': { cost: 1e30, unlocked: false, slow: true, enabled: false },
+            'ab-6': { cost: 1e35, unlocked: false, slow: true, enabled: false },
+            'ab-7': { cost: 1e40, unlocked: false, slow: true, enabled: false },
+            'ab-8': { cost: 1e45, unlocked: false, slow: true, enabled: false },
+            'ab-b': { cost: 1e50, unlocked: false, slow: true, enabled: false },
         },
 
         buy(id) {
+            if(!player.points.gte(this.states[id].cost)) return;
+            player.points = player.points.minus(this.states[id].cost);
             this.states[id].unlocked = true;
             this.states[id].enabled = true;
         },
@@ -566,7 +568,7 @@ const player = {
             this.unlocked = true;
             this.infinities = this.infinities.plus(1);
 
-            player.points = new Decimal(4);
+            player.points = new Decimal(2);
             player.generator.onReset();
             player.boost.onReset();
             player.sacrifice.onReset();
