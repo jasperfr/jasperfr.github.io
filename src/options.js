@@ -195,16 +195,19 @@ const options = {
                     $(':root').css('--bg-color', '#eee');
                     $(':root').css('--text-color', '#000');
                     $(':root').css('--infinity-color', '#d53');
+                    $(':root').css('--infinity-alpha-color', '#d53c');
                     break;
                 case 'Dark':
                     $(':root').css('--bg-color', '#000');
                     $(':root').css('--text-color', '#fff');
                     $(':root').css('--infinity-color', '#09c');
+                    $(':root').css('--infinity-alpha-color', '#09cc');
                     break;
                 case 'Dimmed':
                     $(':root').css('--bg-color', '#333');
                     $(':root').css('--text-color', '#eee');
                     $(':root').css('--infinity-color', '#07a');
+                    $(':root').css('--infinity-alpha-color', '#07ac');
                     break;
             }
 

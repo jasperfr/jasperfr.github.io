@@ -17,6 +17,8 @@
 <body>
     <center>
 
+        <h3>DEBUG: The game time is <span class="time-in-game">0:00:00.000</span></h3>
+
         <div class="news-ticker" loop="0">
             <span class="news-message">I need to add news messages.</span>
         </div>
@@ -87,6 +89,8 @@
         <div class="tab tab-autobuyers" hidden>
             <h3>Autobuyers</h3>
             <p>Slow autobuyers always buy after 4 seconds.<br>Complete challenges to unlock faster autobuyers.</p>
+            <button onclick="player.autobuyers.toggleAll(false)">Turn off all autobuyers</button> <button onclick="player.autobuyers.toggleAll(true)">Turn on all autobuyers</button>
+            <br><br>
             <table>
                 <tr>
                     <td>

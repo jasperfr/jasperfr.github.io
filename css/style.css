@@ -2,6 +2,7 @@
     --bg-color: #000;
     --text-color: #eee;
     --infinity-color: #09c;
+    --infinity-alpha-color: #09cc;
 }
 
 * {
@@ -37,12 +38,11 @@ table span[class^="generator-multiplier-"], table span[class^="infinity-generato
 }
 
 button {
+    background-color: #bbb;
+    border: none;
     cursor: pointer;
     margin: 0em;
-    padding: 1px 6px;
-    border-width: 1.5px;
-    border-style: solid;
-    border-radius: 2px;
+    padding: 3px 8px;
     border-color: var(--text-color);
 }
 
@@ -88,10 +88,6 @@ div.progress-value {
     bottom: 0;
     display: block;
     height: 25px;
-}
-
-div.infinity-percentage-value {
-    background: var(--infinity-color);
 }
 
 div.eternity-percentage-value {
@@ -150,4 +146,25 @@ td.challenge {
     padding: 0pt 10pt;
     margin: 4pt;
     border: 1px solid var(--text-color);
+}
+
+div.infinity-percentage-value {
+    background-image: repeating-linear-gradient(
+        45deg,
+        var(--infinity-color),
+        10px,
+        var(--infinity-alpha-color) 10px,
+        var(--infinity-alpha-color) 20px
+    );
+    background-size: 200% 200%;
+    animation: move linear infinite 5000ms;
+}
+
+@keyframes move {
+    0% {
+        background-position: 0%;
+    }
+    100% {
+        background-position: 97% 100%;
+    }
 }

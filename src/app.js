@@ -48,11 +48,11 @@ const player = {
             1: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 1), baseCostScaling: new Decimal(2) },
             2: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 7), baseCostScaling: new Decimal(2) },
             3: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 12), baseCostScaling: new Decimal(4) },
-            4: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 17), baseCostScaling: new Decimal(4) },
+            4: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 19), baseCostScaling: new Decimal(4) },
             5: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 27), baseCostScaling: new Decimal(6) },
             6: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 46), baseCostScaling: new Decimal(6) },
             7: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 64), baseCostScaling: new Decimal(8) },
-            8: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 96), baseCostScaling: new Decimal(8) },
+            8: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 82), baseCostScaling: new Decimal(8) },
         },
 
         buyGenerator(x) {
@@ -141,15 +141,15 @@ const player = {
         },
 
         get effectOne() {
-            return Decimal.plus(0.05, player.infinity.effect);
+            return Decimal.plus(0.0025, player.infinity.effect);
         },
 
         get effect() {
-            return Decimal.times(Decimal.plus(0.05, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect));
+            return Decimal.times(Decimal.plus(0.0025, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect));
         },
 
         get gain() {
-            return Decimal.times(Decimal.plus(0.05, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect).plus(1));
+            return Decimal.times(Decimal.plus(0.0025, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect).plus(1));
         },
 
         get canAfford() {
@@ -164,11 +164,11 @@ const player = {
         },
 
         onRender() {
-            $('.current-boost').text(F(this.effect, 3));
-            $('.next-boost').text(F(this.gain, 3));
+            $('.current-boost').text(F(this.effect, 4));
+            $('.next-boost').text(F(this.gain, 4));
             $('.boost-cost').text(F(this.cost, 0, 3));
             $('.boost-count').text(F(this.amount, 0, 3));
-            $('.boost-amount').text(F(this.effectOne, 3));
+            $('.boost-amount').text(F(this.effectOne, 4));
             toggleButton('.btn-boost', !this.canAfford);
         },
 
@@ -208,7 +208,7 @@ const player = {
         },
 
         get gain() {
-            return Decimal.max(0, Decimal.log10(player.generator.getGeneratorAmount(1)))
+            return Decimal.max(0, Decimal.pow(player.generator.getGeneratorAmount(1).div(1e20), 0.125)).plus(this.multiplier);
         },
 
         get ratio() {
@@ -251,7 +251,7 @@ const player = {
         multiplier: new Decimal(1),
 
         get canDisplay() {
-            return this.multiplier.gt(1) || player.points.gte(2 ** 196);
+            return this.multiplier.gt(1) || player.points.gte(2 ** 128);
         },
 
         get canAfford() {
@@ -263,7 +263,18 @@ const player = {
         },
 
         get gain() {
-            return Decimal.max(0, Decimal.log2(player.points.minus(2 ** 100))).plus(this.multiplier);
+            if(player.points.lt(2 ** 128)) return this.multiplier;
+            return Decimal.max(0,
+                Decimal.log2(
+                    player.points
+                    .div(2 ** 128)
+                    .pow(2)
+                )
+                .times(
+                    player.points.div(1e38)
+                    .pow(0.0125)
+                )
+                .plus(this.multiplier));
         },
 
         get ratio() {
@@ -328,6 +339,12 @@ const player = {
         toggle(id) {
             if(!this.states[id].unlocked) return;
             this.states[id].enabled ^= true;
+        },
+
+        toggleAll(state) {
+            for(let value of Object.values(this.states)) {
+                value.enabled = state;
+            }
         },
 
         onTick(delta) {
@@ -695,6 +712,11 @@ const hotkeys = {
 
 function main() {
 
+    function setTimeInGame() {
+        const $element = $('.time-in-game');
+        $($element.text(new Date(then).toISOString().slice(11, 23)))
+    };
+
     let then;
     function tick(now) {
         if(!then) {
@@ -704,6 +726,8 @@ function main() {
         }
         let delta = 1000 / (now - then);
         then = now;
+
+        setTimeInGame();
 
         player.points = player.points.plus(player.pointGain.div(delta));
         for(let entry of Object.values(player)) {
