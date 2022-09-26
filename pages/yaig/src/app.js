@@ -95,6 +95,7 @@ const player = {
                 this.generators[i].amount = this.generators[i].amount.plus(
                     this.getGeneratorAmount(i + 1)
                     .times(this.getGeneratorMultiplier(i + 1))
+                    .div(10)
                     .div(delta)
                 );
             }
@@ -134,6 +135,7 @@ const player = {
     },
 
     boost: {
+        base: 0.15,
         amount: new Decimal(0),
 
         get cost() {
@@ -141,15 +143,15 @@ const player = {
         },
 
         get effectOne() {
-            return Decimal.plus(0.0025, player.infinity.effect);
+            return Decimal.plus(this.base, player.infinity.effect);
         },
 
         get effect() {
-            return Decimal.times(Decimal.plus(0.0025, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect));
+            return Decimal.times(Decimal.plus(this.base, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect));
         },
 
         get gain() {
-            return Decimal.times(Decimal.plus(0.0025, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect).plus(1));
+            return Decimal.times(Decimal.plus(this.base, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect).plus(1));
         },
 
         get canAfford() {
@@ -164,11 +166,11 @@ const player = {
         },
 
         onRender() {
-            $('.current-boost').text(F(this.effect, 4));
-            $('.next-boost').text(F(this.gain, 4));
+            $('.current-boost').text(F(this.effect, 2));
+            $('.next-boost').text(F(this.gain, 2));
             $('.boost-cost').text(F(this.cost, 0, 3));
             $('.boost-count').text(F(this.amount, 0, 3));
-            $('.boost-amount').text(F(this.effectOne, 4));
+            $('.boost-amount').text(F(this.effectOne, 2));
             toggleButton('.btn-boost', !this.canAfford);
         },
 
@@ -190,6 +192,35 @@ const player = {
         onReset() {
             this.amount = new Decimal(0)
         }
+    },
+
+    collapse: {
+        count: new Decimal(0),
+
+        get canDisplay() {
+            return this.count.gt(0) || player.generator.getGeneratorAmount(4).gt(0);
+        },
+
+        get canAfford() {
+            return player.generator.getGeneratorAmount(this.count.toNumber() + 4).gt(10);
+        },
+
+        onRender() {
+            $('.collapse').toggle(this.canDisplay);
+            $('.collapse-need').text(this.count.toNumber() + 4);
+            toggleButton('.btn-collapse', !this.canAfford);
+        },
+
+        onSave($data) {
+            $data.collapseCount = this.count;
+            return $data;
+        },
+
+        onLoad($data) {
+            if('collapseCount' in $data)
+            this.count = new Decimal($data.collapseCount);
+        }
+        
     },
 
     sacrifice: {
