@@ -19,6 +19,7 @@ header.main {
     display: flex;
     flex-direction: row;
     color: white;
+    z-index: 255;
 }
 
 header.main .spacer {
@@ -59,9 +60,7 @@ section.roulette article {
 }
 
 section.projects {
-    padding-bottom: 40px;
     background-color: rgb(40, 43, 40);
-    border-top: 2px solid #0002;
     box-sizing: border-box;
 }
 
@@ -76,13 +75,24 @@ section.projects div.projects-list {
 }
 
 section.projects header {
+    display: flex;
     color: white;
     text-align: center;
-    padding: 20px;
+    padding: 40px;
+    gap: 20px;
+    justify-content: center;
+}
+
+section.projects header span {
+    display: block;
+    flex: 1 0 auto;
+    height: 2px;
+    background: white;
 }
 
 section.projects header h1 {
     font-weight: 200;
+    line-height: 0px;
 }
 
 article.project {
@@ -93,10 +103,18 @@ article.project {
     min-width: 400px;
     max-width: 500px;
     flex-direction: column;
+    border-bottom: 2px solid rgb(89, 177, 163);
+    transition: transform 500ms, box-shadow 500ms;
+}
+
+article.project:hover {
+    transform: scale(105%);
+    box-shadow: 0 0 12px white;
 }
 
 article.project div.project-info {
     padding: 20px;
+    user-select: none;
 }
 
 article.project .spacer {
@@ -149,4 +167,12 @@ nav a.discord img {
     height: 16px;
     transform: translateX(-7px) translateY(1px);
     filter:brightness(100) contrast(100)
+}
+
+nav a.a-closed {
+    background-color: rgb(225, 109, 77);
+}
+
+article.project.closed-source {
+    border-bottom: 2px solid rgb(225, 109, 77);
 }
