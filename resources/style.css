@@ -44,6 +44,12 @@ section.roulette {
     background-position: center center;
 }
 
+@media screen and (max-width: 700px) {
+    section.roulette {
+        height: 600px;
+    }
+}
+
 section.roulette article {
     color: white;
     margin: 0 20%;
