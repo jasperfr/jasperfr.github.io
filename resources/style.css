@@ -51,12 +51,27 @@ section.roulette {
     }
 }
 
+section.roulette {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+#canvas {
+    background: black;
+}
+
 section.roulette article {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 20px;
     color: white;
     margin: 0 20%;
     padding: 20px;
-    border: 2px solid rgb(41, 41, 41);
-    background: rgb(54, 54, 54);
+    border: 2px solid rgba(41, 41, 41, 0.5);
+    background: rgba(54, 54, 54, 0.5);
 }
 
 section.projects {
