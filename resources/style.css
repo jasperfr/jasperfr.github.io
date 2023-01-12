@@ -30,11 +30,15 @@ header.main h1 {
     padding: 20px;
 }
 
+
 header.main img {
     width: 32px;
     height: 32px;
     padding: 24px;
     filter: invert();
+}
+header.main > img {
+    padding-right: 0;
 }
 
 section.roulette {

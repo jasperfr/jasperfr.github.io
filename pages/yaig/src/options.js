@@ -4,6 +4,7 @@ const options = {
         console.log('Saving...')
         let $data = {};
         $data.points = player.points.toString();
+        $data.achievements = player.achievements;
         for(let entry of Object.values(player)) {
             if('onSave' in entry) {
                 $data = entry.onSave($data);
@@ -20,6 +21,7 @@ const options = {
         try { data = JSON.parse(data); } catch { return; }
 
         player.points = new Decimal(data.points);
+        player.achievements = data.achievements ?? [];
         for(let entry of Object.values(player)) {
             if('onLoad' in entry) {
                 entry.onLoad(data);

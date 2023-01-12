@@ -1,18 +1,31 @@
 const INFINITY = 2 ** 256;
 const LOG10_INFINITY = 77.06367888997919;
+const s=['K','M','B','T','Qd','Qt','Sx','Sp','Oc','No','Dc'];
+const __=(n,p=0,w=0)=>n===null||n===undefined?'NaN':n.mag<0.001?(0).toFixed(p):n.e<3?n.toFixed(p):n.e<=s.length*3?n.div(`1e${n.e-n.e%3}`).toFixed(w)+' '+s[~~(n.e/3)-1]:n.toFixed(w);
 
+/**
+ * Toggles a button based on a condition.
+ * Useful for styling.
+ */
 const toggleButton = function(element, query) {
     document.querySelector(element).classList[['remove', 'add'][0 | query]]('cant');
 }
-
-const s=['K','M','B','T','Qd','Qt','Sx','Sp','Oc','No','Dc'];
-const __=(n,p=0,w=0)=>n===null||n===undefined?'NaN':n.mag<0.001?(0).toFixed(p):n.e<3?n.toFixed(p):n.e<=s.length*3?n.div(`1e${n.e-n.e%3}`).toFixed(w)+' '+s[~~(n.e/3)-1]:n.toFixed(w)
-
+/**
+ * Formats a Decimal to point based precision using the provided notation.
+ * @param number Input number
+ * @param precision Lowest precision decimals
+ * @param precisionHigh Maximum decimals
+ */
 const F = function(number, precision = 3, precisionHigh = 3) {
     switch(options.data.notation) {
         case 'Scientific':
             if(number.lt(1e4)) return number.toFixed(precision);
-            return number.toExponential(precisionHigh).replace('+', '');
+            return number.toExponential(precisionHigh).replace('+', '').replace(/\.\d+\e/, (e) => {
+                // shitty decimal hack function
+                let no = e.slice(1, e.length - 1);
+                while(no.length < precisionHigh) no += '0';
+                return `.${no}e`;
+            });
         case 'Mixed Scientific': 
             return __(number, precision, precisionHigh);
         case 'Logarithm':
@@ -36,13 +49,19 @@ const F = function(number, precision = 3, precisionHigh = 3) {
 }
 
 const player = {
+    achievements: [],
     points: new Decimal(2),
+
+    resetPoints() {
+        this.points = new Decimal(2);
+    },
 
     get pointGain() {
         return this.generator.getGeneratorAmount(1)
         .times(this.generator.getGeneratorMultiplier(1));
     },
 
+    // finished
     generator: {
         generators: {
             1: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 1), baseCostScaling: new Decimal(2) },
@@ -70,6 +89,8 @@ const player = {
         },
 
         canAffordGenerator(x) {
+            // do not buy when the generator has not been unlocked yet!
+            if(player.collapse.count.plus(4).lt(x)) return false;
             return player.points.gte(this.getGeneratorCost(x));
         },
 
@@ -86,7 +107,6 @@ const player = {
                 .times(this.generators[x].purchased)
                 .plus(1)
                 .times(player.prestige.multiplier);
-            if(x === 8) multiplier = multiplier.times(player.sacrifice.multiplier);
             return multiplier;
         },
 
@@ -134,6 +154,7 @@ const player = {
         }
     },
 
+    // finished
     boost: {
         base: 0.15,
         amount: new Decimal(0),
@@ -143,15 +164,21 @@ const player = {
         },
 
         get effectOne() {
-            return Decimal.plus(this.base, player.infinity.effect);
+            return Decimal.plus(this.base, player.infinity.effect).plus(player.collapse.count.times(0.10));
         },
 
         get effect() {
-            return Decimal.times(Decimal.plus(this.base, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect));
+            return Decimal.times(
+                Decimal.plus(this.base, player.infinity.effect).plus(player.collapse.count.times(0.10)),
+                this.amount.plus(player.infinity.freeBoosterEffect)
+            );
         },
 
         get gain() {
-            return Decimal.times(Decimal.plus(this.base, player.infinity.effect), this.amount.plus(player.infinity.freeBoosterEffect).plus(1));
+            return Decimal.times(
+                Decimal.plus(this.base, player.infinity.effect).plus(player.collapse.count.times(0.10)),
+                this.amount.plus(player.infinity.freeBoosterEffect).plus(1)
+            );
         },
 
         get canAfford() {
@@ -194,19 +221,35 @@ const player = {
         }
     },
 
+    // finished
     collapse: {
         count: new Decimal(0),
 
         get canDisplay() {
-            return this.count.gt(0) || player.generator.getGeneratorAmount(4).gt(0);
+            return (this.count.gt(0) || player.generator.getGeneratorAmount(4).gt(0)) && this.count.lt(4);
         },
 
         get canAfford() {
-            return player.generator.getGeneratorAmount(this.count.toNumber() + 4).gt(10);
+            return player.generator.getGeneratorAmount(this.count.toNumber() + 4).gte(10);
+        },
+
+        onClick() {
+            const collapseCount = this.count.toNumber();
+            if(player.generator.generators[collapseCount + 3].amount.gte(10)) {
+                player.generator.onReset();
+                this.count = this.count.plus(1);
+                player.resetPoints();
+                player.boost.onReset();
+            }
         },
 
         onRender() {
-            $('.collapse').toggle(this.canDisplay);
+            // show/hide dimensions
+            for(let x = 1; x <= 8; x++) {
+                $(`.gen-${x}`).toggle(this.count.plus(4).gte(x));
+            }
+
+            $('.btn-collapse').toggle(this.canDisplay);
             $('.collapse-need').text(this.count.toNumber() + 4);
             toggleButton('.btn-collapse', !this.canAfford);
         },
@@ -219,70 +262,20 @@ const player = {
         onLoad($data) {
             if('collapseCount' in $data)
             this.count = new Decimal($data.collapseCount);
+        },
+
+        onReset() {
+            this.count = new Decimal(0);
         }
         
     },
 
-    sacrifice: {
-        multiplier: new Decimal(1),
-
-        get canDisplay() {
-            return player.prestige.multiplier.gt(1) || player.generator.getGeneratorAmount(8).gt(0);
-        },
-
-        get canAfford() {
-            return player.generator.getGeneratorAmount(8).gt(0) && this.gain.gt(this.effect);
-        },
-
-        get effect() {
-            return this.multiplier.pow(player.infinity.sacrificeBoost.effect);
-        },
-
-        get gain() {
-            return Decimal.max(0, Decimal.pow(player.generator.getGeneratorAmount(1).div(1e20), 0.125)).plus(this.multiplier);
-        },
-
-        get ratio() {
-            return this.gain.div(this.effect);
-        },
-
-        onSacrifice() {
-            if(!this.canAfford) return;
-            this.multiplier = this.gain;
-
-            for(let i = 1; i <= 7; i++) {
-                player.generator.generators[i].amount = new Decimal(0);
-            }
-        },
-
-        onRender() {
-            $('.sacrifice').toggle(this.canDisplay);
-            $('.current-sacrifice-bonus').text(F(this.effect, 3) + 'x');
-            $('.next-sacrifice-bonus').text(F(this.gain, 3) + 'x');
-            $('.ratio-sacrifice-bonus').text('x' + F(this.ratio, 3));
-            toggleButton('.btn-sacrifice', !this.canAfford);
-        },
-
-        onSave($data) {
-            $data.sacrifice = this.multiplier.toString();
-            return $data;
-        },
-
-        onLoad($data) {
-            if('sacrifice' in $data)
-            this.multiplier = new Decimal($data.sacrifice);
-        },
-
-        onReset() {
-            this.multiplier = new Decimal(1);
-        }
-    },
-
+    // finished - requires balancing
     prestige: {
         multiplier: new Decimal(1),
 
         get canDisplay() {
-            return this.multiplier.gt(1) || player.points.gte(2 ** 128);
+            return player.collapse.count.gte(4);
         },
 
         get canAfford() {
@@ -294,21 +287,12 @@ const player = {
         },
 
         get gain() {
-            if(player.points.lt(2 ** 128)) return this.multiplier;
-            return Decimal.max(0,
-                Decimal.log2(
-                    player.points
-                    .div(2 ** 128)
-                    .pow(2)
-                )
-                .times(
-                    player.points.div(1e38)
-                    .pow(0.0125)
-                )
-                .plus(this.multiplier));
+            if(player.points.lt(2 ** 82)) return this.multiplier;
+            return Decimal.min(1e6, this.multiplier.times(Decimal.log(player.points.div(2 ** 82).plus(1), 10)));
         },
 
         get ratio() {
+            if(this.gain.lt(this.multiplier)) return new Decimal(1);
             return this.gain.div(this.multiplier);
         },
 
@@ -319,13 +303,16 @@ const player = {
             player.points = new Decimal(2);
             player.generator.onReset();
             player.boost.onReset();
-            player.sacrifice.onReset();
+            player.collapse.onReset();
         },
 
         onRender() {
+            $('.prestige-multiplier').toggle(this.multiplier.gt(1));
+            $('.prestige-multi').text(`${F(this.effect, 3)}`);
+
             $('.prestige').toggle(this.canDisplay);
             $('.current-prestige-bonus').text(`${F(this.effect, 3)}x`);
-            $('.next-prestige-bonus').text(`${F(this.gain, 3)}x`);
+            $('.next-prestige-bonus').text(`${F(Decimal.max(this.gain, this.multiplier), 3)}x`);
             $('.ratio-prestige-bonus').text('x' + F(this.ratio, 3));
             toggleButton('.btn-prestige', !this.canAfford);
         },
@@ -441,6 +428,7 @@ const player = {
         }
     },
 
+    // REDO THIS ENTIRE THING GOD
     infinity: {
         points: new Decimal(0),
         power: new Decimal(0),
@@ -619,7 +607,6 @@ const player = {
             player.points = new Decimal(2);
             player.generator.onReset();
             player.boost.onReset();
-            player.sacrifice.onReset();
             player.prestige.onReset();
 
             for(let i = 1; i <= 8; i++) {
@@ -720,20 +707,19 @@ const player = {
 }
 
 function maxAll() {
-    for(let i = 8; i >= 1; i--) {
+    for(let i = Decimal.plus(4, Decimal.min(player.collapse.count, 4)); i >= 1; i--) {
         player.generator.buyMaxGenerator(i);
     }
     player.boost.onBuyMax();
 }
 
+/**
+ * Hotkey list.
+ */
 const hotkeys = {
     m: function() {
         if(!options.data.hotkeys) return;
         maxAll();
-    },
-    s: function() {
-        if(!options.data.hotkeys) return;
-        player.sacrifice.onSacrifice();
     },
     p: function() {
         if(!options.data.hotkeys) return;
@@ -741,6 +727,9 @@ const hotkeys = {
     },
 }
 
+/**
+ * Main function, used for updates and rendering.
+ */
 function main() {
 
     function setTimeInGame() {
@@ -779,6 +768,8 @@ function main() {
         let epercentage = Decimal.max(0, Decimal.log10(player.infinity.points).div(LOG10_INFINITY).times(100));
         $(`.eternity-percentage-label`).text(F(epercentage, 2) + '% to Eternity');
         $('.eternity-percentage-value').css('width', epercentage.toNumber() + '%');
+        
+        updateAchievements();
 
         requestAnimationFrame(tick);
     }
@@ -786,5 +777,8 @@ function main() {
     requestAnimationFrame(tick);
 }
 
+/**
+ * DOM Content loaded ? start the application.
+ */
 document.addEventListener('DOMContentLoaded', main);
 document.addEventListener('keydown', (e) => { hotkeys[e.key]?.(); });

@@ -215,7 +215,7 @@
     function max(a, b, dst) {
         dst = dst || new Float32Array(2);
         if(a[0] == 0 && a[1] == 0) return dst;
-        if(vec2.length(a) > b) {
+        if(vec2.length(a) > b ** 2) {
             const truncated = vec2.normalize(a);
             vec2.multiply(truncated, b, dst);
             return dst;

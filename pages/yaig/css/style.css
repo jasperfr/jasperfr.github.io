@@ -168,3 +168,40 @@ div.infinity-percentage-value {
         background-position: 97% 100%;
     }
 }
+
+div.tab-achievements table td {
+    width: 128px;
+    height: 128px;
+    border: 1px solid white;
+    padding: 8px;
+    position: relative;
+    background-image: radial-gradient(red, black);
+}
+
+div.tab-achievements table td.completed {
+    width: 128px;
+    height: 128px;
+    border: 1px solid white;
+    padding: 8px;
+    position: relative;
+    background-image: radial-gradient(rgb(15, 73, 15), black);
+}
+
+div.tab-achievements table td.locked.secret {
+    color: transparent;
+    user-select: none;
+}
+
+div.tab-achievements table td.locked.secret::after {
+    color: white;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 64px;
+    text-align: center;
+    content: "Secret."
+}
+
+div.tab-achievements table td.locked {
+    background-image: radial-gradient(red, black)
+}

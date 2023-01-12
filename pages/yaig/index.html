@@ -11,6 +11,7 @@
     <script type="text/javascript" src="src/tabs.js"></script>
     <script type="text/javascript" src="src/news.js"></script>
     <script type="text/javascript" src="src/app.js"></script>
+    <script type="text/javascript" src="src/achievements.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
@@ -18,6 +19,7 @@
     <center>
 
         <h3>DEBUG: The game time is <span class="time-in-game">0:00:00.000</span></h3>
+        <h3 id="debugger"></h3>
 
         <div class="news-ticker" loop="0">
             <span class="news-message">I need to add news messages.</span>
@@ -35,22 +37,30 @@
         <br>
         <br>
 
+        <!-- tab bar navigation -->
         <nav>
             <button onclick="showTab('generators')">Generators</button>
             <button onclick="showTab('autobuyers')">Autobuyers</button>
             <button class="nav-infinity" onclick="showTab('challenges')">Challenges</button>
             <button class="nav-infinity" onclick="showTab('infinity')">Infinity</button>
             <button onclick="showTab('options')">Options</button>
+            <button onclick="showTab('achievements')">Achievements</button>
         </nav>
 
         <br>
 
+        <!-- generator tab -->
         <div class="tab tab-generators">
             <h3>Generators</h3>
+
+            <!-- generator boost info -->
             <p>
+                <span class="prestige-multiplier">Your prestige bonus multiplies all generators by <span class="prestige-multi">1.000</span>x.<br></span>
                 Generator boost: +<span class="current-boost">0.015</span> -> +<span class="next-boost">0.030</span> <button onclick="player.boost.onBuy()" class="btn-boost">Cost: <span class="boost-cost">1e9</span></button> <button class="max" onclick="player.boost.onBuyMax()">Max</button> <button class="max" onclick="maxAll()">Max All</button><br>
                 You have <span class="boost-count">0</span> boosts. Each boost gives a +<span class="boost-amount">1.000</span>x boost to all generators.
             </p>
+
+            <!-- generators -->
             <table>
                 <tr class="gen-1"><td>1st generators</td><td><span class="generator-amount-1"></span></td><td><span class="generator-multiplier-1">x1.000</span></td><td><button class="btn-generator-1" onclick="player.generator.buyGenerator(1)">Cost: <span class="generator-cost-1">0</span></button> <button class="max" onclick="player.generator.buyMaxGenerator(1)">Max</button></td></tr>
                 <tr class="gen-2"><td>2nd generators</td><td><span class="generator-amount-2"></span></td><td><span class="generator-multiplier-2">x1.000</span></td><td><button class="btn-generator-2" onclick="player.generator.buyGenerator(2)">Cost: <span class="generator-cost-2">0</span></button> <button class="max" onclick="player.generator.buyMaxGenerator(2)">Max</button></td></tr>
@@ -62,28 +72,23 @@
                 <tr class="gen-8"><td>8th generators</td><td><span class="generator-amount-8"></span></td><td><span class="generator-multiplier-8">x1.000</span></td><td><button class="btn-generator-8" onclick="player.generator.buyGenerator(8)">Cost: <span class="generator-cost-8">0</span></button> <button class="max" onclick="player.generator.buyMaxGenerator(8)">Max</button></td></tr>
             </table>
             <br>
+
+            <!-- collapse button -->
             <table>
                 <tr class="collapse">
-                    <button class="btn-collapse" style="width:300pt">
-                        Collapse for a new dimension and a +0.10x boost to the generator boost, but reset your dimensions.
+                    <button class="btn-collapse" style="width:300pt" onclick="player.collapse.onClick()">
+                        Collapse for a new generator and a +0.10x boost to the generator boost, but reset your dimensions.
                         Needs 10x <span class="collapse-need"></span> generators. 
                     </button>
                 </tr>
             </table>
 
-            <table>
-                <tr class="sacrifice">
-                    <td>Sacrifice resets all lower generators,<br>but gives a boost to 8th generators.</td>
-                    <td>
-                        <button class="btn-sacrifice" onclick="player.sacrifice.onSacrifice()">
-                            Sacrifice<br>
-                            <span class="current-sacrifice-bonus">1.000x</span> -> <span class="next-sacrifice-bonus">1.005x</span><br>
-                            (<span class="ratio-sacrifice-bonus">0.000x</span>)
-                        </button>
-                    </td>
+            <!-- prestige button -->
+            <table class="prestige">
+                <tr>
+                    <td>Prestige resets <i>everything</i>,<br>but gives an increasing multiplier to all generators.<br>This slows down after 1e6x.</td>
                 </tr>
-                <tr class="prestige">
-                    <td>Prestige resets everything,<br>but multiplies all generators.</td>
+                <tr>
                     <td>
                         <button class="btn-prestige" onclick="player.prestige.onPrestige()">
                             Prestige<br>
@@ -160,13 +165,14 @@
             <p>
                 Complete challenges to get rewards.<br>
                 Your 0 challenge completions multiply all generators by x1.000.<br>
+                Completing an autobuyer challenge also makes its cost free.<br>
                 Complete all challenges to be able to break Infinity.
             </p>
             <table>
                 <tr>
                     <td class="challenge challenge-1">
                         <p>
-                            <br>Sacrifice is disabled.<br><br><br>
+                            Prestige scales much worse<br>(log<sub>10</sub> -> log<sub>100</sub>).<br><br>
                             <button>Unimplemented</button><br><br>
                             Reward: Fast autobuyer for 1st generator
                         </p>
@@ -180,7 +186,7 @@
                     </td>
                     <td class="challenge challenge-3">
                         <p>
-                            Sacrifice will now reset everything up to that point.<br><br>
+                            You cannot prestige. All generators are raised by ^2.<br><br>
                             <button>Unimplemented</button><br><br>
                             Reward: Fast autobuyer for 3nd generator
                         </p>
@@ -189,21 +195,21 @@
                 <tr>
                     <td class="challenge challenge-4">
                         <p>
-                            Prestige is disabled, but sacrifice is cubed.<br><br>
+                            You can't collapse. Generators 1 to 4 are raised by ^10.<br><br>
                             <button>Unimplemented</button><br><br>
                             Reward: Fast autobuyer for 4th generator
                         </p>
                     </td>
                     <td class="challenge challenge-5">
                         <p>
-                            There's an increasing exponent which drops to 0 per purchase.<br><br>
+                            There's an increasing multiplier which drops to 0 per purchase.<br><br>
                             <button>Unimplemented</button><br><br>
                             Reward: Fast autobuyer for 5th generator
                         </p>
                     </td>
                     <td class="challenge challenge-6">
                         <p>
-                            There are only 6 generators. Prestige power is squared.<br><br>
+                            You can only buy 10 per generator. Prestige power ^2.<br><br>
                             <button>Unimplemented</button><br><br>
                             Reward: Fast autobuyer for 6th generator
                         </p>
@@ -235,7 +241,7 @@
                 <tr>
                     <td class="challenge challenge-10">
                         <p>
-                            There's raising Stniop. If it reaches infinity, you lose.<br><br>
+                            <br>You cannot buy boosts.<br><br><br>
                             <button>Unimplemented</button><br><br>
                             Reward: Autobuyer for sacrifice
                         </p>
@@ -309,6 +315,13 @@
             <br>
             Living Voyage - Kevin MacLeod (incompetech.com)<br>
             Licensed under <a href="http://creativecommons.org/licenses/by/4.0/">Creative Commons: By Attribution 4.0 License</a><br>
+        </div>
+
+        <div class="tab tab-achievements" hidden>
+            <h3>Achievements</h3>
+            <p>Achievements do not give a bonus and are purely for progressing through the game.</p>
+            <table class="achievements">
+            </table>
         </div>
 
         <div class="tab tab-infinity" hidden>
