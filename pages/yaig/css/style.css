@@ -90,6 +90,10 @@ div.progress-value {
     height: 25px;
 }
 
+div.offline-tick-percentage-value {
+    background: rgb(50, 141, 65);
+}
+
 div.eternity-percentage-value {
     background: #c09;
 }
@@ -204,4 +208,32 @@ div.tab-achievements table td.locked.secret::after {
 
 div.tab-achievements table td.locked {
     background-image: radial-gradient(red, black)
+}
+
+div.tab-statistics ul {
+    list-style-type: none;
+}
+
+div.offline-tick-modal {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 999;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+div.offline-tick-simulation {
+    display: block;
+    margin: auto;
+    padding-bottom: 30px;
+    width: 50%;
+    z-index: 999;
+    background: var(--bg-color);
+    color: var(--text-color);
+    border: 1px solid var(--text-color);
 }

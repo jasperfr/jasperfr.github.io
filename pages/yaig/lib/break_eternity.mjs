@@ -232,6 +232,10 @@
           this.fromNumber(value);
         } else if (typeof value === "string") {
           this.fromString(value);
+        } else if (typeof value === "object") {
+          this.sign = value.sign ?? 0;
+          this.layer = value.layer ?? 0;
+          this.mag = value.mag ?? 0;
         } else {
           this.sign = 0;
           this.layer = 0;
