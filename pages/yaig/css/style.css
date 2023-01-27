@@ -1,8 +1,10 @@
 :root {
     --bg-color: #000;
     --text-color: #eee;
-    --infinity-color: #09c;
-    --infinity-alpha-color: #09cc;
+    --point-color: rgb(211, 96, 186);
+    --point-alpha-color: rgba(211, 96, 186, 0.8);
+    --infinity-color: rgb(236, 185, 18);
+    --infinity-alpha-color: rgba(236, 180, 25, 0.8);
 }
 
 * {
@@ -114,9 +116,9 @@ button.cant {
     border-color: #888;
 }
 
-.btn-sacrifice, .btn-prestige {
-    padding: 8pt;
-    width: 160pt !important;
+.btn-prestige {
+    padding-top: 10pt;
+    padding-bottom: 10pt;
 }
 
 .tab-autobuyers td {
@@ -125,18 +127,37 @@ button.cant {
 }
 
 button.btn-gain-infinity {
-    margin: 20pt 0 10pt 0;
+    margin: 0 0 10pt 0;
     width: 200pt !important;
-    background-color: var(--infinity-color);
+}
+
+button.btn-gain-infinity:not(.cant) {
+    background-color: var(--bg-color);
+    box-shadow: 0 0 8px var(--infinity-color) inset;
     color: var(--text-color);
     border-radius: 2pt;
-    border: 2px solid var(--text-color);
+    border: 2px solid var(--infinity-color);
+    animation: infinity-gain 2s linear infinite;
+}
+
+@keyframes infinity-gain {
+    0% {
+        box-shadow: 0 0 8px var(--infinity-color) inset;
+    }
+    50% {
+        box-shadow: 0 0 20px var(--infinity-color) inset;
+    }
+    100% {
+        box-shadow: 0 0 8px var(--infinity-color) inset;
+    }
 }
 
 button.nav-infinity {
-    background-color: var(--infinity-color);
+    background-color: var(--bg-color);
     color: var(--text-color);
-    border-color: var(--text-color);
+    border: 1px solid var(--infinity-color);
+    box-sizing: border-box;
+    animation: infinity-gain 2s linear infinite;
 }
 
 .inf {
@@ -155,10 +176,10 @@ td.challenge {
 div.infinity-percentage-value {
     background-image: repeating-linear-gradient(
         45deg,
-        var(--infinity-color),
+        var(--point-color),
         10px,
-        var(--infinity-alpha-color) 10px,
-        var(--infinity-alpha-color) 20px
+        var(--point-alpha-color) 10px,
+        var(--point-alpha-color) 20px
     );
     background-size: 200% 200%;
     animation: move linear infinite 5000ms;
@@ -236,4 +257,74 @@ div.offline-tick-simulation {
     background: var(--bg-color);
     color: var(--text-color);
     border: 1px solid var(--text-color);
+}
+
+.points {
+    color: var(--point-color);
+    text-shadow: 0 0 4px var(--point-color);
+}
+
+.infinity-points {
+    color: var(--infinity-color);
+    text-shadow: 0 0 4px var(--infinity-color);
+}
+
+.btn-collapse:not(.cant), .btn-prestige:not(.cant) {
+    background: var(--bg-color);
+    border: 1px solid var(--text-color);
+    color: var(--text-color);
+    box-shadow: 0 0 8px var(--point-color);
+    transition: transform 500ms;
+    animation: point-glow 5s ease-in-out infinite;
+}
+
+.btn-prestige:not(.cant) {
+    background-image:url('../img/bg-stars.png');
+    animation: move-bg 5s linear infinite;
+}
+
+.btn-collapse:not(.cant):hover, .btn-prestige:not(.cant):hover {
+    transform: scale(110%);
+}
+
+@keyframes move-bg {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: -64px -64px;
+    }
+}
+
+@keyframes point-glow {
+    0% {
+        box-shadow: 0 0 0px var(--point-color);
+    }
+    50% {
+        box-shadow: 0 0 15px var(--point-color);
+    }
+    100% {
+        box-shadow: 0 0 0px var(--point-color);
+    }
+}
+
+a:link, a:visited {
+    color: var(--point-color);
+    text-decoration: none;
+}
+
+.glowing {
+    animation: glow 5s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0% {
+        text-shadow: 0 0 0px var(--text-color);
+    }
+    50% {
+        text-shadow: 0 0 15px var(--text-color);
+    }
+    100% {
+        text-shadow: 0 0 0px var(--text-color);
+    }
 }
