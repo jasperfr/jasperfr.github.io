@@ -100,7 +100,7 @@ function main() {
     if(savegame) {
         gameWorker.postMessage({ fn: 'load', args: [savegame] });
     } else {
-        gameWorker.postMessage({ fn: 'start', args: [] });
+        gameWorker.postMessage({ fn: 'init', args: [] });
     }
 
     const renderables = {
