@@ -347,7 +347,7 @@ const methods = {
         player.prestige = new Decimal(data.prestige ?? 1);
 
         // load options
-        player.options.autosave.interval = parseInt(data.options.autosave.interval ?? 0);
+        player.options.autosave.interval = parseInt(data.options?.autosave?.interval ?? 0);
         player.options.notation = data.options.notation ?? 'Scientific';
 
         // load infinity data
