@@ -195,6 +195,22 @@ function main() {
                 $('.ip-header').toggle(hasInfinitied || new Decimal(value.infinityPoints).gt(0));
                 toggleButton('.btn-gain-infinity', !value.canAfford);
                 $('.infinity-points').text(F(value.infinityPoints, 0, 3));
+
+                for(let [k, v] of value.generators) {
+                    const cost = new Decimal(v.cost);
+                    $(`.infinity-generator-amount-${k}`).text(F(v.amount));
+                    $(`.infinity-generator-multiplier-${k}`).text('x'+F(v.multiplier));
+                    $(`.infinity-generator-cost-${k}`).text(F(cost, 0, 3));
+                    $(`.infinity-generator-gain-${k}`).text('(+' + F(v.gain, 3, 3) + '%)');
+                    toggleButton(`.btn-infinity-generator-${k}`, !v.canAfford);
+                }
+
+                $('.infinity-power').text(F(value.infinityPower, 0, 3));
+                $('.infinity-power-effect').text('x' + F(value.infinityPowerEffect, 3));
+                $('.infinity-infinities').text(F(value.infinities, 0, 3));
+
+                const nerf = Decimal.min(Decimal.div(value.infinities, 256), 1).toNumber();
+                $('.infinity-nerf').text(F(nerf, 4));
             }
         },
 

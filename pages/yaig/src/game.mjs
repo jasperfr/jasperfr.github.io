@@ -25,6 +25,17 @@ const player = {
     // infinity layer
     infinityPoints: new Decimal(0),
     infinities: new Decimal(0),
+    infinityGenerators: {
+        1: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 1), baseCostScaling: new Decimal(2) },
+        2: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 4), baseCostScaling: new Decimal(2) },
+        3: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 8), baseCostScaling: new Decimal(4) },
+        4: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 16), baseCostScaling: new Decimal(4) },
+        5: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 32), baseCostScaling: new Decimal(6) },
+        6: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 64), baseCostScaling: new Decimal(6) },
+        7: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 96), baseCostScaling: new Decimal(8) },
+        8: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 128), baseCostScaling: new Decimal(8) },
+    },
+    infinityPower: new Decimal(0),
 
     options: {
         notation: 'Scientific',
@@ -106,7 +117,8 @@ const fn = {
             let multiplier = fn.boosts.effect()
                 .times(player.generators[x]?.purchased)
                 .plus(1)
-                .pow(fn.prestige.amount());
+                .pow(fn.prestige.amount())
+                .times(fn.infinityPower.effect());
             return multiplier;
         },
 
@@ -234,6 +246,7 @@ const fn = {
             fn.generators.reset();
             fn.collapses.reset();
             fn.prestige.reset();
+            fn.infinityPower.reset();
     
             player.statistics.timeInCurrentInfinity = 0;
             player.infinities = player.infinities.plus(1);
@@ -244,6 +257,78 @@ const fn = {
     infinities: {
         amount() {
             return player.infinities;
+        }
+    },
+
+    infinityGenerators: {
+        buy(x) {
+            const cost = this.cost(x);
+            if(!this.canAfford(x)) return false;
+            player.infinityPoints = player.infinityPoints.minus(cost);
+            player.infinityGenerators[x].purchased = player.infinityGenerators[x].purchased.plus(1);
+            player.infinityGenerators[x].amount = player.infinityGenerators[x].amount.plus(1);
+            return true;
+        },
+
+        buyMax(x) {
+            let can = true;
+            do { can = this.buy(x) } while(can);
+        },
+
+        cost(x) {
+            return player.infinityGenerators[x].baseCost.times(
+                Decimal.pow(player.infinityGenerators[x].baseCostScaling, player.infinityGenerators[x].purchased)
+            );
+        },
+
+        canAfford(x) {
+            return player.infinityPoints.gte(this.cost(x));
+        },
+
+        amount(x) {
+            return player.infinityGenerators[x].amount;
+        },
+
+        gain(x) {
+            return this.amount(x)
+                .times(this.multiplier(x))
+                .div(8)
+                .pow(Decimal.min(player.infinities.div(256), 1));
+        },
+
+        percentageGain(x) {
+            if(x >= 8) return new Decimal(0);
+            return Decimal.max(0, this.gain(1 + x).div(this.amount(x)).times(100));
+        },
+
+        multiplier(x) {
+            return new Decimal(1.0);
+        },
+
+        reset() {
+            for(let i = 1; i <= 8; i++) {
+                player.infinityGenerators[i].amount = new Decimal(0);
+                player.infinityGenerators[i].purchased = new Decimal(0);
+            }
+        }
+    },
+
+    infinityPower: {
+        amount() {
+            return player.infinityPower;
+        },
+
+        effect() {
+            return Decimal.max(1, Decimal.log10(this.amount().plus(1)));
+        },
+
+        gain() {
+            let gain = fn.infinityGenerators.amount(1).times(fn.infinityGenerators.multiplier(1));
+            return gain;
+        },
+
+        reset() {
+            player.infinityPower = new Decimal(0);
         }
     },
 
@@ -258,6 +343,13 @@ const fn = {
                 fn.generators.gain(i + 1).div(delta)
             );
         }
+
+        for(let i = 1; i <= 7; i++) {
+            player.infinityGenerators[i].amount = player.infinityGenerators[i].amount.plus(
+                fn.infinityGenerators.gain(i + 1).div(delta)
+            );
+        }
+        player.infinityPower = player.infinityPower.plus(fn.infinityPower.gain().div(delta));
 
         // Update statistics (replace somewhere else???)
         player.statistics.timeInCurrentInfinity += 1000 / delta;
@@ -353,6 +445,11 @@ const methods = {
         // load infinity data
         player.infinityPoints = new Decimal(data.infinityPoints ?? 0);
         player.infinities = new Decimal(data.infinities ?? 0);
+        for(let i = 1; i <= 8; i++) {
+            player.infinityGenerators[i].amount = new Decimal(data.infinityGenerators[i].amount ?? 0);
+            player.infinityGenerators[i].purchased = new Decimal(data.infinityGenerators[i].purchased ?? 0);
+        }
+        player.infinityPower = new Decimal(data.infinityPower ?? 0);
 
         // load statistics
         player.statistics.timeInCurrentInfinity = parseFloat(data.statistics?.timeInCurrentInfinity) ?? 0;
@@ -431,7 +528,16 @@ const methods = {
                     canAfford: fn.infinityPoints.canAfford(),
                     ipGained: new Decimal(2),
                     infinityPoints: player.infinityPoints,
-                    infinities: player.infinities
+                    infinities: player.infinities,
+                    generators: Object.entries(player.infinityGenerators).map(([i, g]) => [i, {
+                        amount: g.amount,
+                        multiplier: fn.infinityGenerators.multiplier(i),
+                        cost: fn.infinityGenerators.cost(i),
+                        gain: fn.infinityGenerators.percentageGain(parseInt(i)),
+                        canAfford: fn.infinityGenerators.canAfford(i)
+                    }]),
+                    infinityPowerEffect: fn.infinityPower.effect(),
+                    infinityPower: fn.infinityPower.amount()
                 }
             }
         }
@@ -493,6 +599,16 @@ const methods = {
 
     buyMaxGenerator(x) {
         fn.generators.buyMax(x);
+        return {};
+    },
+
+    buyInfinityGenerator(x) {
+        fn.infinityGenerators.buy(x);
+        return {};
+    },
+
+    buyMaxInfinityGenerator(x) {
+        fn.infinityGenerators.buyMax(x);
         return {};
     },
 

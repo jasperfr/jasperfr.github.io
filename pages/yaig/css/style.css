@@ -167,7 +167,7 @@ button.nav-infinity {
 td.challenge {
     display: inline-block;
     width: 150pt;
-    height: 120pt;
+    height: 170pt;
     padding: 0pt 10pt;
     margin: 4pt;
     border: 1px solid var(--text-color);
@@ -327,4 +327,22 @@ a:link, a:visited {
     100% {
         text-shadow: 0 0 0px var(--text-color);
     }
+}
+
+button.btn-inf {
+    background-color: var(--bg-color);
+    border: 1px solid var(--text-color);
+    color: var(--text-color);
+    box-sizing: border-box;
+}
+
+button.btn-inf:not(.cant) {
+    box-shadow: 0 0 8px var(--infinity-color) inset;
+    border: 1px solid var(--infinity-color);
+}
+
+.infinity {
+    color: var(--infinity-color);
+    font-weight: 600;
+    text-shadow: 0 0 2px var(--infinity-color);
 }
