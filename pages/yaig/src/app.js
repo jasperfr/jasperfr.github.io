@@ -55,6 +55,7 @@ const call = (fn, args) => {
     }
 }
 
+// just wrap this in a render function smh
 function render() {
     gameWorker.postMessage({ fn: 'render', args: ['points'] });
     gameWorker.postMessage({ fn: 'render', args: ['generators'] });
@@ -63,6 +64,8 @@ function render() {
     gameWorker.postMessage({ fn: 'render', args: ['prestige'] });
     gameWorker.postMessage({ fn: 'render', args: ['statistics'] });
     gameWorker.postMessage({ fn: 'render', args: ['infinity'] });
+    gameWorker.postMessage({ fn: 'render', args: ['autobuyers'] });
+    gameWorker.postMessage({ fn: 'render', args: ['challenges'] });
 }
 
 function exec(fn, args) {
@@ -231,6 +234,51 @@ function main() {
             refresh(value) {
                 $('.stat-time-in-infinity').text(new Date(value.timeInCurrentInfinity).toISOString().slice(11, 23));
                 $('.stat-infinities').text(F(value.infinities, 0, 3));
+            }
+        },
+
+        'autobuyers': {
+            refresh(value) {
+                for(let [k, v] of value) {
+                    $(`.slow-ab-${k}`).toggle(v.slow);
+                    $(`.btn-ab-${k}`).toggle(!v.unlocked);
+                    $(`.div-ab-${k}`).toggle(v.unlocked);
+                    $(`.chk-ab-${k}`).prop('checked', v.enabled);
+                    $(`.chk-ab-max-${k}`).prop('checked', v.max);
+                    $(`.cost-ab-${k}`).text(v.cost);
+                }
+            }
+        },
+
+        'challenges': {
+            refresh(value) {
+                $('.ch-header').toggle(value.unlocked);
+
+                // challenge ids are 1 to 12 for now
+                for(let i = 1; i <= 12; i++) {
+                    let completed = value.completions.indexOf(i) !== -1;
+                    $(`.challenge-${i}`).toggleClass('completed', completed);
+                    if(completed) {
+                        $(`.challenge-${i} button`).text('Completed');
+                    } else {
+                        $(`.challenge-${i} button`).text('Start');
+                    }
+                }
+
+                if(value.current !== null) {
+                    $('.ch-header-value').text('Challenge ' + value.current);
+                    $(`.challenge-${value.current} button`).text('Running');
+                } else {
+                    $('.ch-header-value').text('no challenge');
+                }
+
+                $('.challenge-bonus').text(F(value.bonus, 3));
+
+                $('.btn-gain-infinity .text-pre-break-inf').toggle(value.current === null);
+                $('.btn-gain-infinity .complete-challenge').toggle(value.current !== null);
+                $('.challenge-completions').text(value.completions.length);
+                $('.challenge-completions-ord').text(value.completions.length !== 1 ? 's' : '');
+                $('.challenge-completions-ord-2').text(value.completions.length !== 1 ? 'y' : 'ies');
             }
         }
     }

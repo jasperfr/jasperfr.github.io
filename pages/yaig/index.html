@@ -11,6 +11,7 @@
     <script type="text/javascript" src="src/app.js"></script>
     <script type="text/javascript" src="src/news.js"></script>
     <script type="text/javascript" src="src/tabs.js"></script>
+    <script src="./src/components/abtable.js"></script>
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" type="text/css" href="css/tooltip.css">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -39,15 +40,20 @@
         </div>
 
         <button class="btn-gain-infinity" onclick="call('doInfinity', [])">
-            <p>
+            <p class="text-pre-break-inf">
                 The universe is full...<br>
                 Compress it into <span class="infinity-gain">2</span> IP.<br>
+            </p>
+            <p class="complete-challenge">
+                Complete the challenge...<br>
+                Compress the universe for <span class="infinity-gain">2</span> IP.
             </p>
         </button>
 
         <h3 class="ip-header">You have <span class="infinity-points">0</span> Infinity points.</h3>
         <h1>You have <span class="points">0</span> points.</h1>
         <h4>You are getting <span class="point-gain">0</span> points per second.</h4>
+        <h5 class="ch-header">You are currently in <span class="ch-header-value"></span>.</h5>
 
         <br>
 
@@ -126,7 +132,7 @@
             <p>You have <span class="infinity-points infinity">0</span> Infinity points.</p>
             <p>
                 You have <span class="infinity-power infinity">0</span> Infinity Power, which gives a post-generator multiplier of <span class="infinity-power-effect infinity">x1.000</span>. ( log<sub>10</sub>(power) )<br>
-                You have <span class="infinity-infinities infinity">0</span><sub>/256</sub> Infinities, which nerf the Infinity Generator speed to ^<span class="infinity-nerf">1.000</span>.<br>
+                You have <span class="infinity-infinities infinity">0</span><sub>/256</sub> Infinities, which nerf the Infinity Generator speed to x<span class="infinity-nerf">1.000</span>.<br>
                 The Infinity Power effect is applied to <b>all</b> point generators after the power effect from your Prestige bonus.
             </p>
 
@@ -145,106 +151,55 @@
         <div class="tab tab-autobuyers" hidden>
             <h3>Autobuyers</h3>
             <p>Slow autobuyers always buy after 4 seconds.<br>Complete challenges to unlock faster autobuyers.</p>
-            <button onclick="player.autobuyers.toggleAll(false)">Turn off all autobuyers</button> <button onclick="player.autobuyers.toggleAll(true)">Turn on all autobuyers</button>
+            <button onclick="call('disableAllAutobuyers', null)">Turn off all autobuyers</button> <button onclick="call('enableAllAutobuyers', null)">Turn on all autobuyers</button>
             <br><br>
-            <table>
-                <tr>
-                    <td>
-                        1st Generator<br>Autobuyer <span class="slow-ab-1">(slow)</span><br><br>
-                        <button class="btn-ab-1" onclick="player.autobuyers.buy('ab-1')">Cost: 1e10</button>
-                        <div class="div-ab-1" style="display:none;"><input class="chk-ab-1" type="checkbox" onchange="player.autobuyers.toggle('ab-1')"><span>Enabled</span></div>
-                    </td>
-                    <td>
-                        2nd Generator<br>Autobuyer <span class="slow-ab-2">(slow)</span><br><br>
-                        <button class="btn-ab-2" onclick="player.autobuyers.buy('ab-2')">Cost: 1e15</button>
-                        <div class="div-ab-2" style="display:none;"><input class="chk-ab-2" type="checkbox" onchange="player.autobuyers.toggle('ab-2')"><span>Enabled</span></div>
-                    </td>
-                    <td>
-                        3rd Generator<br>Autobuyer <span class="slow-ab-3">(slow)</span><br><br>
-                        <button class="btn-ab-3" onclick="player.autobuyers.buy('ab-3')">Cost: 1e20</button>
-                        <div class="div-ab-3" style="display:none;"><input class="chk-ab-3" type="checkbox" onchange="player.autobuyers.toggle('ab-3')"><span>Enabled</span></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        4th Generator<br>Autobuyer <span class="slow-ab-4">(slow)</span><br><br>
-                        <button class="btn-ab-4" onclick="player.autobuyers.buy('ab-4')">Cost: 1e25</button>
-                        <div class="div-ab-4" style="display:none;"><input class="chk-ab-4" type="checkbox" onchange="player.autobuyers.toggle('ab-4')"><span>Enabled</span></div>
-                    </td>
-                    <td>
-                        5th Generator<br>Autobuyer <span class="slow-ab-5">(slow)</span><br><br>
-                        <button class="btn-ab-5" onclick="player.autobuyers.buy('ab-5')">Cost: 1e30</button>
-                        <div class="div-ab-5" style="display:none;"><input class="chk-ab-5" type="checkbox" onchange="player.autobuyers.toggle('ab-5')"><span>Enabled</span></div>
-                    </td>
-                    <td>
-                        6th Generator<br>Autobuyer <span class="slow-ab-6">(slow)</span><br><br>
-                        <button class="btn-ab-6" onclick="player.autobuyers.buy('ab-6')">Cost: 1e35</button>
-                        <div class="div-ab-6" style="display:none;"><input class="chk-ab-6" type="checkbox" onchange="player.autobuyers.toggle('ab-6')"><span>Enabled</span></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        7th Generator<br>Autobuyer <span class="slow-ab-7">(slow)</span><br><br>
-                        <button class="btn-ab-7" onclick="player.autobuyers.buy('ab-7')">Cost: 1e40</button>
-                        <div class="div-ab-7" style="display:none;"><input class="chk-ab-7" type="checkbox" onchange="player.autobuyers.toggle('ab-7')"><span>Enabled</span></div>
-                    </td>
-                    <td>
-                        8th Generator<br>Autobuyer <span class="slow-ab-8">(slow)</span><br><br>
-                        <button class="btn-ab-8" onclick="player.autobuyers.buy('ab-8')">Cost: 1e45</button>
-                        <div class="div-ab-8" style="display:none;"><input class="chk-ab-8" type="checkbox" onchange="player.autobuyers.toggle('ab-8')"><span>Enabled</span></div>
-                    </td>
-                    <td>
-                        Booster<br>Autobuyer <span class="slow-ab-b">(slow)</span><br><br>
-                        <button class="btn-ab-b" onclick="player.autobuyers.buy('ab-b')">Cost: 1e50</button>
-                        <div class="div-ab-b" style="display:none;"><input class="chk-ab-b" type="checkbox" onchange="player.autobuyers.toggle('ab-b')"><span>Enabled</span></div>
-                    </td>
-                </tr>
-            </table>
+            <table class="tbl-autobuyers"></table>
         </div>
 
         <div class="tab tab-challenges" hidden>
             <h3>Challenges</h3>
             <p>
                 Complete challenges to get rewards.<br>
-                Your 0 challenge completions multiply all generators by x1.000.<br>
+                Your <span class="challenge-completions">0</span> challenge completion<span class="challenge-completions-ord">s</span> multipl<span class="challenge-completions-ord-2">y</span> <b>all</b> generators by x<span class="challenge-bonus">0.000</span>.<br>
                 Completing an autobuyer challenge also makes the generator cost free.<br>
-                Complete all challenges to be able to break Infinity.
+                Complete all challenges to be able to break Infinity.<br><br>
+                <button style="width: 200px;" onclick="call('restartChallenge', null)">Restart current challenge</button> <button onclick="call('exitChallenge', null)">Exit challenge</button>
             </p>
             <table>
                 <tr>
                     <td class="challenge challenge-1">
                         <p>
                             The prestige cap is lowered.<br>(^2.5 -> ^2.0)<br><br><br><br>
-                            <button>Unimplemented</button><br><br><br><br>
+                            <button onclick="call('startChallenge', 1)">Start</button><br><br><br><br>
                             Reward: Fast autobuyer for 1st generator
                         </p>
                     </td>
                     <td class="challenge challenge-2">
                         <p>
                             Buying a generator resets all your lower generators.<br><br><br><br>
-                            <button>Unimplemented</button><br><br><br><br>
+                            <button onclick="call('startChallenge', 2)">Start</button><br><br><br><br>
                             Reward: Fast autobuyer for 2nd generator
                         </p>
                     </td>
                     <td class="challenge challenge-3">
                         <p>
-                            You can't prestige. Generator 1 is raised by ^64.<br><br><br><br>
-                            <button>Unimplemented</button><br><br><br><br>
-                            Reward: Fast autobuyer for 3nd generator
+                            You can't prestige. Generator 1 is raised by ^8 when you have 10 8th dimensions.<br><br><br>
+                            <button onclick="call('startChallenge', 3)">Start</button><br><br><br><br>
+                            Reward: Fast autobuyer for 3rd generator
                         </p>
                     </td>
                 </tr>
                 <tr>
                     <td class="challenge challenge-4">
                         <p>
-                            You can't collapse. Generators 1 to 4 are raised by ^10.<br><br><br><br>
-                            <button>Unimplemented</button><br><br><br><br>
+                            You can't collapse. Generators 1 to 4 are raised by ^5.<br><br><br><br>
+                            <button onclick="call('startChallenge', 4)">Start</button><br><br><br><br>
                             Reward: Fast autobuyer for 4th generator
                         </p>
                     </td>
                     <td class="challenge challenge-5">
                         <p>
-                            There's an increasing multiplier to all generators which drops to 0 per purchase.<br><br><br>
+                            There's an increasing multiplier to all generators that drops to 0 per purchase.<br><br><br>
                             <button>Unimplemented</button><br><br><br><br>
                             Reward: Fast autobuyer for 5th generator
                         </p>

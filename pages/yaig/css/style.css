@@ -5,6 +5,7 @@
     --point-alpha-color: rgba(211, 96, 186, 0.8);
     --infinity-color: rgb(236, 185, 18);
     --infinity-alpha-color: rgba(236, 180, 25, 0.8);
+    --challenge-color: rgb(55, 217, 228);
 }
 
 * {
@@ -162,6 +163,15 @@ button.nav-infinity {
 
 .inf {
     color: var(--infinity-color);
+}
+
+.ch-header {
+    margin: 2pt;
+    color: #555;
+}
+
+.ch-header-value {
+    color: var(--challenge-color);
 }
 
 td.challenge {
@@ -345,4 +355,25 @@ button.btn-inf:not(.cant) {
     color: var(--infinity-color);
     font-weight: 600;
     text-shadow: 0 0 2px var(--infinity-color);
+}
+
+td.challenge button {
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    border: 1px solid var(--challenge-color);
+    padding: inherit 20pt;
+}
+
+td.challenge.running button {
+    color: var(--bg-color);
+    background-color: var(--challenge-color);
+}
+
+.challenge.completed {
+    border-color:rgb(41, 198, 41);
+    box-shadow: 0 0 16px inset rgb(41, 198, 41);
+}
+
+.challenge.completed button {
+    border-color:rgb(41, 198, 41);
 }

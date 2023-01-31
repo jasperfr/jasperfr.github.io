@@ -2,6 +2,10 @@ import '../lib/break_eternity.mjs';
 const defaultRefreshRate = 1000 / 60;
 const LOG_INFINITY = 77.06367888997919;
 const INFINITY = 2 ** 256;
+const kvpChallenges = {
+    1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,
+    'b':9,'c':10,'p':11,'i':12
+};
 
 const player = {
     points: new Decimal(2),
@@ -36,6 +40,24 @@ const player = {
         8: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 128), baseCostScaling: new Decimal(8) },
     },
     infinityPower: new Decimal(0),
+
+    autobuyers: {
+        '1': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e10' },
+        '2': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e15' },
+        '3': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e20' },
+        '4': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e25' },
+        '5': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e30' },
+        '6': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e35' },
+        '7': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e40' },
+        '8': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e45' },
+        'b': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e50' }, // booster autobuyer
+        'c': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e60' }, // collapse autobuyer
+        'p': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e70', mode: 'time', value: 10.0 }, // prestige autobuyer
+        'i': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1.16e77', mode: 'time', value: 10.0 }, // infinity autobuyer
+    },
+
+    inChallenge: null,
+    challenges: [],
 
     options: {
         notation: 'Scientific',
@@ -76,9 +98,19 @@ const fn = {
         buy(x) {
             const cost = this.cost(x);
             if(!this.canAfford(x)) return false;
-            player.points = player.points.minus(cost);
+            if(!fn.challenges.isCompleted(kvpChallenges[x])) {
+                player.points = player.points.minus(cost);
+            }
             player.generators[x].purchased = player.generators[x].purchased.plus(1);
             player.generators[x].amount = player.generators[x].amount.plus(1);
+
+            // challenge 2
+            if(player.inChallenge === 2 && x > 1) {
+                for(let i = x - 1; i >= 1; i--) {
+                    player.generators[i].amount = new Decimal(0);
+                }
+            }
+
             return true;
         },
 
@@ -118,7 +150,10 @@ const fn = {
                 .times(player.generators[x]?.purchased)
                 .plus(1)
                 .pow(fn.prestige.amount())
-                .times(fn.infinityPower.effect());
+                .pow(player.inChallenge === 3 && x == 1 && fn.generators.amount(8).gte(10) ? 8 : 1)
+                .pow(player.inChallenge === 4 ? 5 : 1)
+                .times(fn.infinityPower.effect())
+                .times(fn.challenges.bonus())
             return multiplier;
         },
 
@@ -182,6 +217,7 @@ const fn = {
         },
 
         canAfford() {
+            if(player.inChallenge === 4) return false;
             return fn.generators.amount(this.amount().toNumber() + 4).gte(10);
         },
 
@@ -209,10 +245,15 @@ const fn = {
         },
 
         canAfford() {
+            if(player.inChallenge === 3) return false;
             return fn.generators.amount(8).gte(10) && this.gain().gt(this.amount());
         },
 
         gain() {
+            if(player.inChallenge === 3) return new Decimal(1);
+            if(fn.challenges.in(1)) {
+                return Decimal.min(2, Decimal.max(Decimal.log(fn.points.amount(), INFINITY).times(1.5).plus(1), this.amount()));
+            }
             return Decimal.min(2.5, Decimal.max(Decimal.log(fn.points.amount(), INFINITY).times(1.5).plus(1), this.amount()));
         },
 
@@ -247,10 +288,18 @@ const fn = {
             fn.collapses.reset();
             fn.prestige.reset();
             fn.infinityPower.reset();
+            fn.infinityGenerators.clear();
     
             player.statistics.timeInCurrentInfinity = 0;
             player.infinities = player.infinities.plus(1);
             player.infinityPoints = player.infinityPoints.plus(2); // v1.1 - add get gain
+
+            // check if challenge completion
+            let currentChallenge = player.inChallenge;
+            if(currentChallenge !== -1) {
+                fn.challenges.complete(currentChallenge);
+                player.inChallenge = null;
+            }
         }
     },
 
@@ -293,7 +342,7 @@ const fn = {
             return this.amount(x)
                 .times(this.multiplier(x))
                 .div(8)
-                .pow(Decimal.min(player.infinities.div(256), 1));
+                .mul(Decimal.min(player.infinities.div(256), 1));
         },
 
         percentageGain(x) {
@@ -302,7 +351,14 @@ const fn = {
         },
 
         multiplier(x) {
-            return new Decimal(1.0);
+            return new Decimal(1.0)
+            .times(fn.challenges.bonus());
+        },
+
+        clear() {
+            for(let i = 1; i <= 8; i++) {
+                player.infinityGenerators[i].amount = player.infinityGenerators[i].purchased;
+            }
         },
 
         reset() {
@@ -332,6 +388,114 @@ const fn = {
         }
     },
 
+    autobuyers: {
+        canAfford(x) {
+            return player.points.lt(player.autobuyers[x].cost);
+        },
+
+        buy(x) {
+            if(!player.autobuyers[x]) return false;
+            if(player.points.lt(player.autobuyers[x].cost)) return false;
+            if(player.autobuyers[x].unlocked) return false;
+
+            player.points = player.points.minus(player.autobuyers[x].cost);
+            player.autobuyers[x].unlocked = true;
+            player.autobuyers[x].enabled = true;
+        },
+
+        autobuy(key, max) {
+            switch(key) {
+                case '1': case '2': case '3': case '4': 
+                case '5': case '6': case '7': case '8':
+                    if(max) fn.generators.buyMax(key);
+                    else fn.generators.buy(key);
+                break;
+                case 'b':
+                    if(max) fn.boosts.buyMax();
+                    else fn.boosts.buy();
+                break;
+            }
+            // todo booster etc.
+        },
+
+        // Update autobuyers.
+        tick(fps) {
+            const delta = 60 / fps;
+            Object.entries(player.autobuyers).forEach(([key, autobuyer]) => {
+                let completed = fn.challenges.isCompleted(kvpChallenges[key]);
+                if(autobuyer.unlocked && autobuyer.enabled) {
+                    if(autobuyer.slow && !completed) {
+                        autobuyer.delta += delta;
+                        if(autobuyer.delta >= 240) { // 4 seconds
+                            autobuyer.delta = 0;
+                            fn.autobuyers.autobuy(key, autobuyer.max);
+                        }
+                    } else {
+                        if(completed && autobuyer.slow) {
+                            player.autobuyers[key].slow = false;
+                        }
+                        fn.autobuyers.autobuy(key, autobuyer.max);
+                    }
+                }
+            });
+        }
+    },
+
+    // Normal challenges.
+    challenges: {
+        bonus() {
+            return new Decimal(0.25).times(player.challenges.length).plus(1);
+        },
+
+        in(id) {
+            return player.inChallenge == id;
+        },
+
+        start(id) {
+            // Reset this infinity
+            fn.points.reset();
+            fn.boosts.reset();
+            fn.generators.reset();
+            fn.collapses.reset();
+            fn.prestige.reset();
+            fn.infinityPower.reset();
+            fn.infinityGenerators.clear();
+
+            // Start the challenge
+            player.inChallenge = id;
+        },
+
+        isCompleted(id) {
+            return player.challenges.indexOf(id) !== -1;
+        },
+
+        complete(id) {
+            if(player.challenges.indexOf(id) === -1) {
+                player.challenges.push(id);
+            }
+        },
+
+        restart() {
+            if(player.inChallenge !== null) {
+                this.start(player.inChallenge);
+            }
+        },
+
+        exit() {
+            // Reset this infinity
+            fn.points.reset();
+            fn.boosts.reset();
+            fn.generators.reset();
+            fn.collapses.reset();
+            fn.prestige.reset();
+            fn.infinityPower.reset();
+            fn.infinityGenerators.clear();
+
+            // Exit the challenge.
+            player.inChallenge = null;
+        }
+    },
+
     onTick(delta) {
         player.points = player.points.plus(fn.points.gain().div(delta));
         player.points = Decimal.min(player.points, 2 ** 256);
@@ -354,10 +518,59 @@ const fn = {
         // Update statistics (replace somewhere else???)
         player.statistics.timeInCurrentInfinity += 1000 / delta;
         player.statistics.bestPoints = Decimal.max(fn.points.amount(), player.statistics.bestPoints);
+
+        fn.autobuyers.tick(delta);
     }
 }
 
 const methods = {
+
+    /* Challenges */
+    startChallenge(id) {
+        id = parseInt(id);
+        fn.challenges.start(id);
+        return {};
+    },
+
+    restartChallenge() {
+        fn.challenges.restart();
+        return {};
+    },
+
+    exitChallenge() {
+        fn.challenges.exit();
+        return {};
+    },
+
+    /* Autobuyers */
+    buyAutobuyer(key) {
+        fn.autobuyers.buy(key);
+        return {};
+    },
+
+    toggleAutobuyer(key) {
+        player.autobuyers[key].enabled ^= true;
+        return {};
+    },
+
+    enableAllAutobuyers() {
+        for(const key of Object.keys(player.autobuyers)) {
+            player.autobuyers[key].enabled = true;
+        }
+        return {};
+    },
+
+    disableAllAutobuyers() {
+        for(const key of Object.keys(player.autobuyers)) {
+            player.autobuyers[key].enabled = false;
+        }
+        return {};
+    },
+
+    toggleMaxAutobuyer(key) {
+        player.autobuyers[key].max ^= true;
+        return {};
+    },
 
     /* Options */
 
@@ -454,6 +667,21 @@ const methods = {
         // load statistics
         player.statistics.timeInCurrentInfinity = parseFloat(data.statistics?.timeInCurrentInfinity) ?? 0;
 
+        // load autobuyers
+        if('autobuyers' in data) {
+            for(const [k, v] of Object.entries(data.autobuyers)) {
+                player.autobuyers[k].unlocked = v.unlocked;
+                player.autobuyers[k].enabled = v.enabled;
+                player.autobuyers[k].max = v.max;
+                player.autobuyers[k].slow = v.slow;
+            }
+        }
+
+        player.inChallenge = data.inChallenge ?? null;
+        if('challenges' in data) {
+            player.challenges = [...data.challenges];
+        }
+
         this.init();
 
         return {};
@@ -538,6 +766,27 @@ const methods = {
                     }]),
                     infinityPowerEffect: fn.infinityPower.effect(),
                     infinityPower: fn.infinityPower.amount()
+                }
+            }
+
+            case 'autobuyers': return {
+                key: key,
+                value: Object.entries(player.autobuyers)
+                .map(([k, v]) => [k, {
+                    unlocked: v.unlocked,
+                    enabled: v.enabled,
+                    slow: v.slow,
+                    cost: v.cost
+                }])
+            }
+
+            case 'challenges': return {
+                key: key,
+                value: {
+                    unlocked: player.infinities.gte(1),
+                    current: player.inChallenge,
+                    completions: [...player.challenges],
+                    bonus: fn.challenges.bonus()
                 }
             }
         }
