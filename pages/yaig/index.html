@@ -74,7 +74,10 @@
             <p>
                 Generator boost: x<span class="boost-effect">1.000</span> <button onclick="call('buyBoost', [])" class="boost-cost">Cost: <span class="boost-cost">1e9</span></button> <button class="boost-cost-max max" onclick="call('buyMaxBoost', [])">Max</button> <button class="max" onclick="call('buyMaxAll', [])">Max All</button><br>
                 You have <span class="boost-amount">0</span> boosts. Each boost gives a +<span class="boost-multiplier">1.000</span>x multiplier to all generators.
-                <span class="prestige-bonus"><br>Your prestige bonus powers all generators by ^<span class="prestige-bonus-current glowing"></span>.</span>
+                <span class="prestige-bonus"><br>Your prestige bonus powers <span class="challenge-7-label">all generators</span> by ^<span class="prestige-bonus-current glowing"></span>.</span>
+                <span class="challenge-5-label"><br>Challenge 5 multiplier: x<span class="challenge-5-multiplier">0.000</span> (<span class="challenge-5-timer">0</span>/60)</span>
+                <span class="challenge-6-label"><br>Challenge 6: You can only buy <b>10</b> of each Generator.<br>Your max presitge has also been raised to ^3.</span>
+                <span class="challenge-9-label"><br>Challenge 9: The boost effect is square rooted.</span>
             </p>
 
             <table class="generators">
@@ -108,7 +111,7 @@
                             <div class="tooltiptext">
                                 Prestige resets EVERYTHING,<br>but powers your generators after the generator boost multiplier.<br>
                                 Prestige gain is based on your current points.<br>
-                                You need 10 8th generators to prestige.
+                                You need <span class="challenge-8-label">10</span> 8th generators to prestige.
                             </div>
                             Prestige for ^<span class="prestige-bonus-current">1.000</span> → ^<span class="prestige-bonus-next">1.000</span><br>
                             (+<span class="prestige-bonus-gain-add">0.000</span>, <span class="prestige-bonus-gain-mult">1.000</span>x current)
@@ -200,14 +203,14 @@
                     <td class="challenge challenge-5">
                         <p>
                             There's an increasing multiplier to all generators that drops to 0 per purchase.<br><br><br>
-                            <button>Unimplemented</button><br><br><br><br>
+                            <button onclick="call('startChallenge', 5)">Start</button><br><br><br><br>
                             Reward: Fast autobuyer for 5th generator
                         </p>
                     </td>
                     <td class="challenge challenge-6">
                         <p>
-                            You can only buy 10 generators per generator. Prestige gain is always maxed.<br><br><br>
-                            <button>Unimplemented</button><br><br><br><br>
+                            You can only buy 10 generators per generator. Prestige max is ^3.<br><br><br>
+                            <button onclick="call('startChallenge', 6)">Start</button><br><br><br><br>
                             Reward: Fast autobuyer for 6th generator
                         </p>
                     </td>
@@ -215,22 +218,22 @@
                 <tr>
                     <td class="challenge challenge-7">
                         <p>
-                            Prestige only affects generators 1-4.<br><br><br><br><br>
-                            <button>Unimplemented</button><br><br><br><br>
+                            Prestige only affects generators 1-5.<br><br><br><br><br>
+                            <button onclick="call('startChallenge', 7)">Start</button><br><br><br><br>
                             Reward: Fast autobuyer for 7th generator
                         </p>
                     </td>
                     <td class="challenge challenge-8">
                         <p>
-                            You need 50 8th generators to unlock Prestige.<br><br><br><br>
-                            <button>Unimplemented</button><br><br><br><br>
+                            You need 30 8th generators to unlock Prestige.<br><br><br><br>
+                            <button onclick="call('startChallenge', 8)">Start</button><br><br><br><br>
                             Reward: Fast autobuyer for 8th generator
                         </p>
                     </td>
                     <td class="challenge challenge-9">
                         <p>
                             Generator booster power is square rooted.<br><br><br><br>
-                            <button>Unimplemented</button><br><br><br><br>
+                            <button onclick="call('startChallenge', 9)">Start</button><br><br><br><br>
                             Reward: Fast autobuyer for generator boosters
                         </p>
                     </td>
@@ -238,7 +241,7 @@
                 <tr>
                     <td class="challenge challenge-10">
                         <p>
-                            <br>You can't buy boosts.<br><br><br><br><br>
+                            You can't prestige. Collapses are more powerful and you can collapse multiple times.<br><br>
                             <button>Unimplemented</button><br><br><br><br>
                             Reward: Autobuyer for collapsing
                         </p>

@@ -58,6 +58,7 @@ const player = {
 
     inChallenge: null,
     challenges: [],
+    challenge5mult: new Decimal(0),
 
     options: {
         notation: 'Scientific',
@@ -111,6 +112,10 @@ const fn = {
                 }
             }
 
+            if(player.inChallenge === 5) {
+                player.challenge5mult = new Decimal(0);
+            }
+
             return true;
         },
 
@@ -127,6 +132,7 @@ const fn = {
 
         canAfford(x) {
             if(player.collapses.plus(4).lt(x)) return false;
+            if(player.inChallenge === 6 && this.amount(x).gte(10)) return false;
             return player.points.gte(this.cost(x));
         },
 
@@ -149,9 +155,10 @@ const fn = {
             let multiplier = fn.boosts.effect()
                 .times(player.generators[x]?.purchased)
                 .plus(1)
-                .pow(fn.prestige.amount())
+                .pow((player.inChallenge === 7 && x > 5) ? 1 : fn.prestige.amount())
                 .pow(player.inChallenge === 3 && x == 1 && fn.generators.amount(8).gte(10) ? 8 : 1)
                 .pow(player.inChallenge === 4 ? 5 : 1)
+                .times(player.inChallenge === 5 ? player.challenge5mult : 1)
                 .times(fn.infinityPower.effect())
                 .times(fn.challenges.bonus())
             return multiplier;
@@ -184,8 +191,15 @@ const fn = {
         buy() {
             const cost = this.cost();
             if(!this.canAfford()) return false;
-            player.points = player.points.minus(cost);
+            if(!fn.challenges.isCompleted(kvpChallenges['b'])) {
+                player.points = player.points.minus(cost);
+            }
             player.boosts = player.boosts.plus(1);
+
+            if(player.inChallenge === 5) {
+                player.challenge5mult = new Decimal(0);
+            }
+
             return true;
         },
 
@@ -195,10 +209,12 @@ const fn = {
         },
 
         multiplier() {
-            return new Decimal(0.125).times(fn.collapses.amount().plus(1));
+            let multi = new Decimal(0.125).times(fn.collapses.amount().plus(1));
+            return multi;
         },
 
         effect() {
+            if(player.inChallenge === 9) return player.boosts.times(this.multiplier()).sqrt();
             return player.boosts.times(this.multiplier());
         },
 
@@ -227,6 +243,11 @@ const fn = {
             fn.boosts.reset();
             fn.points.reset();
             player.collapses = player.collapses.plus(1);
+
+            if(player.inChallenge === 5) {
+                player.challenge5mult = new Decimal(0);
+            }
+
             return true;
         },
 
@@ -246,10 +267,11 @@ const fn = {
 
         canAfford() {
             if(player.inChallenge === 3) return false;
-            return fn.generators.amount(8).gte(10) && this.gain().gt(this.amount());
+            return fn.generators.amount(8).gte((player.inChallenge === 8) ? 30 : 10) && this.gain().gt(this.amount());
         },
 
         gain() {
+            if(player.inChallenge === 6) return Decimal.min(3, Decimal.max(Decimal.log(fn.points.amount(), INFINITY).times(3).plus(1), this.amount()));
             if(player.inChallenge === 3) return new Decimal(1);
             if(fn.challenges.in(1)) {
                 return Decimal.min(2, Decimal.max(Decimal.log(fn.points.amount(), INFINITY).times(1.5).plus(1), this.amount()));
@@ -264,6 +286,11 @@ const fn = {
             fn.generators.reset();
             fn.boosts.reset();
             fn.collapses.reset();
+
+            if(player.inChallenge === 5) {
+                player.challenge5mult = new Decimal(0);
+            }
+
             return true;
         },
 
@@ -460,6 +487,7 @@ const fn = {
             fn.prestige.reset();
             fn.infinityPower.reset();
             fn.infinityGenerators.clear();
+            player.challenge5mult = new Decimal(0);
 
             // Start the challenge
             player.inChallenge = id;
@@ -518,6 +546,8 @@ const fn = {
         // Update statistics (replace somewhere else???)
         player.statistics.timeInCurrentInfinity += 1000 / delta;
         player.statistics.bestPoints = Decimal.max(fn.points.amount(), player.statistics.bestPoints);
+
+        player.challenge5mult = Decimal.min(player.challenge5mult.plus((1000 / delta) / 60000), 1);
 
         fn.autobuyers.tick(delta);
     }
@@ -681,6 +711,7 @@ const methods = {
         if('challenges' in data) {
             player.challenges = [...data.challenges];
         }
+        player.challenge5mult = new Decimal(data.challenge5mult ?? 0);
 
         this.init();
 
@@ -737,7 +768,8 @@ const methods = {
                     amount: fn.prestige.amount(),
                     visible: fn.prestige.visible(),
                     canAfford: fn.prestige.canAfford(),
-                    gain: fn.prestige.gain()
+                    gain: fn.prestige.gain(),
+                    challenge: player.inChallenge,
                 }
             }
 
@@ -786,6 +818,7 @@ const methods = {
                     unlocked: player.infinities.gte(1),
                     current: player.inChallenge,
                     completions: [...player.challenges],
+                    challenge5mult: player.challenge5mult,
                     bonus: fn.challenges.bonus()
                 }
             }

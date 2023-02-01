@@ -1,6 +1,6 @@
-function abtable(k, title) {
+function abtable(k, title, hasSlow = true) {
     return $(`<td>
-        ${title}<br>Autobuyer <span class="slow-ab-${k}">(slow)</span><br><br>
+        ${title}<br>Autobuyer ${hasSlow ? `<span class="slow-ab-${k}">(slow)</span>` : ''}<br><br>
         <button class="btn-ab-${k}" onclick="call('buyAutobuyer', '${k}')">Cost: <span class="cost-ab-${k}"></span></button>
         <div class="div-ab-${k}" style="display:none;">
             <input class="chk-ab-${k}" checked type="checkbox" onchange="call('toggleAutobuyer', '${k}')"><span>Enabled</span><br>
@@ -31,8 +31,8 @@ $(() => {
         $tr.append(abtable(b, 'Booster'));
     $('.tbl-autobuyers').append($tr);
     $tr = $('<tr>');
-        $tr.append(abtable(c, 'Collapse'));
-        $tr.append(abtable(p, 'Prestige'));
-        $tr.append(abtable(i, 'Infinity'));
+        $tr.append(abtable(c, 'Collapse', false));
+        $tr.append(abtable(p, 'Prestige', false));
+        $tr.append(abtable(i, 'Infinity', false));
     $('.tbl-autobuyers').append($tr);
 });

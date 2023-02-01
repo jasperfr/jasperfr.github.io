@@ -183,7 +183,7 @@ function main() {
                 $('.prestige-bonus-gain-mult').text(F(gain.div(amount)));
                 toggleButton('.btn-prestige', !value.canAfford);
 
-                if(amount.gte(2.5)) {
+                if((value.challenge === 6 && amount.gte(3)) || (value.challenge !== 6 && amount.gte(2.5))) {
                     $('.prestige-bonus-next').text(F(gain) + ' (MAX)');
                     toggleButton('.btn-prestige', true);
                 }
@@ -279,6 +279,26 @@ function main() {
                 $('.challenge-completions').text(value.completions.length);
                 $('.challenge-completions-ord').text(value.completions.length !== 1 ? 's' : '');
                 $('.challenge-completions-ord-2').text(value.completions.length !== 1 ? 'y' : 'ies');
+
+                $('.challenge-5-label').toggle(value.current === 5);
+                $('.challenge-5-multiplier').text(F(value.challenge5mult, 3));
+                $('.challenge-5-timer').text(F(60 * new Decimal(value.challenge5mult).toNumber(), 0));
+
+                $('.challenge-6-label').toggle(value.current === 6);
+                $('.challenge-7-label').text(value.current === 7 ? 'Generator 1-5' : 'all generators');
+
+                $('.boost-effect').toggleClass('nerfed', value.current === 9);
+                $('.challenge-9-label').toggle(value.current === 9);
+
+                $('.challenge-8-label').text(value.current === 8 ? '30' : '10');
+
+                // lock autobuyers
+                toggleButton('.btn-ab-c', value.completions.indexOf('c') === -1);
+                $('.btn-ab-c').text(value.completions.indexOf('c') === -1 ? 'Locked' : 'Unlock');
+                toggleButton('.btn-ab-p', value.completions.indexOf('p') === -1);
+                $('.btn-ab-p').text(value.completions.indexOf('p') === -1 ? 'Locked' : 'Unlock');
+                toggleButton('.btn-ab-i', value.completions.indexOf('i') === -1);
+                $('.btn-ab-i').text(value.completions.indexOf('i') === -1 ? 'Locked' : 'Unlock');
             }
         }
     }

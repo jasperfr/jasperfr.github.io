@@ -346,6 +346,11 @@ button.btn-inf {
     box-sizing: border-box;
 }
 
+.nerfed {
+    color:rgb(221, 50, 50);
+    text-shadow: 0 0 2px rgb(168, 34, 34);
+}
+
 button.btn-inf:not(.cant) {
     box-shadow: 0 0 8px var(--infinity-color) inset;
     border: 1px solid var(--infinity-color);
