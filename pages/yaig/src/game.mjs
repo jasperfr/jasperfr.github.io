@@ -689,8 +689,8 @@ const methods = {
         player.infinityPoints = new Decimal(data.infinityPoints ?? 0);
         player.infinities = new Decimal(data.infinities ?? 0);
         for(let i = 1; i <= 8; i++) {
-            player.infinityGenerators[i].amount = new Decimal(data.infinityGenerators[i]?.amount ?? 0);
-            player.infinityGenerators[i].purchased = new Decimal(data.infinityGenerators[i]?.purchased ?? 0);
+            player.infinityGenerators[i].amount = new Decimal(data.infinityGenerators?.[i]?.amount ?? 0);
+            player.infinityGenerators[i].purchased = new Decimal(data.infinityGenerators?.[i]?.purchased ?? 0);
         }
         player.infinityPower = new Decimal(data.infinityPower ?? 0);
 
