@@ -5,6 +5,16 @@ const __=(n,p=0,w=0)=>n===null||n===undefined?'NaN':n.mag<0.001?(0).toFixed(p):n
 const gameWorker = new Worker('./src/game.mjs', { type: 'module' });
 const notations = ['Scientific', 'Mixed Scientific', 'Logarithm', 'Full Logarithm', 'Infinity', 'Blind', 'OTTFFSSENT', 'Kanji', 'Do I have it?'];
 
+const TIME = function(value) {
+    const y = Math.floor(value / 31557600);
+    if(y > 100) return ' (> 100 years)';
+    const d = Math.floor((value % 31557600) / 86400);
+    const h = Math.floor((value % 86400) / 3600);
+    const m = Math.floor((value % 3600) / 60);
+    const s = Math.round(value % 60);
+    return ` (${y?y + ' years, ':''}${d?d + ' days, ':''}${h}:${m>9?m:'0'+m}:${s>9?s:'0'+s})`;
+};
+
 var notation = 0;
 
 const toggleButton = function(element, query) {
@@ -111,6 +121,9 @@ function main() {
             refresh(value) {
                 $('.points').text(F(value.points, 0, 3));
                 $('.point-gain').text(F(value.pointgen, 0, 3));
+
+                // calculate time to infinity
+                $('.tooltip-time-to-infinity').text(TIME(Decimal.div(Decimal.sub(2 ** 256, value.points), value.pointgen).toNumber()));
                 
                 if(new Decimal(value.points).eq(2 ** 256)) {
                     $('.points').text('Infinite');
@@ -164,7 +177,12 @@ function main() {
         'collapse': {
             refresh(value) {
                 let amount = new Decimal(value.amount).toNumber();
-                $('.collapse-need').text(['4th', '5th', '6th', '7th'][amount]);
+                // challenge 10 shitty hack
+                if(amount < 4) {
+                    $('.collapse-need').text(['10x 4th', '10x 5th', '10x 6th', '10x 7th'][amount]);
+                } else {
+                    $('.collapse-need').text(`10x 8th`);
+                }
                 $('.collapse').toggle(value.visible);
                 toggleButton('.btn-collapse', !value.canAfford);
             }
@@ -292,13 +310,23 @@ function main() {
 
                 $('.challenge-8-label').text(value.current === 8 ? '30' : '10');
 
+                $('.btn-collapse .challenge-10-text').toggle(value.current === 10);
+                $('.btn-collapse .default-text').toggle(value.current !== 10);
+
                 // lock autobuyers
-                toggleButton('.btn-ab-c', value.completions.indexOf('c') === -1);
-                $('.btn-ab-c').text(value.completions.indexOf('c') === -1 ? 'Locked' : 'Unlock');
+                // js templating would be too complex to add this in.
+                toggleButton('.btn-ab-c', value.completions.indexOf(10) === -1);
+                $('.btn-ab-c').text(value.completions.indexOf(10) === -1 ? 'Locked' : 'Unlock');
+                $('input.chk-ab-max-c').hide();
+                $('input.chk-ab-max-c + span').hide();
                 toggleButton('.btn-ab-p', value.completions.indexOf('p') === -1);
                 $('.btn-ab-p').text(value.completions.indexOf('p') === -1 ? 'Locked' : 'Unlock');
+                $('input.chk-ab-max-p').hide();
+                $('input.chk-ab-max-p + span').hide();
                 toggleButton('.btn-ab-i', value.completions.indexOf('i') === -1);
                 $('.btn-ab-i').text(value.completions.indexOf('i') === -1 ? 'Locked' : 'Unlock');
+                $('input.chk-ab-max-i').hide();
+                $('input.chk-ab-max-i + span').hide();
             }
         }
     }
@@ -351,6 +379,9 @@ document.addEventListener('keydown', (e) => {
     switch(e.key) {
         case 'm': case 'M':
             call('buyMaxAll', []);
+            break;
+        case 'c': case 'C':
+            call('buyCollapse', []);
             break;
     }
 })

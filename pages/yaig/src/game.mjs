@@ -51,9 +51,9 @@ const player = {
         '7': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e40' },
         '8': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e45' },
         'b': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e50' }, // booster autobuyer
-        'c': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e60' }, // collapse autobuyer
-        'p': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e70', mode: 'time', value: 10.0 }, // prestige autobuyer
-        'i': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1.16e77', mode: 'time', value: 10.0 }, // infinity autobuyer
+        'c': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '0' }, // collapse autobuyer
+        'p': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '0', mode: 'time', value: 10.0 }, // prestige autobuyer
+        'i': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '0', mode: 'time', value: 10.0 }, // infinity autobuyer
     },
 
     inChallenge: null,
@@ -92,6 +92,10 @@ const fn = {
 
         reset() {
             player.points = new Decimal(2);
+
+            if(player.inChallenge === 10) {
+                player.points = new Decimal(64);
+            }
         }
     },
 
@@ -209,6 +213,7 @@ const fn = {
         },
 
         multiplier() {
+            if(player.inChallenge === 10) return new Decimal(1).times(fn.collapses.amount().plus(1));
             let multi = new Decimal(0.125).times(fn.collapses.amount().plus(1));
             return multi;
         },
@@ -229,19 +234,29 @@ const fn = {
         },
 
         visible() {
+            if(player.inChallenge === 10 && fn.generators.amount(4).gt(0)) return true;
             return (this.amount().gt(0) || fn.generators.amount(4).gt(0)) && this.amount().lt(4);
         },
 
         canAfford() {
+            if(player.inChallenge === 10) {
+                if(this.amount().gte(4)) {
+                    return fn.generators.amount(8).gte(10);
+                } else {
+                    return fn.generators.amount(this.amount().toNumber() + 4).gte(10);
+                }
+            }
             if(player.inChallenge === 4) return false;
             return fn.generators.amount(this.amount().toNumber() + 4).gte(10);
         },
 
         buy() {
             if(!this.canAfford()) return false;
-            fn.generators.reset();
-            fn.boosts.reset();
-            fn.points.reset();
+            if(!fn.challenges.isCompleted(10)) {
+                fn.generators.reset();
+                fn.boosts.reset();
+                fn.points.reset();
+            }
             player.collapses = player.collapses.plus(1);
 
             if(player.inChallenge === 5) {
@@ -262,15 +277,18 @@ const fn = {
         },
 
         visible() {
+            if(player.inChallenge === 10) return false;
             return fn.collapses.amount().gte(4);
         },
 
         canAfford() {
+            if(player.inChallenge === 10) return false;
             if(player.inChallenge === 3) return false;
             return fn.generators.amount(8).gte((player.inChallenge === 8) ? 30 : 10) && this.gain().gt(this.amount());
         },
 
         gain() {
+            if(player.inChallenge === 10) return new Decimal(1);
             if(player.inChallenge === 6) return Decimal.min(3, Decimal.max(Decimal.log(fn.points.amount(), INFINITY).times(3).plus(1), this.amount()));
             if(player.inChallenge === 3) return new Decimal(1);
             if(fn.challenges.in(1)) {
@@ -421,6 +439,10 @@ const fn = {
         },
 
         buy(x) {
+            if(x === 'c' && !fn.challenges.isCompleted(10)) return false;
+            if(x === 'p' && !fn.challenges.isCompleted(11)) return false;
+            if(x === 'i' && !fn.challenges.isCompleted(12)) return false;
+
             if(!player.autobuyers[x]) return false;
             if(player.points.lt(player.autobuyers[x].cost)) return false;
             if(player.autobuyers[x].unlocked) return false;
@@ -440,6 +462,9 @@ const fn = {
                 case 'b':
                     if(max) fn.boosts.buyMax();
                     else fn.boosts.buy();
+                break;
+                case 'c':
+                    fn.collapses.buy();
                 break;
             }
             // todo booster etc.
@@ -479,6 +504,9 @@ const fn = {
         },
 
         start(id) {
+            // Start the challenge
+            player.inChallenge = id;
+
             // Reset this infinity
             fn.points.reset();
             fn.boosts.reset();
@@ -488,9 +516,6 @@ const fn = {
             fn.infinityPower.reset();
             fn.infinityGenerators.clear();
             player.challenge5mult = new Decimal(0);
-
-            // Start the challenge
-            player.inChallenge = id;
         },
 
         isCompleted(id) {
@@ -510,6 +535,9 @@ const fn = {
         },
 
         exit() {
+            // Exit the challenge.
+            player.inChallenge = null;
+
             // Reset this infinity
             fn.points.reset();
             fn.boosts.reset();
@@ -518,9 +546,6 @@ const fn = {
             fn.prestige.reset();
             fn.infinityPower.reset();
             fn.infinityGenerators.clear();
-
-            // Exit the challenge.
-            player.inChallenge = null;
         }
     },
 
@@ -732,7 +757,7 @@ const methods = {
             case 'generators': return {
                 key: key,
                 value: Object.entries(player.generators)
-                .filter(([i, _g]) => i <= Decimal.max(4, Decimal.plus(4, fn.collapses.amount())))
+                .filter(([i, _g]) => i <= Decimal.min(8, Decimal.max(4, Decimal.plus(4, fn.collapses.amount()))))
                 .map(([i, g]) => [i, {
                     amount: g.amount,
                     multiplier: fn.generators.multiplier(i),
