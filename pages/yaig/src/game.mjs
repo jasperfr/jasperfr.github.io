@@ -247,6 +247,7 @@ const fn = {
                 }
             }
             if(player.inChallenge === 4) return false;
+            if(this.amount().toNumber() >= 5) return false;
             return fn.generators.amount(this.amount().toNumber() + 4).gte(10);
         },
 
