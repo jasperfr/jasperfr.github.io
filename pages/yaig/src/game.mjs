@@ -40,6 +40,7 @@ const player = {
         8: { amount: new Decimal(0), purchased: new Decimal(0), baseCost: new Decimal(2 ** 128), baseCostScaling: new Decimal(8) },
     },
     infinityPower: new Decimal(0),
+    infinityBroken: false,
 
     autobuyers: {
         '1': { unlocked: false, enabled: false, max: true, slow: true, delta: 0, cost: '1e10' },
@@ -72,6 +73,7 @@ const player = {
     },
 
     statistics: {
+        timeInCurrentPrestige: 0,
         timeInCurrentInfinity: 0
     }
 }
@@ -93,7 +95,7 @@ const fn = {
         reset() {
             player.points = new Decimal(2);
 
-            if(player.inChallenge === 10) {
+            if(player.inChallenge === 10 || player.inChallenge === 11) {
                 player.points = new Decimal(64);
             }
         }
@@ -278,17 +280,24 @@ const fn = {
         },
 
         visible() {
+            if(player.inChallenge === 12) return true;
             if(player.inChallenge === 10) return false;
             return fn.collapses.amount().gte(4);
         },
 
         canAfford() {
+            if(player.inChallenge === 12) return true;
             if(player.inChallenge === 10) return false;
             if(player.inChallenge === 3) return false;
-            return fn.generators.amount(8).gte((player.inChallenge === 8) ? 30 : 10) && this.gain().gt(this.amount());
+            return fn.generators.amount(8).gte((player.inChallenge === 8) ? 30 : 10) && this.gain().gte(this.amount());
         },
 
         gain() {
+            if(player.inChallenge === 11) {
+                let a = Decimal.sub(0.016, Decimal.div(player.statistics.timeInCurrentPrestige, 10000000));
+                return Decimal.max(this.amount(), Decimal.plus(this.amount(), a))
+            }
+
             if(player.inChallenge === 10) return new Decimal(1);
             if(player.inChallenge === 6) return Decimal.min(3, Decimal.max(Decimal.log(fn.points.amount(), INFINITY).times(3).plus(1), this.amount()));
             if(player.inChallenge === 3) return new Decimal(1);
@@ -301,14 +310,19 @@ const fn = {
         buy() {
             if(!this.canAfford()) return false;
             player.prestige = this.gain();
-            fn.points.reset();
-            fn.generators.reset();
-            fn.boosts.reset();
-            fn.collapses.reset();
+
+            if(!fn.challenges.isCompleted(11)) {
+                fn.points.reset();
+                fn.generators.reset();
+                fn.boosts.reset();
+                fn.collapses.reset();
+            }
 
             if(player.inChallenge === 5) {
                 player.challenge5mult = new Decimal(0);
             }
+
+            player.statistics.timeInCurrentPrestige = 0;
 
             return true;
         },
@@ -328,6 +342,8 @@ const fn = {
         },
 
         buy() {
+            if(!this.canAfford()) return;
+
             fn.points.reset();
             fn.boosts.reset();
             fn.generators.reset();
@@ -385,6 +401,8 @@ const fn = {
         },
 
         gain(x) {
+            if(player.inChallenge === 12) return new Decimal(0);
+
             return this.amount(x)
                 .times(this.multiplier(x))
                 .div(8)
@@ -397,7 +415,11 @@ const fn = {
         },
 
         multiplier(x) {
+            if(player.inChallenge === 12) return new Decimal(0);
+
             return new Decimal(1.0)
+            .times(player.infinityGenerators[x]?.purchased)
+            .times(0.05)
             .times(fn.challenges.bonus());
         },
 
@@ -421,7 +443,7 @@ const fn = {
         },
 
         effect() {
-            return Decimal.max(1, Decimal.log10(this.amount().plus(1)));
+            return Decimal.max(1, Decimal.sqrt(this.amount().plus(1)));
         },
 
         gain() {
@@ -466,6 +488,12 @@ const fn = {
                 break;
                 case 'c':
                     fn.collapses.buy();
+                break;
+                case 'p':
+                    fn.prestige.buy();
+                break;
+                case 'i':
+                    fn.infinityPoints.buy(); // TODO_WARNING - THIS WILL NOT WORK IN THE BREAK INFINITY UPDATE
                 break;
             }
             // todo booster etc.
@@ -517,6 +545,12 @@ const fn = {
             fn.infinityPower.reset();
             fn.infinityGenerators.clear();
             player.challenge5mult = new Decimal(0);
+            player.statistics.timeInCurrentPrestige = 0;
+            player.statistics.timeInCurrentInfinity = 0;
+
+            if(id === 12) {
+                player.collapses = new Decimal(4);
+            }
         },
 
         isCompleted(id) {
@@ -524,7 +558,7 @@ const fn = {
         },
 
         complete(id) {
-            if(player.challenges.indexOf(id) === -1) {
+            if(player.challenges.indexOf(id) === -1 && player.inChallenge !== null) {
                 player.challenges.push(id);
             }
         },
@@ -570,10 +604,16 @@ const fn = {
         player.infinityPower = player.infinityPower.plus(fn.infinityPower.gain().div(delta));
 
         // Update statistics (replace somewhere else???)
+        player.statistics.timeInCurrentPrestige += 1000 / delta;
         player.statistics.timeInCurrentInfinity += 1000 / delta;
         player.statistics.bestPoints = Decimal.max(fn.points.amount(), player.statistics.bestPoints);
 
         player.challenge5mult = Decimal.min(player.challenge5mult.plus((1000 / delta) / 60000), 1);
+
+        let chal12TimeLeft = 60000 - player.statistics.timeInCurrentInfinity;
+        if(player.inChallenge === 12 && chal12TimeLeft <= 0) {
+            fn.challenges.exit();
+        }
 
         fn.autobuyers.tick(delta);
     }
@@ -719,9 +759,11 @@ const methods = {
             player.infinityGenerators[i].purchased = new Decimal(data.infinityGenerators?.[i]?.purchased ?? 0);
         }
         player.infinityPower = new Decimal(data.infinityPower ?? 0);
+        player.infinityBroken = data.infinityBroken ?? false;
 
         // load statistics
-        player.statistics.timeInCurrentInfinity = parseFloat(data.statistics?.timeInCurrentInfinity) ?? 0;
+        player.statistics.timeInCurrentPrestige = parseFloat(data.statistics?.timeInCurrentPrestige ?? 0) ?? 0;
+        player.statistics.timeInCurrentInfinity = parseFloat(data.statistics?.timeInCurrentInfinity ?? 0) ?? 0;
 
         // load autobuyers
         if('autobuyers' in data) {
@@ -803,6 +845,7 @@ const methods = {
                 key: key,
                 value: {
                     timeInCurrentInfinity: player.statistics.timeInCurrentInfinity,
+                    timeInCurrentPrestige: player.statistics.timeInCurrentPrestige,
                     infinities: player.infinities,
                     bestPoints: player.statistics.bestPoints
                 }
@@ -845,7 +888,8 @@ const methods = {
                     current: player.inChallenge,
                     completions: [...player.challenges],
                     challenge5mult: player.challenge5mult,
-                    bonus: fn.challenges.bonus()
+                    bonus: fn.challenges.bonus(),
+                    chal12TimeLeft: 60000 - player.statistics.timeInCurrentInfinity
                 }
             }
         }

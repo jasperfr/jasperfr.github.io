@@ -132,7 +132,13 @@ button.btn-gain-infinity {
     width: 200pt !important;
 }
 
-button.btn-gain-infinity:not(.cant) {
+button.btn-break-infinity {
+    margin: 0 0 10pt 0;
+    padding: 20pt;
+    width: 200pt !important;
+}
+
+button.btn-gain-infinity:not(.cant), button.btn-break-infinity {
     background-color: var(--bg-color);
     box-shadow: 0 0 8px var(--infinity-color) inset;
     color: var(--text-color);

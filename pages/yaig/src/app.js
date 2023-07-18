@@ -199,6 +199,8 @@ function main() {
                 $('.prestige-bonus-next').text(F(gain));
                 $('.prestige-bonus-gain-add').text(F(gain.minus(amount)));
                 $('.prestige-bonus-gain-mult').text(F(gain.div(amount)));
+                $('.challenge-11-prestige-gain').text('+^' + F(gain.minus(amount)));
+                $('.challenge-11-prestige-gain').css('color', `hsl(${gain.minus(amount).times(10000).toNumber()} 100% 50%)`);
                 toggleButton('.btn-prestige', !value.canAfford);
 
                 if((value.challenge === 6 && amount.gte(3)) || (value.challenge !== 6 && amount.gte(2.5))) {
@@ -250,6 +252,7 @@ function main() {
 
         'statistics': {
             refresh(value) {
+                $('.stat-time-in-prestige').text(new Date(value.timeInCurrentPrestige).toISOString().slice(11, 23));
                 $('.stat-time-in-infinity').text(new Date(value.timeInCurrentInfinity).toISOString().slice(11, 23));
                 $('.stat-infinities').text(F(value.infinities, 0, 3));
             }
@@ -313,18 +316,25 @@ function main() {
                 $('.btn-collapse .challenge-10-text').toggle(value.current === 10);
                 $('.btn-collapse .default-text').toggle(value.current !== 10);
 
+                $('.challenge-11-label').toggle(value.current === 11);
+                $('.challenge-12-label').toggle(value.current === 12);
+                $('.challenge-12-time-left').text(new Date(value.chal12TimeLeft).toISOString().slice(17, 23));
+                $('.challenge-12-color').css('color', `hsl(${(value.chal12TimeLeft / 400)} 100% 50%)`);
+                
+                $('.btn-break-infinity').toggle(value.completions.indexOf(12) !== -1);
+
                 // lock autobuyers
                 // js templating would be too complex to add this in.
                 toggleButton('.btn-ab-c', value.completions.indexOf(10) === -1);
                 $('.btn-ab-c').text(value.completions.indexOf(10) === -1 ? 'Locked' : 'Unlock');
                 $('input.chk-ab-max-c').hide();
                 $('input.chk-ab-max-c + span').hide();
-                toggleButton('.btn-ab-p', value.completions.indexOf('p') === -1);
-                $('.btn-ab-p').text(value.completions.indexOf('p') === -1 ? 'Locked' : 'Unlock');
+                toggleButton('.btn-ab-p', value.completions.indexOf(11) === -1);
+                $('.btn-ab-p').text(value.completions.indexOf(11) === -1 ? 'Locked' : 'Unlock');
                 $('input.chk-ab-max-p').hide();
                 $('input.chk-ab-max-p + span').hide();
-                toggleButton('.btn-ab-i', value.completions.indexOf('i') === -1);
-                $('.btn-ab-i').text(value.completions.indexOf('i') === -1 ? 'Locked' : 'Unlock');
+                toggleButton('.btn-ab-i', value.completions.indexOf(12) === -1);
+                $('.btn-ab-i').text(value.completions.indexOf(12) === -1 ? 'Locked' : 'Unlock');
                 $('input.chk-ab-max-i').hide();
                 $('input.chk-ab-max-i + span').hide();
             }
@@ -383,5 +393,11 @@ document.addEventListener('keydown', (e) => {
         case 'c': case 'C':
             call('buyCollapse', []);
             break;
+        case 'p': case 'P':
+            call('buyPrestige', []);
+            break;
+        case 'i': case 'I':
+            call('doInfinity', []);
+            break;
     }
-})
+});

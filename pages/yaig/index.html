@@ -78,6 +78,9 @@
                 <span class="challenge-5-label"><br>Challenge 5 multiplier: x<span class="challenge-5-multiplier">0.000</span> (<span class="challenge-5-timer">0</span>/60)</span>
                 <span class="challenge-6-label"><br>Challenge 6: You can only buy <b>10</b> of each Generator.<br>Your max presitge has also been raised to ^3.</span>
                 <span class="challenge-9-label"><br>Challenge 9: The boost effect is square rooted.</span>
+                <span class="challenge-11-label"><br>Challenge 11: Your maximum prestige gain this prestige is <span class="challenge-11-prestige-gain">+^0.016</span>.<br>Your current time in this Prestige is <span class="stat-time-in-prestige">0:00:00.000</span>.<br></span>
+                <span class="challenge-12-label"><br><br>FINAL CHALLENGE! You have <span class="challenge-12-time-left challenge-12-color">0.000</span> seconds remaining.<br>All generators and prestige have been unlocked!<br><span class="challenge-12-color">Warning: If the timer reaches 0, you will exit the challenge.</span><br></span>
+            </span>
             </p>
 
             <table class="generators">
@@ -133,9 +136,12 @@
 
         <div class="tab tab-infinity" hidden>
             <h3 class="infinity">Infinity</h3>
+
+            <button class="btn-break-infinity">BREAK INFINITY<br>(Not implemented yet)</button>
+
             <p>You have <span class="infinity-points infinity">0</span> Infinity points.</p>
             <p>
-                You have <span class="infinity-power infinity">0</span> Infinity Power, which gives a post-generator multiplier of <span class="infinity-power-effect infinity">x1.000</span>. ( log<sub>10</sub>(power) )<br>
+                You have <span class="infinity-power infinity">0</span> Infinity Power, which gives a post-generator multiplier of <span class="infinity-power-effect infinity">x1.000</span>. ( sqrt(power) )<br>
                 You have <span class="infinity-infinities infinity">0</span><sub>/256</sub> Infinities, which nerf the Infinity Generator speed to x<span class="infinity-nerf">1.000</span>.<br>
                 The Infinity Power effect is applied to <b>all</b> point generators after the power effect from your Prestige bonus.
             </p>
@@ -246,22 +252,22 @@
                     <td class="challenge challenge-10">
                         <p>
                             You can't prestige. Collapses are more powerful and you can collapse multiple times.<br><br>
-                            <button onclick="call('startChallenge', 10)">Unimplemented</button><br><br>
+                            <button onclick="call('startChallenge', 10)">Start</button><br><br>
                             Reward: Autobuyer for collapsing. Collapsing will not reset your dimensions.
                         </p>
                     </td>
                     <td class="challenge challenge-11">
                         <p>
-                            The last bought generator is raised to ^0.005.<br><br><br><br>
-                            <button>Unimplemented</button><br><br>
+                            You can only prestige up to +^0.016 per prestige. Each 10 seconds it decreases by -^0.001.<br><br>
+                            <button onclick="call('startChallenge', 11)">Start</button><br><br>
                             Reward: Autobuyer for prestige. Prestige will reset nothing.
                         </p>
                     </td>
                     <td class="challenge challenge-12">
                         <p>
-                            The Infinity Layer's generators are disabled. You need to Infinity in under 60 seconds.<br><br>
-                            <button>Unimplemented</button><br><br>
-                            Reward: Infinity autobuyer. You will be able to Break Infinity.
+                            Infinity generators are disabled. Prestige/collapse unlock instantly. You have 60 seconds.<br><br>
+                            <button onclick="call('startChallenge', 12)">Start</button><br><br>
+                            Reward: Infinity autobuyer <strike>and the power to break Infinity.</strike>
                         </p>
                     </td>
                 </tr>
@@ -293,6 +299,7 @@
             <h3>Statistics</h3>
 
             <p>
+                Your current time in this Prestige is <span class="stat-time-in-prestige">0:00:00.000</span>.<br>
                 Your current time in this Infinity is <span class="stat-time-in-infinity">0:00:00.000</span>.<br>
                 You have Infinitied <span class="stat-infinities">0</span> times.<br>
             </p>
